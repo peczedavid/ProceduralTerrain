@@ -1,5 +1,6 @@
-workspace "OpenGL-Engine"
+workspace "OpenGLWorkspace"
     architecture "x64"
+    startproject "OpenGL-Engine"
 
     configurations
     {
@@ -10,7 +11,7 @@ workspace "OpenGL-Engine"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 project "OpenGL-Engine"
-    location "Engine"
+    location "OpenGL-Engine"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
@@ -19,11 +20,21 @@ project "OpenGL-Engine"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+    files
+    {
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.cpp"
+    }
+
     defines
     {
         "_CRT_SECURE_NO_WARNINGS"
     }
 
+    includedirs
+    {
+		"%{prj.name}/src"
+    }
 
     filter "system:windows"
         systemversion "latest"
