@@ -1,4 +1,5 @@
 #include "Core/Window.h"
+#include "Core/Application.h"
 
 void error_callback(int error, const char* description)
 {
@@ -9,6 +10,18 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+	{
+		static bool cursor = true;
+		cursor = !cursor;
+		glfwSetInputMode(window, GLFW_CURSOR, cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+	}
+
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+	{
+		// Renderer -> Wireframe toggle
+	}
 }
 
 Window::Window(const WindowProps& props)
