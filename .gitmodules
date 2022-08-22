@@ -1,3 +1,6 @@
 [submodule "OpenGL-Engine/vendor/GLFW"]
 	path = OpenGL-Engine/vendor/GLFW
 	url = https://github.com/peczedavid/glfw.git
+[submodule "OpenGL-Engine/vendor/glm"]
+	path = OpenGL-Engine/vendor/glm
+	url = https://github.com/peczedavid/glm.git
