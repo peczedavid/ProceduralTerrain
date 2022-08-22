@@ -1,0 +1,5 @@
+- glad/GLFW		- for OpenGL 
+- stb_image		- for texture loading
+- ImGui			- for UI
+- glm			- for linear algebra
+- spdlog		- for logging

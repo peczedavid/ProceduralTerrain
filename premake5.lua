@@ -10,6 +10,15 @@ workspace "OpenGLWorkspace"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder (solution directory)
+IncludeDir = {} -- Lua table
+IncludeDir["Glad"] = "OpenGL-Engine/vendor/Glad/include"
+
+group "Dependencies"
+    -- Include projects with the premake5.lua file in it
+    include "OpenGL-Engine/vendor/Glad"
+group ""
+
 project "OpenGL-Engine"
     location "OpenGL-Engine"
     kind "ConsoleApp"
@@ -33,7 +42,13 @@ project "OpenGL-Engine"
 
     includedirs
     {
-		"%{prj.name}/src"
+		"%{prj.name}/src",
+        "%{IncludeDir.Glad}"
+    }
+
+    links
+    {
+        "Glad",
     }
 
     filter "system:windows"
