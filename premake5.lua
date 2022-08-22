@@ -13,10 +13,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {} -- Lua table
 IncludeDir["Glad"] = "OpenGL-Engine/vendor/Glad/include"
+IncludeDir["GLFW"] = "OpenGL-Engine/vendor/GLFW/include"
 
 group "Dependencies"
     -- Include projects with the premake5.lua file in it
     include "OpenGL-Engine/vendor/Glad"
+    include "OpenGL-Engine/vendor/GLFW"
 group ""
 
 project "OpenGL-Engine"
@@ -43,12 +45,15 @@ project "OpenGL-Engine"
     includedirs
     {
 		"%{prj.name}/src",
+        "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}"
     }
 
     links
     {
+        "GLFW",
         "Glad",
+        "opengl32.lib"
     }
 
     filter "system:windows"
