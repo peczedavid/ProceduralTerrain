@@ -1296,6 +1296,7 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
+    <ClInclude Include="src\Rendering\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Application.cpp">
@@ -1319,5 +1320,6 @@
     <ClCompile Include="src\Sandbox\SandboxApp.cpp">
       <Filter>src\Sandbox</Filter>
     </ClCompile>
+    <ClCompile Include="src\Rendering\Shader.cpp" />
   </ItemGroup>
 </Project>
