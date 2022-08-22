@@ -23,7 +23,7 @@ Window::Window(const WindowProps& props)
 	if (!m_Window)
 		printf("Window or OpenGL context creation failed!");
 
-	m_VSync = true;
+	m_VSync = false;
 
 	glfwMakeContextCurrent(m_Window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
