@@ -75,6 +75,11 @@ void GameLayer::OnUpdate(float dt)
 
 void GameLayer::OnImGuiRender()
 {
+	ImGui::Begin("Info");
+	ImGui::Text("Camera position:");
+	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
+	ImGui::End();
+	
 	static bool show = true;
 	ImGui::ShowDemoWindow(&show);
 }

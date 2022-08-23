@@ -4,7 +4,8 @@
 class Sandbox : public Application
 {
 public:
-	Sandbox()
+	Sandbox(const WindowProps& props)
+		: Application(props)
 	{
 		this->PushLayer(new GameLayer());
 	}
@@ -17,5 +18,11 @@ public:
 
 Application* CreateApplication()
 {
-	return new Sandbox();
+	WindowProps windowProps;
+	windowProps.Width = 1280;
+	windowProps.Height = 720;
+	windowProps.Title = "OpenGL Engine";
+	windowProps.Maximized = true;
+
+	return new Sandbox(windowProps);
 }

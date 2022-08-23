@@ -3,10 +3,10 @@
 
 Application* Application::s_Instance = nullptr;
 
-Application::Application()
+Application::Application(const WindowProps& props)
 	: m_Cursor(false)
 {
-	m_Window = new Window();
+	m_Window = new Window(props);
 	s_Instance = this;
 
 	Renderer::SetOpenGLConfig();
