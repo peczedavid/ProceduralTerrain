@@ -6,6 +6,7 @@
 GameLayer::GameLayer()
 {
 	m_Shader = new Shader("src/Rendering/Shaders/default.vert", "src/Rendering/Shaders/default.frag");
+	m_Camera = new Camera(glm::vec3(0, 0, 2));
 
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);
@@ -57,20 +58,16 @@ void GameLayer::OnUpdate(float dt)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_Shader->Use();
-	m_UvTexture->Bind();
+
+	m_Camera->UpdateMatrix(45.0f, 0.1f, 100.0f);
+	if(!Application::Get().IsCursor())
+		m_Camera->Update(dt);
+	m_Shader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 
 	static float rot = 0.0f;
 	rot += 0.65f * dt;
 	glm::mat4 model = glm::rotate(glm::mat4(1.0f), rot, glm::vec3(0.0f, 1.0f, 0.0f));
-	static float z = -2.0f;
-	z -= 0.075f * dt;
-	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, z));
-	float asp = Application::Get().GetWindow()->GetWidth() / (float)Application::Get().GetWindow()->GetHeight();
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), asp, 0.1f, 100.0f);
-
 	m_Shader->SetUniform("u_Model", model);
-	m_Shader->SetUniform("u_View", view);
-	m_Shader->SetUniform("u_Proj", proj);
-
+	m_UvTexture->Bind();
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }

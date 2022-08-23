@@ -21,9 +21,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
-		static bool cursor = true;
-		cursor = !cursor;
-		glfwSetInputMode(window, GLFW_CURSOR, cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+		Application::Get().SetCursor(!Application::Get().IsCursor());
+		glfwSetInputMode(window, GLFW_CURSOR, Application::Get().IsCursor() ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 	}
 
 	if (key == GLFW_KEY_F && action == GLFW_PRESS)
@@ -52,6 +51,8 @@ Window::Window(const WindowProps& props)
 	glfwSetErrorCallback(error_callback);
 	glfwSetKeyCallback(m_Window, key_callback);
 	glfwSetWindowSizeCallback(m_Window, window_size_callback);
+
+	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 Window::~Window()
