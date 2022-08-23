@@ -1,11 +1,15 @@
 #include "Core/Application.h"
+#include "Rendering/Renderer.h"
 
 Application* Application::s_Instance = nullptr;
 
 Application::Application()
+	: m_Cursor(false)
 {
 	m_Window = new Window();
 	s_Instance = this;
+
+	Renderer::SetOpenGLConfig();
 }
 
 Application::~Application()

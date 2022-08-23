@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glad/glad.h>
-
 #include <string>
 #include <iostream>
 #include <glm/vec3.hpp>
