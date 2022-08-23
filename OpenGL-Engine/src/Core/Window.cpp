@@ -42,6 +42,10 @@ Window::Window(const WindowProps& props)
 	m_Window = glfwCreateWindow(props.Width, props.Height, props.Title.c_str(), NULL, NULL);
 	if (!m_Window)
 		printf("Window or OpenGL context creation failed!");
+	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	const int x = (mode->width - props.Width) / 2;
+	const int y = (mode->height - props.Height) / 2;
+	glfwSetWindowPos(m_Window, x, y);
 
 	m_VSync = false;
 

@@ -2,6 +2,7 @@
 #include "Core/Application.h"
 #include <glad/glad.h>
 #include <glm/gtx/transform.hpp>
+#include <imgui.h>
 
 GameLayer::GameLayer()
 {
@@ -70,4 +71,10 @@ void GameLayer::OnUpdate(float dt)
 	m_Shader->SetUniform("u_Model", model);
 	m_UvTexture->Bind();
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+}
+
+void GameLayer::OnImGuiRender()
+{
+	static bool show = true;
+	ImGui::ShowDemoWindow(&show);
 }

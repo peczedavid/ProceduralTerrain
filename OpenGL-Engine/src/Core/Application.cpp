@@ -10,10 +10,16 @@ Application::Application()
 	s_Instance = this;
 
 	Renderer::SetOpenGLConfig();
+	
+	m_LayerStack = new LayerStack();
+
+	m_ImGuiLayer = new ImGuiLayer();
+	this->PushOverlay(m_ImGuiLayer);
 }
 
 Application::~Application()
 {
+	delete m_LayerStack;
 	delete m_Window;
 }
 
@@ -27,8 +33,13 @@ void Application::Run()
 		lastFrameTime = time;
 
 		// Update the layers from bottom to top
-		for (Layer* layer : m_LayerStack)
+		for (Layer* layer : *m_LayerStack)
 			layer->OnUpdate(dt);
+
+		m_ImGuiLayer->Begin();
+		for (Layer* layer : *m_LayerStack)
+			layer->OnImGuiRender();
+		m_ImGuiLayer->End();
 
 		m_Window->OnUpdate();
 	}
@@ -36,12 +47,12 @@ void Application::Run()
 
 void Application::PushLayer(Layer* layer)
 {
-	m_LayerStack.PushLayer(layer);
+	m_LayerStack->PushLayer(layer);
 	layer->OnAttach();
 }
 
 void Application::PushOverlay(Layer* overlay)
 {
-	m_LayerStack.PushOverlay(overlay);
+	m_LayerStack->PushOverlay(overlay);
 	overlay->OnAttach();
 }
