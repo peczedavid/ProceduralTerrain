@@ -7,6 +7,13 @@ void error_callback(int error, const char* description)
 	fprintf(stderr, "Error: %s\n", description);
 }
 
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+	Application::Get().GetWindow()->SetWidth(width);
+	Application::Get().GetWindow()->SetHeight(height);
+}
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -44,6 +51,7 @@ Window::Window(const WindowProps& props)
 
 	glfwSetErrorCallback(error_callback);
 	glfwSetKeyCallback(m_Window, key_callback);
+	glfwSetWindowSizeCallback(m_Window, window_size_callback);
 }
 
 Window::~Window()

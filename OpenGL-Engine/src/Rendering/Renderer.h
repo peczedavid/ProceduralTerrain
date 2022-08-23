@@ -10,4 +10,9 @@ namespace Renderer
 		wireframe = !wireframe;
 		glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 	}
+
+	static void SetOpenGLConfig()
+	{
+		glEnable(GL_DEPTH_TEST);
+	}
 };

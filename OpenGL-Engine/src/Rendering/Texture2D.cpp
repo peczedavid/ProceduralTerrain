@@ -1,7 +1,7 @@
 #include "Texture2D.h"
 #include <stb_image.h>
 
-Texture2D::Texture2D(const char* path, uint32_t filter, uint32_t wrap, uint32_t format, uint32_t pixelType)
+Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum format, GLenum pixelType)
 	: m_Format(format)
 {
 	int width, height, colorCh;

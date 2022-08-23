@@ -14,7 +14,7 @@ public:
 	void PushOverlay(Layer* overlay);
 
 	static inline Application& Get() { return *s_Instance; }
-	inline Window GetWindow() { return *m_Window; }
+	inline Window* GetWindow() { return m_Window; }
 
 private:
 	Window* m_Window;

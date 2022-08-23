@@ -28,12 +28,6 @@ public:
 
 	virtual void OnUpdate();
 
-	inline uint32_t GetWidth() const { return m_Width; }
-	inline uint32_t GetHeight() const { return m_Height; }
-
-	inline void SetVSync(bool enabled) { m_VSync = enabled; }
-	inline bool IsVSync() const { return m_VSync; }
-
 	inline bool ShouldClose() { return glfwWindowShouldClose(m_Window); }
 
 	virtual GLFWwindow* GetNativeWindow() const { return m_Window; }
@@ -41,4 +35,15 @@ private:
 	uint32_t m_Height, m_Width;
 	GLFWwindow* m_Window;
 	bool m_VSync;
+
+public:
+	inline uint32_t GetWidth() { return m_Width; }
+	inline const uint32_t GetWidth() const { return m_Width; }
+	inline uint32_t GetHeight() { return m_Height; }
+	inline const uint32_t GetHeight() const { return m_Height; }
+	inline void SetHeight(uint32_t height) { m_Height = height; }
+	inline void SetWidth(uint32_t width) { m_Width = width; }
+
+	inline void SetVSync(bool enabled) { m_VSync = enabled; }
+	inline bool IsVSync() const { return m_VSync; }
 };
