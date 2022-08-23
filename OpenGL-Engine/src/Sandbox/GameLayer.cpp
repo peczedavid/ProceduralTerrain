@@ -98,6 +98,13 @@ void GameLayer::OnImGuiRender()
 	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
 	ImGui::End();
 	
+	ImGui::Begin("Height map");
+	ImGui::Button("Generate");
+	ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
+	ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
+	ImGui::Image((ImTextureID)m_UvTexture->GetId(), ImVec2(350.0f, 350.0f), uv_min, uv_max);
+	ImGui::End();
+
 	static bool show = true;
 	ImGui::ShowDemoWindow(&show);
 }
