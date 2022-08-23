@@ -1,6 +1,6 @@
 #include "Sandbox/GameLayer.h"
 #include <glad/glad.h>
-#include <stb_image.h>
+#include "Rendering/Texture2D.h"
 
 GameLayer::GameLayer()
 {
@@ -33,26 +33,8 @@ GameLayer::GameLayer()
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-	int width, height, colorCh;
-	stbi_set_flip_vertically_on_load(1);
-	unsigned char* bytes = stbi_load("assets/Textures/uv-texture.png", &width, &height, &colorCh, 0);
-
-	uint32_t textureId;
-	glGenTextures(1, &textureId);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
-	glGenerateMipmap(textureId);
-	stbi_image_free(bytes);
-
-	uint32_t textureUnit = glGetUniformLocation(m_Shader->GetProgramId(), "u_Texture");
-	glUniform1i(textureUnit, 0);
+	Texture2D* uvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_UNSIGNED_BYTE);
+	uvTexture->TexUnit(m_Shader, "u_Texture", 0);
 }
 
 void GameLayer::OnUpdate(float dt)
