@@ -15,6 +15,7 @@ IncludeDir = {} -- Lua table
 IncludeDir["Glad"] = "OpenGL-Engine/vendor/Glad/include"
 IncludeDir["GLFW"] = "OpenGL-Engine/vendor/GLFW/include"
 IncludeDir["glm"] = "OpenGL-Engine/vendor/glm"
+IncludeDir["stb_image"] = "OpenGL-Engine/vendor/stb_image"
 
 group "Dependencies"
     -- Include projects with the premake5.lua file in it
@@ -37,7 +38,9 @@ project "OpenGL-Engine"
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl"
+        "%{prj.name}/vendor/glm/glm/**.inl",
+        "%{prj.name}/vendor/stb_image/**.h",
+        "%{prj.name}/vendor/stb_image/**.cpp"
     }
 
     defines
@@ -50,7 +53,8 @@ project "OpenGL-Engine"
 		"%{prj.name}/src",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.stb_image}"
     }
 
     links

@@ -1,5 +1,6 @@
 #include "Core/Window.h"
 #include "Core/Application.h"
+#include "Rendering/Renderer.h"
 
 void error_callback(int error, const char* description)
 {
@@ -20,7 +21,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 	if (key == GLFW_KEY_F && action == GLFW_PRESS)
 	{
-		// Renderer -> Wireframe toggle
+		Renderer::TogglePolygonMode();
 	}
 }
 
