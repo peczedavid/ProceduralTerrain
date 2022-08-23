@@ -10,6 +10,7 @@ Application::Application()
 
 Application::~Application()
 {
+	delete m_Window;
 }
 
 void Application::Run()
