@@ -4,7 +4,7 @@
 class Texture2D
 {
 public:
-	Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum format, GLenum pixelType);
+	Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum internalFormat, GLenum format, GLenum pixelType);
 	~Texture2D();
 
 	void TexUnit(Shader* shader, const char* uniform, uint32_t slot);

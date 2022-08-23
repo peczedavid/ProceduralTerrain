@@ -1,7 +1,7 @@
 #include "Texture2D.h"
 #include <stb_image.h>
 
-Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum format, GLenum pixelType)
+Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum internalFormat, GLenum format, GLenum pixelType)
 	: m_Format(format)
 {
 	int width, height, colorCh;
@@ -20,7 +20,7 @@ Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum format
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_Width, m_Height, 0, format, pixelType, bytes);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_Width, m_Height, 0, format, pixelType, bytes);
 	glGenerateMipmap(m_Id);
 	stbi_image_free(bytes);
 }

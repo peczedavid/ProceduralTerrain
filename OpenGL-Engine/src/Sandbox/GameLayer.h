@@ -3,6 +3,7 @@
 #include "Rendering/Shader.h"
 #include "Rendering/Texture2D.h"
 #include "Rendering/Camera.h"
+#include "Rendering/Skybox.h"
 
 class GameLayer : public Layer
 {
@@ -16,4 +17,5 @@ private:
 	Shader* m_Shader;
 	Texture2D* m_UvTexture;
 	Camera* m_Camera;
+	Skybox* m_Skybox;
 };

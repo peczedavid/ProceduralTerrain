@@ -7,7 +7,10 @@
 GameLayer::GameLayer()
 {
 	m_Shader = new Shader("src/Rendering/Shaders/default.vert", "src/Rendering/Shaders/default.frag");
-	m_Camera = new Camera(glm::vec3(0, 0, 2));
+	m_Camera = new Camera(glm::vec3(0, 2, 5), glm::vec3(0, -0.35f, -1.0f));
+
+	Shader* skyboxShader = new Shader("src/Rendering/Shaders/skybox.vert", "src/Rendering/Shaders/skybox.frag");
+	m_Skybox = new Skybox(skyboxShader);
 
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);
@@ -49,7 +52,11 @@ GameLayer::GameLayer()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
-	m_UvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_UNSIGNED_BYTE);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	m_UvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_UvTexture->TexUnit(m_Shader, "u_Texture", 0);
 }
 
@@ -58,26 +65,37 @@ void GameLayer::OnUpdate(float dt)
 	glClearColor(0.2f, 0.1f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_Shader->Use();
+	float asp = (float)Application::Get().GetWindow()->GetWidth() / (float)Application::Get().GetWindow()->GetHeight();
+	float fov = 45.0f, nearPlane = 0.1f, farPlane = 100.0f;
 
-	m_Camera->UpdateMatrix(45.0f, 0.1f, 100.0f);
+	m_Camera->UpdateMatrix(fov, asp, nearPlane, farPlane);
 	if(!Application::Get().IsCursor())
 		m_Camera->Update(dt);
+
+	m_Shader->Use();
 	m_Shader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 
+	glBindVertexArray(m_Vao);
+	static float t = 0.0f; t += dt;
+	static float scale = 1.0f;
+	scale = sinf(t * 2.0f) * 0.4f + 1.0f;
+	glm::mat4 model = glm::scale(glm::vec3(scale, scale, scale));
 	static float rot = 0.0f;
 	rot += 0.65f * dt;
-	glm::mat4 model = glm::rotate(glm::mat4(1.0f), rot, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, rot, glm::vec3(0.0f, 1.0f, 0.0f));
 	m_Shader->SetUniform("u_Model", model);
 	m_UvTexture->Bind();
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+	m_Skybox->Render(m_Camera);
+
 }
 
 void GameLayer::OnImGuiRender()
 {
 	ImGui::Begin("Info");
-	ImGui::Text("Camera position:");
 	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
+	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
 	ImGui::End();
 	
 	static bool show = true;
