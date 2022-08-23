@@ -1,38 +1,9 @@
 #include "Sandbox/GameLayer.h"
 #include <glad/glad.h>
 
-const char* vertexSource = R"(
-#version 330
-precision highp float;
-
-layout(location = 0) in vec2 a_Position;
-
-out vec2 v_Position;
-
-void main()
-{
-	gl_Position = vec4(a_Position, 0, 1);
-	v_Position = a_Position;
-}
-)";
-
-const char* fragmentSource = R"(
-#version 330
-
-out vec4 outColor;
-
-in vec2 v_Position;
-
-void main()
-{
-	outColor = vec4(v_Position * 0.5 + 0.5, 0, 1);
-}
-)";
-
-
 GameLayer::GameLayer()
 {
-	m_Shader = new Shader(vertexSource, fragmentSource);
+	m_Shader = new Shader("src/Rendering/Shaders/default.vert", "src/Rendering/Shaders/default.frag");
 
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);

@@ -1,7 +1,29 @@
 #include "Rendering/Shader.h"
+#include<fstream>
 
-Shader::Shader(const char* vertexSrc, const char* fragmentSrc)
+std::string ReadFile(const char* fileName) {
+	std::ifstream in(fileName, std::ios::binary);
+	if (in)
+	{
+		std::string contents;
+		in.seekg(0, std::ios::end);
+		contents.resize(in.tellg());
+		in.seekg(0, std::ios::beg);
+		in.read(&contents[0], contents.size());
+		in.close();
+		return(contents);
+	}
+	throw(errno);
+}
+
+Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* outputName)
 {
+	std::string vertexStr = ReadFile(vertexPath);
+	std::string fragmentStr = ReadFile(fragmentPath);
+
+	const char* vertexSrc = vertexStr.c_str();
+	const char* fragmentSrc = fragmentStr.c_str();
+
 	uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSrc, NULL);
 	glCompileShader(vertexShader);
@@ -14,10 +36,17 @@ Shader::Shader(const char* vertexSrc, const char* fragmentSrc)
 	glAttachShader(m_ProgramId, vertexShader);
 	glAttachShader(m_ProgramId, fragmentShader);
 	glLinkProgram(m_ProgramId);
+	glBindFragDataLocation(m_ProgramId, 0, outputName);
 	glUseProgram(m_ProgramId);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+}
+
+Shader::~Shader()
+{
+	if (m_ProgramId > 0)
+		glDeleteProgram(m_ProgramId);
 }
 
 void Shader::Use() const
