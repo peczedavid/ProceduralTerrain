@@ -14,6 +14,8 @@ public:
 	void OnUpdate(float dt) override;
 	void OnImGuiRender() override;
 private:
+	void GenerateHeightMap();
+private:
 	uint32_t m_Vao, m_Vbo, m_Ebo;
 	Shader* m_Shader;
 	//ComputeShader* m_ComputeShader;
