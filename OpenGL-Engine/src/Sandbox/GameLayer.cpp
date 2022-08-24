@@ -111,6 +111,8 @@ void GameLayer::OnUpdate(float dt)
 void GameLayer::GenerateHeightMap()
 {
 #pragma warning( push )
+#pragma warning( disable: 6385 )
+#pragma warning( disable: 6386 )
 	uint32_t* pixels = new uint32_t[m_HeightMap->GetWidth() * m_HeightMap->GetHeight()];
 	for (uint32_t y = 0; y < m_HeightMap->GetHeight(); y++)
 	{
