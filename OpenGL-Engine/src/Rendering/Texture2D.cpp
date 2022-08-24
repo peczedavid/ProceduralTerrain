@@ -49,13 +49,6 @@ void Texture2D::LoadData(unsigned char* bytes, GLenum internalFormat, GLenum for
 	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, format, GL_UNSIGNED_BYTE, bytes);
 }
 
-void Texture2D::LoadData(uint32_t* pixels, GLenum internalFormat)
-{
-	m_InternalFormat = internalFormat;
-	glBindTexture(GL_TEXTURE_2D, m_Id);
-	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, pixels);
-}
-
 void Texture2D::TexUnit(Shader* shader, const char* uniform, uint32_t slot)
 {
 	uint32_t textureUnit = glGetUniformLocation(shader->GetProgramId(), uniform);

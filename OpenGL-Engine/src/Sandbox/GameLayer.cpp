@@ -19,6 +19,11 @@ int octaves = 4;
 GameLayer::GameLayer()
 {
 	m_Shader = new Shader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
+	m_TessellationShader = new TessellationShader(
+		"src/Rendering/Shaders/glsl/default.vert",
+		"src/Rendering/Shaders/glsl/terrain.tesc",
+		"src/Rendering/Shaders/glsl/terrain.tese",
+		"src/Rendering/Shaders/glsl/default.frag");
 
 	m_HeightMap = new Texture2D(512, 512, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
@@ -28,12 +33,13 @@ GameLayer::GameLayer()
 	Shader* skyboxShader = new Shader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
 
-	glGenVertexArrays(1, &m_Vao);
-	glGenBuffers(1, &m_Vbo);
-	glGenBuffers(1, &m_Ebo);
+	// ----------- CUBE GENEREATION START -----------
+	glGenVertexArrays(1, &m_VaoCube);
+	glGenBuffers(1, &m_VboCube);
+	glGenBuffers(1, &m_EboCube);
 
-	glBindVertexArray(m_Vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+	glBindVertexArray(m_VaoCube);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VboCube);
 
 	float s = 0.5f;
 	float vertices[24 * 5] = {
@@ -52,7 +58,7 @@ GameLayer::GameLayer()
 	};
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EboCube);
 	uint32_t indices[36] = {
 		0,   1,  2,    0,  2,  3,
 		4,   5,  6,    4,  6,  7,
@@ -71,6 +77,38 @@ GameLayer::GameLayer()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	// ----------- CUBE GENEREATION END -----------
+
+	// ----------- PLANE GENEREATION START -----------
+	glGenVertexArrays(1, &m_VaoSquare);
+	glGenBuffers(1, &m_VboSquare);
+	glGenBuffers(1, &m_EboSquare);
+
+	glBindVertexArray(m_VaoSquare);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VboSquare);
+
+	const float a = 0.5f;
+	float verticesSquare[4 * 5] = {
+		-a,  0,  a,  0, 0,    a,  0,  a, 1, 0,
+		 a,  0, -a,  1, 1,   -a,  0, -a, 0, 1
+	};
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesSquare), &verticesSquare[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EboSquare);
+	uint32_t indicesSquare[6] = {
+		0, 1, 2,  0, 2, 3
+	};
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesSquare), &indicesSquare[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	// ----------- PLANE GENEREATION END -----------
 
 	m_UvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_UvTexture->TexUnit(m_Shader, "u_Texture", 0);
@@ -93,16 +131,23 @@ void GameLayer::OnUpdate(float dt)
 	m_Shader->Use();
 	m_Shader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 
-	glBindVertexArray(m_Vao);
+	glBindVertexArray(m_VaoCube);
 	static float scale = 1.0f;
 	scale = sinf(t * 2.0f) * 0.4f + 1.0f;
-	glm::mat4 model = glm::scale(glm::vec3(scale, scale, scale));
+	glm::mat4 model = glm::scale(glm::vec3(scale, scale, scale) / 3.f);
 	static float rot = 0.0f;
 	rot += 0.65f * dt;
 	model = glm::rotate(model, rot, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(0, 2, 0));
 	m_Shader->SetUniform("u_Model", model);
 	m_UvTexture->Bind();
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+	glBindVertexArray(m_VaoSquare);
+	model = glm::scale(glm::vec3(2, 1, 2));
+	m_Shader->SetUniform("u_Model", model);
+	m_HeightMap->Bind();
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	m_Skybox->Render(m_Camera);
 
@@ -110,24 +155,26 @@ void GameLayer::OnUpdate(float dt)
 
 void GameLayer::GenerateHeightMap()
 {
-#pragma warning( push )
-#pragma warning( disable: 6385 )
-#pragma warning( disable: 6386 )
-	uint32_t* pixels = new uint32_t[m_HeightMap->GetWidth() * m_HeightMap->GetHeight()];
+#pragma warning ( push )
+#pragma warning ( disable: 6386)
+	unsigned char* bytes = new unsigned char[m_HeightMap->GetWidth() * m_HeightMap->GetHeight() * 4];
 	for (uint32_t y = 0; y < m_HeightMap->GetHeight(); y++)
 	{
 		for (uint32_t x = 0; x < m_HeightMap->GetWidth(); x++)
 		{
 			uint32_t i = y * m_HeightMap->GetWidth() + x;
 			const double noise = perlin.octave2D_01(x * frequency, y * frequency, octaves);
-			// ABGR
-			pixels[i] = 0xff000000;
-			pixels[i] |= 0x00ffffff * (uint32_t)(std::clamp(noise, 0.01, 0.99) * 255);
+			const uint32_t height = (uint32_t)(std::clamp(noise, 0.01, 0.99) * 255);
+
+			bytes[4 * i + 0] = height;
+			bytes[4 * i + 1] = height;
+			bytes[4 * i + 2] = height;
+			bytes[4 * i + 3] = 255;
 		}
 	}
-	m_HeightMap->LoadData(pixels, GL_RGBA);
-	delete[] pixels;
-#pragma warning( pop )
+	m_HeightMap->LoadData(bytes, GL_RGBA, GL_RGBA);
+	delete[] bytes;
+#pragma warning (pop)
 }
 
 void GameLayer::OnImGuiRender()

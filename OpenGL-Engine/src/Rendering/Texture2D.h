@@ -9,7 +9,6 @@ public:
 	~Texture2D();
 
 	void LoadData(unsigned char* bytes, GLenum internalFormat, GLenum format);
-	void LoadData(uint32_t* pixels, GLenum internalFormat);
 
 	void TexUnit(Shader* shader, const char* uniform, uint32_t slot);
 	void Bind();
