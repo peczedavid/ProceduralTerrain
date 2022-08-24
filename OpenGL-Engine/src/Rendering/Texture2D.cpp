@@ -2,7 +2,7 @@
 #include <stb_image.h>
 
 Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum internalFormat, GLenum format, GLenum pixelType)
-	: m_Format(format), m_InternalFormat(internalFormat)
+	: m_InternalFormat(internalFormat)
 {
 	int width, height, colorCh;
 	stbi_set_flip_vertically_on_load(1);
@@ -20,7 +20,7 @@ Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum intern
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_Format, pixelType, bytes);
+	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, format, pixelType, bytes);
 	glGenerateMipmap(m_Id);
 	stbi_image_free(bytes);
 }
@@ -40,6 +40,20 @@ Texture2D::Texture2D(uint32_t width, uint32_t height, GLenum filter, GLenum wrap
 
 Texture2D::~Texture2D()
 {
+}
+
+void Texture2D::LoadData(unsigned char* bytes, GLenum internalFormat, GLenum format)
+{
+	m_InternalFormat = internalFormat;
+	glBindTexture(GL_TEXTURE_2D, m_Id);
+	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, format, GL_UNSIGNED_BYTE, bytes);
+}
+
+void Texture2D::LoadData(uint32_t* pixels, GLenum internalFormat)
+{
+	m_InternalFormat = internalFormat;
+	glBindTexture(GL_TEXTURE_2D, m_Id);
+	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, pixels);
 }
 
 void Texture2D::TexUnit(Shader* shader, const char* uniform, uint32_t slot)

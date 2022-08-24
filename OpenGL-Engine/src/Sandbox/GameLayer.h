@@ -16,8 +16,8 @@ public:
 private:
 	uint32_t m_Vao, m_Vbo, m_Ebo;
 	Shader* m_Shader;
-	ComputeShader* m_ComputeShader;
-	Texture2D* m_UvTexture;
+	//ComputeShader* m_ComputeShader;
+	Texture2D* m_UvTexture, *m_HeightMap;
 	Camera* m_Camera;
 	Skybox* m_Skybox;
 };

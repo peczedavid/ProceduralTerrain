@@ -8,13 +8,16 @@ public:
 	Texture2D(uint32_t width, uint32_t height, GLenum filter, GLenum wrap, GLenum internalFormat);
 	~Texture2D();
 
+	void LoadData(unsigned char* bytes, GLenum internalFormat, GLenum format);
+	void LoadData(uint32_t* pixels, GLenum internalFormat);
+
 	void TexUnit(Shader* shader, const char* uniform, uint32_t slot);
 	void Bind();
 
 private:
 	uint32_t m_Id;
 	uint32_t m_Width, m_Height, m_ColorChannels;
-	uint32_t m_Format, m_InternalFormat;
+	uint32_t m_InternalFormat;
 
 public:
 	inline uint32_t GetId() { return m_Id; }

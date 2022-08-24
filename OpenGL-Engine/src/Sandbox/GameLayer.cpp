@@ -3,13 +3,19 @@
 #include <glad/glad.h>
 #include <glm/gtx/transform.hpp>
 #include <imgui.h>
+#include <PerlinNoise.hpp>
+#include <iostream>
+
+const siv::PerlinNoise::seed_type seed = 123456u;
+const siv::PerlinNoise perlin{ seed };
 
 GameLayer::GameLayer()
 {
 	m_Shader = new Shader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
 
-	m_ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/noise.comp");
-	m_ComputeShader->Dispatch();
+	//m_ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/noise.comp");
+	//m_ComputeShader->Dispatch();
+	m_HeightMap = new Texture2D(512, 512, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 
 	m_Camera = new Camera(glm::vec3(0, 2, 5), glm::vec3(0, -0.35f, -1.0f));
 
@@ -105,13 +111,40 @@ void GameLayer::OnImGuiRender()
 	ImGui::Begin("Height map");
 	if (ImGui::Button("Generate"))
 	{
-		m_ComputeShader->Dispatch();
+		/*for (int y = 0; y < 5; ++y)
+		{
+			for (int x = 0; x < 5; ++x)
+			{
+				const double noise = perlin.octave2D_01((x * 0.01), (y * 0.01), 4);
+
+				std::cout << noise << '\t';
+			}
+
+			std::cout << '\n';
+		}*/
+		//m_ComputeShader->Dispatch();
+#pragma warning( disable : 6386 )
+		uint32_t* pixels = new uint32_t[m_HeightMap->GetWidth() * m_HeightMap->GetHeight()];
+		for (uint32_t y = 0; y < m_HeightMap->GetHeight(); y++)
+		{
+			for (uint32_t x = 0; x < m_HeightMap->GetWidth(); x++)
+			{
+				uint32_t i = y * m_HeightMap->GetWidth() + x;
+				const double noise = perlin.octave2D_01((x * 0.01), (y * 0.01), 4);
+				// ABGR
+				pixels[i] = 0xff0000ff * (uint32_t)(noise * 255);
+			}
+		}
+		m_HeightMap->LoadData(pixels, GL_RGBA);
+		delete[] pixels;
+#pragma warning( pop )
 	}
 	ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
 	ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
 	float my_tex_w = 350.0f;
 	float my_tex_h = 350.0f;
-	ImGui::Image((ImTextureID)m_ComputeShader->GetTexture()->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+	//ImGui::Image((ImTextureID)m_ComputeShader->GetTexture()->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+	ImGui::Image((ImTextureID)m_HeightMap->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
 	ImGui::End();
 
 	static bool show = true;
