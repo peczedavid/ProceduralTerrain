@@ -32,6 +32,8 @@ public:
 
 	inline bool ShouldClose() { return glfwWindowShouldClose(m_Window); }
 
+	inline void SetCursor(bool cursor) const { glfwSetInputMode(m_Window, GLFW_CURSOR, cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN); }
+
 	virtual GLFWwindow* GetNativeWindow() const { return m_Window; }
 private:
 	uint32_t m_Height, m_Width;

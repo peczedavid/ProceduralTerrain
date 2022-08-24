@@ -4,9 +4,10 @@
 Application* Application::s_Instance = nullptr;
 
 Application::Application(const WindowProps& props)
-	: m_Cursor(false)
+	: m_Cursor(true)
 {
 	m_Window = new Window(props);
+	m_Window->SetCursor(m_Cursor);
 	s_Instance = this;
 
 	Renderer::SetOpenGLConfig();

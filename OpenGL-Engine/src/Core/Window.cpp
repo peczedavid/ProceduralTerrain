@@ -38,7 +38,7 @@ Window::Window(const WindowProps& props)
 		printf("Initialization failed!");
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	if(props.Maximized)
 		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 

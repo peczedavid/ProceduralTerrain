@@ -6,10 +6,14 @@
 
 GameLayer::GameLayer()
 {
-	m_Shader = new Shader("src/Rendering/Shaders/default.vert", "src/Rendering/Shaders/default.frag");
+	m_Shader = new Shader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
+
+	m_ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/noise.comp");
+	m_ComputeShader->Dispatch();
+
 	m_Camera = new Camera(glm::vec3(0, 2, 5), glm::vec3(0, -0.35f, -1.0f));
 
-	Shader* skyboxShader = new Shader("src/Rendering/Shaders/skybox.vert", "src/Rendering/Shaders/skybox.frag");
+	Shader* skyboxShader = new Shader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
 
 	glGenVertexArrays(1, &m_Vao);
@@ -23,16 +27,16 @@ GameLayer::GameLayer()
 	float vertices[24 * 5] = {
 		// FAR FACE
 		 s, -s, -s, 0, 0,   -s, -s, -s, 1, 0,   -s,  s, -s, 1, 1,    s,  s, -s, 0, 1,
-		// CLOSE FACE															
-		-s, -s,  s, 0, 0,    s, -s,  s, 1, 0,    s,  s,  s, 1, 1,   -s,  s,  s, 0, 1,
-		// RIGHT FACE															
-		 s, -s,  s, 0, 0,    s, -s, -s, 1, 0,    s,  s, -s, 1, 1,    s,  s,  s, 0, 1,
-		// LEFT FACE															
-		-s, -s, -s, 0, 0,   -s, -s,  s, 1, 0,   -s,  s,  s, 1, 1,   -s,  s, -s, 0, 1,
-		// UP FACE																
-		-s,  s,  s, 0, 0,    s,  s,  s, 1, 0,    s,  s, -s, 1, 1,   -s,  s, -s, 0, 1,
-		// DOWN FACE															
-		-s, -s, -s, 0, 0,    s, -s, -s, 1, 0,    s, -s,  s, 1, 1,   -s, -s,  s, 0, 1,
+		 // CLOSE FACE															
+		 -s, -s,  s, 0, 0,    s, -s,  s, 1, 0,    s,  s,  s, 1, 1,   -s,  s,  s, 0, 1,
+		 // RIGHT FACE															
+		  s, -s,  s, 0, 0,    s, -s, -s, 1, 0,    s,  s, -s, 1, 1,    s,  s,  s, 0, 1,
+		  // LEFT FACE															
+		  -s, -s, -s, 0, 0,   -s, -s,  s, 1, 0,   -s,  s,  s, 1, 1,   -s,  s, -s, 0, 1,
+		  // UP FACE																
+		  -s,  s,  s, 0, 0,    s,  s,  s, 1, 0,    s,  s, -s, 1, 1,   -s,  s, -s, 0, 1,
+		  // DOWN FACE															
+		  -s, -s, -s, 0, 0,    s, -s, -s, 1, 0,    s, -s,  s, 1, 1,   -s, -s,  s, 0, 1,
 	};
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
 
@@ -69,7 +73,7 @@ void GameLayer::OnUpdate(float dt)
 	float fov = 45.0f, nearPlane = 0.1f, farPlane = 100.0f;
 
 	m_Camera->UpdateMatrix(fov, asp, nearPlane, farPlane);
-	if(!Application::Get().IsCursor())
+	if (!Application::Get().IsCursor())
 		m_Camera->Update(dt);
 
 	m_Shader->Use();
@@ -97,12 +101,17 @@ void GameLayer::OnImGuiRender()
 	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
 	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
 	ImGui::End();
-	
+
 	ImGui::Begin("Height map");
-	ImGui::Button("Generate");
+	if (ImGui::Button("Generate"))
+	{
+		m_ComputeShader->Dispatch();
+	}
 	ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
 	ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
-	ImGui::Image((ImTextureID)m_UvTexture->GetId(), ImVec2(350.0f, 350.0f), uv_min, uv_max);
+	float my_tex_w = 350.0f;
+	float my_tex_h = 350.0f;
+	ImGui::Image((ImTextureID)m_ComputeShader->GetTexture()->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
 	ImGui::End();
 
 	static bool show = true;

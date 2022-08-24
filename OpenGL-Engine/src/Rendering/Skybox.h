@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "Rendering/Shader.h"
+#include "Rendering/Shaders/Shader.h"
 #include "Rendering/Camera.h"
 
 class Skybox
