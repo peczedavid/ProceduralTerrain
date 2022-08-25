@@ -1,11 +1,12 @@
 #pragma once
 #include "Core/Window.h"
 #include "Core/Layers/LayerStack.h"
+#include "Rendering/ImGui/ImGuiLayer.h"
 
 class Application
 {
 public:
-	Application();
+	Application(const WindowProps& props = WindowProps());
 	virtual ~Application();
 
 	void Run();
@@ -15,10 +16,12 @@ public:
 	static inline Application& Get() { return *s_Instance; }
 	inline Window* GetWindow() { return m_Window; }
 private:
+	LayerStack* m_LayerStack;
 	Window* m_Window;
 	bool m_Cursor;
+	ImGuiLayer* m_ImGuiLayer;
+
 	static Application* s_Instance;
-	LayerStack m_LayerStack;
 public:
 	inline bool IsCursor() { return m_Cursor; }
 	inline const bool IsCursor() const { return m_Cursor; }

@@ -1,18 +1,29 @@
 #pragma once
 #include "Core/Layers/Layer.h"
-#include "Rendering/Shader.h"
+#include "Rendering/Shaders/Shader.h"
 #include "Rendering/Texture2D.h"
 #include "Rendering/Camera.h"
+#include "Rendering/Skybox.h"
+#include "Rendering/Shaders/TessellationShader.h"
 
 class GameLayer : public Layer
 {
 public:
 	GameLayer();
 
-	void OnUpdate(float dt);
+	void OnUpdate(float dt) override;
+	void OnImGuiRender() override;
 private:
-	uint32_t m_Vao, m_Vbo, m_Ebo;
+	void GenerateHeightMap();
+private:
+	uint32_t m_VaoCube, m_VboCube, m_EboCube;
+	uint32_t m_VaoSquare, m_VboSquare, m_EboSquare;
+	int m_TessLevel = 10;
+	float m_MaxHeight = 2.0f;
+
 	Shader* m_Shader;
-	Texture2D* m_UvTexture;
+	TessellationShader* m_TessellationShader;
+	Texture2D* m_UvTexture, *m_HeightMap;
 	Camera* m_Camera;
+	Skybox* m_Skybox;
 };

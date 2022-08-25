@@ -1,7 +1,7 @@
-#include "Rendering/Shader.h"
+#include "Rendering/Shaders/Shader.h"
 #include<fstream>
 
-std::string ReadFile(const char* fileName) {
+std::string ReadSource(const char* fileName) {
 	std::ifstream in(fileName, std::ios::binary);
 	if (in)
 	{
@@ -18,8 +18,8 @@ std::string ReadFile(const char* fileName) {
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* outputName)
 {
-	std::string vertexStr = ReadFile(vertexPath);
-	std::string fragmentStr = ReadFile(fragmentPath);
+	std::string vertexStr = ReadSource(vertexPath);
+	std::string fragmentStr = ReadSource(fragmentPath);
 
 	const char* vertexSrc = vertexStr.c_str();
 	const char* fragmentSrc = fragmentStr.c_str();

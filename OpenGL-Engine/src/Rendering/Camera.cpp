@@ -5,13 +5,12 @@
 #include <GLFW/glfw3.h>
 #include <Core/Application.h>
 
-Camera::Camera(glm::vec3 position)
-	: m_Position(position),
-	m_Orientation({ 0.0f, 0.0f, -1.0f }), m_Up({ 0.0f, 1.0f, 0.0f })
+Camera::Camera(const glm::vec3& position, const glm::vec3& orientation)
+	: m_Position(position), m_Orientation(glm::normalize(orientation)), m_Up({ 0.0f, 1.0f, 0.0f })
 {
 }
 
-void Camera::UpdateMatrix(float fovDeg, float nearPlane, float farPlane)
+void Camera::UpdateMatrix(float fovDeg, float asp, float nearPlane, float farPlane)
 {
 	m_Proj = glm::mat4(1.0f);
 	m_View = glm::mat4(1.0f);
@@ -19,7 +18,7 @@ void Camera::UpdateMatrix(float fovDeg, float nearPlane, float farPlane)
 	m_View = glm::lookAt(m_Position, m_Position + m_Orientation, m_Up);
 	m_Proj = glm::perspective(
 		glm::radians(fovDeg),
-		(float)Application::Get().GetWindow()->GetWidth() / (float)Application::Get().GetWindow()->GetHeight(),
+		asp,
 		nearPlane,
 		farPlane
 	);
@@ -85,10 +84,11 @@ void Camera::Update(float dt)
 	m_Speed = m_BaseSpeed * m_SpeedMultiplier;
 
 	// Make static bool here
-	if (m_FirstLook)
+	static bool firstLook = true;
+	if (firstLook)
 	{
 		glfwSetCursorPos(glfwWindow, (width / 2), (height / 2));
-		m_FirstLook = false;
+		firstLook = false;
 	}
 
 	double mouseX, mouseY;

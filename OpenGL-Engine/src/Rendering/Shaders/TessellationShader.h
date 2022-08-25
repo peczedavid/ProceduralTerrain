@@ -2,17 +2,18 @@
 
 #include <glad/glad.h>
 #include <string>
-#include <iostream>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-class Shader
+class TessellationShader
 {
 public:
 
-    Shader(const char* vertexPath, const char* fragmentPath, const char* outputName = "outColor");
-    ~Shader();
+    TessellationShader(const char* vertexPath,
+        const char* tessControlPath, const char* tessEvalPath,
+        const char* fragmentPath, const char* outputName = "outColor");
+    ~TessellationShader();
 
     void Use() const;
 
@@ -21,6 +22,7 @@ public:
 
     void SetUniform(const std::string& name, int value) const;
     void SetUniform(const std::string& name, float value) const;
+    void SetUniform(const std::string& name, uint32_t value) const;
 
     void SetUniform(const std::string& name, const glm::vec3& value) const;
     void SetUniform(const std::string& name, const glm::vec4& value) const;

@@ -38,10 +38,21 @@ Window::Window(const WindowProps& props)
 		printf("Initialization failed!");
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	if(props.Maximized)
+		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
 	m_Window = glfwCreateWindow(props.Width, props.Height, props.Title.c_str(), NULL, NULL);
 	if (!m_Window)
 		printf("Window or OpenGL context creation failed!");
+
+	if (!props.Maximized)
+	{
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		const int x = (mode->width - props.Width) / 2;
+		const int y = (mode->height - props.Height) / 2;
+		glfwSetWindowPos(m_Window, x, y);
+	}
 
 	m_VSync = false;
 
