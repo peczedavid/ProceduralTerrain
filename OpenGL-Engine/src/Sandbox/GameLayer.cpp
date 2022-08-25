@@ -7,7 +7,9 @@
 #include <iostream>
 #include <random>
 
-const uint32_t heighMapSize = 2048u;
+constexpr uint32_t heighMapSize = 2048u;
+constexpr uint32_t planeSize = 250u;
+constexpr uint32_t planeDivision = 25u;
 
 std::random_device rd; // obtain a random number from hardware
 std::mt19937 gen(rd()); // seed the generator
@@ -30,7 +32,7 @@ GameLayer::GameLayer()
 	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
 
-	m_Plane = new Plane(100, 25);
+	m_Plane = new Plane(planeSize, planeDivision);
 
 	m_Camera = new Camera(glm::vec3(0, 10, 10), glm::vec3(0, -0.45f, -1.0f));
 
@@ -125,7 +127,7 @@ void GameLayer::OnUpdate(float dt)
 	//m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
 	//m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-50, 0, -50));
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)planeSize/2.0f, 0, -(float)planeSize / 2.0f));
 	m_TessellationShader->SetUniform("u_Model", model);
 	m_TessellationShader->SetUniform("u_CameraPosition", m_Camera->GetPosition());
 	m_Plane->Render();

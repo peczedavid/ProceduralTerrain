@@ -20,7 +20,7 @@ private:
 	uint32_t m_VaoCube, m_VboCube, m_EboCube;
 	Plane* m_Plane;
 	int m_TessLevel = 1;
-	float m_MaxHeight = 5.0f;
+	float m_MaxHeight = 10.0f;
 
 	Shader* m_Shader;
 	TessellationShader* m_TessellationShader;
