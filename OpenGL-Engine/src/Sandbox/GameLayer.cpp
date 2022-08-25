@@ -7,13 +7,15 @@
 #include <iostream>
 #include <random>
 
+const uint32_t heighMapSize = 2048u;
+
 std::random_device rd; // obtain a random number from hardware
 std::mt19937 gen(rd()); // seed the generator
 std::uniform_int_distribution<> distr(10e3, 10e4); // define the range
 siv::PerlinNoise::seed_type seed = distr(gen);
 siv::PerlinNoise perlin{ seed };
 
-float frequency = 0.01f;
+float frequency = 0.005f;
 int octaves = 4;
 
 GameLayer::GameLayer()
@@ -25,10 +27,10 @@ GameLayer::GameLayer()
 		"src/Rendering/Shaders/glsl/terrain.tese",
 		"src/Rendering/Shaders/glsl/terrain.frag");
 
-	m_HeightMap = new Texture2D(512, 512, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
+	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
 
-	m_Camera = new Camera(glm::vec3(0, 10, 10), glm::vec3(0, -1.0f, -1.0f));
+	m_Camera = new Camera(glm::vec3(0, 6, 11), glm::vec3(0, -0.45f, -1.0f));
 
 	Shader* skyboxShader = new Shader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
@@ -95,8 +97,8 @@ GameLayer::GameLayer()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesSquare), &verticesSquare[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EboSquare);
-	uint32_t indicesSquare[6] = {
-		0, 1, 2,  0, 2, 3
+	uint32_t indicesSquare[4] = {
+		0, 1, 2, 3
 	};
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesSquare), &indicesSquare[0], GL_STATIC_DRAW);
 
@@ -113,7 +115,7 @@ GameLayer::GameLayer()
 	m_UvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_UvTexture->TexUnit(m_Shader, "u_Texture", 0);
 
-	glPatchParameteri(GL_PATCH_VERTICES, 3);
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -137,13 +139,13 @@ void GameLayer::OnUpdate(float dt)
 
 	m_UvTexture->Bind();
 	glBindVertexArray(m_VaoCube);
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 1, -2));
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 3, -6));
 	static float rot = 0.0f;
 	rot += 0.65f * dt;
 	model = glm::rotate(model, rot, glm::vec3(0.0f, 1.0f, 0.0f));
 	static float scale = 1.0f;
 	scale = sinf(t * 2.0f) * 0.4f + 1.0f;
-	model = glm::scale(model, glm::vec3(scale, scale, scale) / 2.f);
+	model = glm::scale(model, glm::vec3(scale, scale, scale));
 	m_Shader->SetUniform("u_Model", model);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
@@ -152,9 +154,10 @@ void GameLayer::OnUpdate(float dt)
 	glBindVertexArray(m_VaoSquare);
 	model = glm::scale(glm::mat4(1.0f), glm::vec3(10, 1, 10));
 	m_TessellationShader->SetUniform("u_Model", model);
-	m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevelInner);
-	m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevelOuter);
-	glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, 0);
+	m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
+	m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
+	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
+	glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_INT, 0);
 
 	m_Skybox->Render(m_Camera);
 }
@@ -199,7 +202,7 @@ void GameLayer::OnImGuiRender()
 		perlin.reseed(seed);
 		GenerateHeightMap();
 	}
-	if (ImGui::SliderFloat("Frequency", &frequency, 0.001, 0.1)) GenerateHeightMap();
+	if (ImGui::SliderFloat("Frequency", &frequency, 0.001, 0.02)) GenerateHeightMap();
 	if (ImGui::SliderInt("Octaves", &octaves, 1, 8)) GenerateHeightMap();
 	ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
 	ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
@@ -209,8 +212,8 @@ void GameLayer::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Tessellation");
-	ImGui::SliderInt("TessLevelInner", &m_TessLevelInner, 1, 50);
-	ImGui::SliderInt("TessLevelOuter", &m_TessLevelOuter, 1, 50);
+	ImGui::SliderInt("TessLevel", &m_TessLevel, 1, 64);
+	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.5f, 5.0f);
 	ImGui::End();
 
 	static bool show = true;

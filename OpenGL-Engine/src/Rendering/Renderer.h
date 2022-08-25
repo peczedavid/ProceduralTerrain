@@ -4,7 +4,7 @@
 // Might become a namespace
 namespace Renderer
 {
-	static bool wireframe = true;
+	static bool wireframe = false;
 
 	static void TogglePolygonMode()
 	{
