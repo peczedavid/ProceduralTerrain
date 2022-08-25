@@ -22,7 +22,7 @@ Application* CreateApplication()
 	windowProps.Width = 1280;
 	windowProps.Height = 720;
 	windowProps.Title = "OpenGL Engine";
-	windowProps.Maximized = false;
+	windowProps.Maximized = true;
 
 	return new Sandbox(windowProps);
 }

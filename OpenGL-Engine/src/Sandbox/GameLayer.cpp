@@ -30,7 +30,7 @@ GameLayer::GameLayer()
 	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
 
-	m_Plane = new Plane(5, 5);
+	m_Plane = new Plane(100, 100);
 
 	m_Camera = new Camera(glm::vec3(0, 6, 11), glm::vec3(0, -0.45f, -1.0f));
 
@@ -97,7 +97,7 @@ void GameLayer::OnUpdate(float dt)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	float asp = (float)Application::Get().GetWindow()->GetWidth() / (float)Application::Get().GetWindow()->GetHeight();
-	float fov = 45.0f, nearPlane = 0.1f, farPlane = 100.0f;
+	float fov = 45.0f, nearPlane = 0.1f, farPlane = 500.0f;
 
 	m_Camera->UpdateMatrix(fov, asp, nearPlane, farPlane);
 	if (!Application::Get().IsCursor())
@@ -118,14 +118,14 @@ void GameLayer::OnUpdate(float dt)
 	scale = sinf(t * 2.0f) * 0.4f + 1.0f;
 	model = glm::scale(model, glm::vec3(scale, scale, scale));
 	m_Shader->SetUniform("u_Model", model);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 	m_TessellationShader->Use();
 	m_HeightMap->Bind();
 	m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
 	m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
-	model = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-50, 0, -50));
 	m_TessellationShader->SetUniform("u_Model", model);
 	m_Plane->Render();
 

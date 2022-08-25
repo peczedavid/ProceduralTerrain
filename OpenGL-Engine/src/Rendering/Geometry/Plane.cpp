@@ -1,6 +1,6 @@
 #include "Rendering/Geometry/Plane.h"
 
-Plane::Plane(uint32_t width, uint32_t _div)
+Plane::Plane(uint32_t width, uint32_t div)
 {
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);
@@ -9,41 +9,7 @@ Plane::Plane(uint32_t width, uint32_t _div)
 	glBindVertexArray(m_Vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 
-	//  6---7---8
-	//  |   |   |
-	//  3---4---5
-	//  |   |   |
-	//  0---1---2
-
-	constexpr float w = 2.0f;
-	constexpr int div = 2;
-	float verticesSquare[(2 + 1) * (2 + 1) * (3 + 2)] = {
-		/*0*/ (float)0 / (float)div * w, 0, (float)0 / (float)div * w, (float)0 / div, (float)0 / div,
-		/*1*/ (float)1 / (float)div * w, 0, (float)0 / (float)div * w, (float)1 / div, (float)0 / div,
-		/*2*/ (float)2 / (float)div * w, 0, (float)0 / (float)div * w, (float)2 / div, (float)0 / div,
-
-		/*3*/ (float)0 / (float)div * w, 0, (float)1 / (float)div * w, (float)0 / div, (float)1 / div,
-		/*4*/ (float)1 / (float)div * w, 0, (float)1 / (float)div * w, (float)1 / div, (float)1 / div,
-		/*5*/ (float)2 / (float)div * w, 0, (float)1 / (float)div * w, (float)2 / div, (float)1 / div,
-
-		/*6*/ (float)0 / (float)div * w, 0, (float)2 / (float)div * w, (float)0 / div, (float)2 / div,
-		/*7*/ (float)1 / (float)div * w, 0, (float)2 / (float)div * w, (float)1 / div, (float)2 / div,
-		/*8*/ (float)2 / (float)div * w, 0, (float)2 / (float)div * w, (float)2 / div, (float)2 / div,
-	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesSquare), &verticesSquare[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
-	uint32_t indicesSquare[div * div * 4] = {
-		// 0 * 3 + 0
-		0, 0 + 1, 0 + div + 1 + 1, 0 + div + 1,
-		// 0 * 3 + 1
-		1, 1 + 1, 1 + div + 1 + 1, 1 + div + 1,
-		// 1 * 3 + 0
-		3, 3 + 1, 3 + div + 1 + 1, 3 + div + 1,
-		// 1 * 3 + 1
-		4, 4 + 1, 4 + div + 1 + 1, 4 + div + 1
-	};
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesSquare), &indicesSquare[0], GL_STATIC_DRAW);
+	this->GenerateMesh(width, div);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
@@ -61,10 +27,46 @@ Plane::~Plane()
 
 void Plane::GenerateMesh(uint32_t width, uint32_t div)
 {
+	//  6---7---8
+	//  |   |   |
+	//  3---4---5
+	//  |   |   |
+	//  0---1---2
+
+	m_Vertices.clear();
+	for (uint32_t y = 0; y <= div; y++)
+	{
+		for (uint32_t x = 0; x <= div; x++)
+		{
+			m_Vertices.push_back((float)x / (float)div * width);
+			m_Vertices.push_back(0);
+			m_Vertices.push_back((float)y / (float)div * width);
+			m_Vertices.push_back((float)x / div);
+			m_Vertices.push_back(1.0f - ((float)y / div));
+		}
+	}
+
+	glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), &m_Vertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
+	m_Indices.clear();
+	for (uint32_t y = 0; y < div; y++)
+	{
+		for (uint32_t x = 0; x < div; x++)
+		{
+			uint32_t i = y * (div + 1) + x;
+			m_Indices.push_back(i);
+			m_Indices.push_back(i + 1);
+			m_Indices.push_back(i + div + 1 + 1);
+			m_Indices.push_back(i + div + 1);
+		}
+	}
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(uint32_t), &m_Indices[0], GL_STATIC_DRAW);
 }
 
 void Plane::Render()
 {
 	glBindVertexArray(m_Vao);
-	glDrawElements(GL_PATCHES, 16, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_PATCHES, m_Indices.size(), GL_UNSIGNED_INT, 0);
 }

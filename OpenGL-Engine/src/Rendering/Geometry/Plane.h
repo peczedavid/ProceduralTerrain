@@ -7,10 +7,10 @@
 class Plane
 {
 public:
-	Plane(uint32_t width, uint32_t div);
+	Plane(uint32_t width, const uint32_t div);
 	~Plane();
 
-	void GenerateMesh(uint32_t width, uint32_t div);
+	void GenerateMesh(uint32_t width, const uint32_t div);
 	void Render();
 private:
 	uint32_t m_Vao, m_Vbo, m_Ebo;
