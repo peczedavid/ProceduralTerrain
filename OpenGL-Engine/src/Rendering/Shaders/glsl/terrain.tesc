@@ -41,10 +41,10 @@ void main()
    else if(tess > 1 && tess < 5) maskColors[gl_InvocationID] = vec4(1, 1, 0, 1);
    else maskColors[gl_InvocationID] = vec4(1, 0, 0, 1);
 
-   gl_TessLevelOuter[0] = 5;//tess;
-   gl_TessLevelOuter[1] = 5;//tess;
-   gl_TessLevelOuter[2] = 5;//tess;
-   gl_TessLevelOuter[3] = 5;//tess;
+   gl_TessLevelOuter[0] = 1;//tess;
+   gl_TessLevelOuter[1] = 1;//tess;
+   gl_TessLevelOuter[2] = 1;//tess;
+   gl_TessLevelOuter[3] = 1;//tess;
    gl_TessLevelInner[0] = tess;
    gl_TessLevelInner[1] = tess;
 }
