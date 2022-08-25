@@ -5,6 +5,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/Skybox.h"
 #include "Rendering/Shaders/TessellationShader.h"
+#include "Rendering/Geometry/Plane.h"
 
 class GameLayer : public Layer
 {
@@ -17,9 +18,9 @@ private:
 	void GenerateHeightMap();
 private:
 	uint32_t m_VaoCube, m_VboCube, m_EboCube;
-	uint32_t m_VaoSquare, m_VboSquare, m_EboSquare;
-	int m_TessLevel = 10;
-	float m_MaxHeight = 2.0f;
+	Plane* m_Plane;
+	int m_TessLevel = 1;
+	float m_MaxHeight = 1.0f;
 
 	Shader* m_Shader;
 	TessellationShader* m_TessellationShader;

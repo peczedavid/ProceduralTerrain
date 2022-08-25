@@ -15,7 +15,7 @@ std::uniform_int_distribution<> distr(10e3, 10e4); // define the range
 siv::PerlinNoise::seed_type seed = distr(gen);
 siv::PerlinNoise perlin{ seed };
 
-float frequency = 0.005f;
+float frequency = 0.003f;
 int octaves = 4;
 
 GameLayer::GameLayer()
@@ -29,6 +29,8 @@ GameLayer::GameLayer()
 
 	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
+
+	m_Plane = new Plane(5, 5);
 
 	m_Camera = new Camera(glm::vec3(0, 6, 11), glm::vec3(0, -0.45f, -1.0f));
 
@@ -81,37 +83,6 @@ GameLayer::GameLayer()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	// ----------- CUBE GENEREATION END -----------
 
-	// ----------- PLANE GENEREATION START -----------
-	glGenVertexArrays(1, &m_VaoSquare);
-	glGenBuffers(1, &m_VboSquare);
-	glGenBuffers(1, &m_EboSquare);
-
-	glBindVertexArray(m_VaoSquare);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VboSquare);
-
-	const float a = 0.5f;
-	float verticesSquare[4 * 5] = {
-		-a,  0,  a,  0, 0,    a,  0,  a, 1, 0,
-		 a,  0, -a,  1, 1,   -a,  0, -a, 0, 1
-	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesSquare), &verticesSquare[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EboSquare);
-	uint32_t indicesSquare[4] = {
-		0, 1, 2, 3
-	};
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesSquare), &indicesSquare[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	// ----------- PLANE GENEREATION END -----------
-
 	m_UvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_UvTexture->TexUnit(m_Shader, "u_Texture", 0);
 
@@ -151,13 +122,12 @@ void GameLayer::OnUpdate(float dt)
 
 	m_TessellationShader->Use();
 	m_HeightMap->Bind();
-	glBindVertexArray(m_VaoSquare);
-	model = glm::scale(glm::mat4(1.0f), glm::vec3(10, 1, 10));
-	m_TessellationShader->SetUniform("u_Model", model);
 	m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
 	m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
-	glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_INT, 0);
+	model = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+	m_TessellationShader->SetUniform("u_Model", model);
+	m_Plane->Render();
 
 	m_Skybox->Render(m_Camera);
 }
