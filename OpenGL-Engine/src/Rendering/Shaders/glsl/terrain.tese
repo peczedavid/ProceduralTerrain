@@ -4,7 +4,9 @@ precision highp float;
 layout (quads, equal_spacing , ccw) in;
 
 in vec2 uvsCoord[];
+in vec4 maskColors[];
 out vec2 v_TexCoords;
+out vec4 maskColor;
 
 uniform mat4 u_Model;
 uniform mat4 u_ViewProj;
@@ -39,4 +41,5 @@ void main()
 
     gl_Position = u_ViewProj * u_Model * pos;
     v_TexCoords = texCoord;
+    maskColor = 0.25 * maskColors[0] + 0.25 * maskColors[1] + 0.25 * maskColors[2] + 0.25 * maskColors[3];
 }

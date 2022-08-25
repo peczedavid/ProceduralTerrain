@@ -30,9 +30,9 @@ GameLayer::GameLayer()
 	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
 
-	m_Plane = new Plane(100, 100);
+	m_Plane = new Plane(100, 25);
 
-	m_Camera = new Camera(glm::vec3(0, 6, 11), glm::vec3(0, -0.45f, -1.0f));
+	m_Camera = new Camera(glm::vec3(0, 10, 10), glm::vec3(0, -0.45f, -1.0f));
 
 	Shader* skyboxShader = new Shader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
@@ -122,11 +122,12 @@ void GameLayer::OnUpdate(float dt)
 
 	m_TessellationShader->Use();
 	m_HeightMap->Bind();
-	m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
-	m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
+	//m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
+	//m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-50, 0, -50));
 	m_TessellationShader->SetUniform("u_Model", model);
+	m_TessellationShader->SetUniform("u_CameraPosition", m_Camera->GetPosition());
 	m_Plane->Render();
 
 	m_Skybox->Render(m_Camera);
@@ -183,7 +184,7 @@ void GameLayer::OnImGuiRender()
 
 	ImGui::Begin("Tessellation");
 	ImGui::SliderInt("TessLevel", &m_TessLevel, 1, 64);
-	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.5f, 5.0f);
+	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.5f, 15.0f);
 	ImGui::End();
 
 	static bool show = true;

@@ -67,7 +67,7 @@ void Camera::Update(float dt)
 
 	if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
-		m_SpeedMultiplier = 3.f;
+		m_SpeedMultiplier = 5.f;
 	}
 
 	if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
