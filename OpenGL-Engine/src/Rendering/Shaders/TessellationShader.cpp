@@ -79,10 +79,35 @@ TessellationShader::TessellationShader(const char* vertexPath,
 
 	m_ProgramId = glCreateProgram();
 	glAttachShader(m_ProgramId, vertexShader);
+	glAttachShader(m_ProgramId, fragmentShader);
 	glAttachShader(m_ProgramId, tessControlShader);
 	glAttachShader(m_ProgramId, tessEvalShader);
-	glAttachShader(m_ProgramId, fragmentShader);
 	glLinkProgram(m_ProgramId);
+	GLint isLinked = 0;
+	glGetProgramiv(m_ProgramId, GL_LINK_STATUS, (int*)&isLinked);
+	if (isLinked == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetProgramiv(m_ProgramId, GL_INFO_LOG_LENGTH, &maxLength);
+
+		// The maxLength includes the NULL character
+		std::vector<GLchar> infoLog(maxLength);
+		glGetProgramInfoLog(m_ProgramId, maxLength, &maxLength, &infoLog[0]);
+
+		// We don't need the program anymore.
+		glDeleteProgram(m_ProgramId);
+		// Don't leak shaders either.
+		glDeleteShader(vertexShader);
+		glDeleteShader(tessControlShader);
+		glDeleteShader(tessEvalShader);
+		glDeleteShader(fragmentShader);
+
+		// Use the infoLog as you see fit.
+			for (uint32_t i = 0; i < maxLength; i++)
+				printf("%c", infoLog[i]);
+		// In this simple program, we'll just leave
+		return;
+	}
 	glBindFragDataLocation(m_ProgramId, 0, outputName);
 	glUseProgram(m_ProgramId);
 
@@ -117,6 +142,15 @@ void TessellationShader::SetUniform(const std::string& name, float value) const
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
 	if (location >= 0)
 		glUniform1f(location, value);
+	else
+		printf("Uniform %s not found in shader!", name.c_str());
+}
+
+void TessellationShader::SetUniform(const std::string& name, uint32_t value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform1i(location, value);
 	else
 		printf("Uniform %s not found in shader!", name.c_str());
 }

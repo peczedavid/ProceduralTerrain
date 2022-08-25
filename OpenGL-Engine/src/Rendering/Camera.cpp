@@ -6,7 +6,7 @@
 #include <Core/Application.h>
 
 Camera::Camera(const glm::vec3& position, const glm::vec3& orientation)
-	: m_Position(position), m_Orientation(orientation), m_Up({ 0.0f, 1.0f, 0.0f })
+	: m_Position(position), m_Orientation(glm::normalize(orientation)), m_Up({ 0.0f, 1.0f, 0.0f })
 {
 }
 

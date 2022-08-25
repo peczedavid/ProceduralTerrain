@@ -4,9 +4,10 @@
 // Might become a namespace
 namespace Renderer
 {
+	static bool wireframe = true;
+
 	static void TogglePolygonMode()
 	{
-		static bool wireframe = false;
 		wireframe = !wireframe;
 		glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 	}
@@ -14,5 +15,6 @@ namespace Renderer
 	static void SetOpenGLConfig()
 	{
 		glEnable(GL_DEPTH_TEST);
+		glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 	}
 };

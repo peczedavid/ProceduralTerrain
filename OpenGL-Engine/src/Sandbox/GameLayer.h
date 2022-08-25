@@ -18,6 +18,9 @@ private:
 private:
 	uint32_t m_VaoCube, m_VboCube, m_EboCube;
 	uint32_t m_VaoSquare, m_VboSquare, m_EboSquare;
+	int m_TessLevelInner = 1;
+	int m_TessLevelOuter = 1;
+
 	Shader* m_Shader;
 	TessellationShader* m_TessellationShader;
 	Texture2D* m_UvTexture, *m_HeightMap;

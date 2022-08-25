@@ -20,15 +20,15 @@ GameLayer::GameLayer()
 {
 	m_Shader = new Shader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
 	m_TessellationShader = new TessellationShader(
-		"src/Rendering/Shaders/glsl/default.vert",
+		"src/Rendering/Shaders/glsl/terrain.vert",
 		"src/Rendering/Shaders/glsl/terrain.tesc",
 		"src/Rendering/Shaders/glsl/terrain.tese",
-		"src/Rendering/Shaders/glsl/default.frag");
+		"src/Rendering/Shaders/glsl/terrain.frag");
 
 	m_HeightMap = new Texture2D(512, 512, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
 
-	m_Camera = new Camera(glm::vec3(0, 2, 5), glm::vec3(0, -0.35f, -1.0f));
+	m_Camera = new Camera(glm::vec3(0, 10, 10), glm::vec3(0, -1.0f, -1.0f));
 
 	Shader* skyboxShader = new Shader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
@@ -112,6 +112,8 @@ GameLayer::GameLayer()
 
 	m_UvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_UvTexture->TexUnit(m_Shader, "u_Texture", 0);
+
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -128,29 +130,33 @@ void GameLayer::OnUpdate(float dt)
 	if (!Application::Get().IsCursor())
 		m_Camera->Update(dt);
 
+	m_TessellationShader->Use();
+	m_TessellationShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 	m_Shader->Use();
 	m_Shader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 
+	m_UvTexture->Bind();
 	glBindVertexArray(m_VaoCube);
-	static float scale = 1.0f;
-	scale = sinf(t * 2.0f) * 0.4f + 1.0f;
-	glm::mat4 model = glm::scale(glm::vec3(scale, scale, scale) / 3.f);
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 1, -2));
 	static float rot = 0.0f;
 	rot += 0.65f * dt;
 	model = glm::rotate(model, rot, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, glm::vec3(0, 2, 0));
+	static float scale = 1.0f;
+	scale = sinf(t * 2.0f) * 0.4f + 1.0f;
+	model = glm::scale(model, glm::vec3(scale, scale, scale) / 2.f);
 	m_Shader->SetUniform("u_Model", model);
-	m_UvTexture->Bind();
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-	glBindVertexArray(m_VaoSquare);
-	model = glm::scale(glm::vec3(2, 1, 2));
-	m_Shader->SetUniform("u_Model", model);
+	m_TessellationShader->Use();
 	m_HeightMap->Bind();
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(m_VaoSquare);
+	model = glm::scale(glm::mat4(1.0f), glm::vec3(10, 1, 10));
+	m_TessellationShader->SetUniform("u_Model", model);
+	m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevelInner);
+	m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevelOuter);
+	glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, 0);
 
 	m_Skybox->Render(m_Camera);
-
 }
 
 void GameLayer::GenerateHeightMap()
@@ -197,9 +203,14 @@ void GameLayer::OnImGuiRender()
 	if (ImGui::SliderInt("Octaves", &octaves, 1, 8)) GenerateHeightMap();
 	ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
 	ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
-	float my_tex_w = 350.0f;
-	float my_tex_h = 350.0f;
+	float my_tex_w = 200.0f;
+	float my_tex_h = 200.0f;
 	ImGui::Image((ImTextureID)m_HeightMap->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+	ImGui::End();
+
+	ImGui::Begin("Tessellation");
+	ImGui::SliderInt("TessLevelInner", &m_TessLevelInner, 1, 50);
+	ImGui::SliderInt("TessLevelOuter", &m_TessLevelOuter, 1, 50);
 	ImGui::End();
 
 	static bool show = true;
