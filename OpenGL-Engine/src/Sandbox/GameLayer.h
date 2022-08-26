@@ -26,6 +26,7 @@ private:
 	TessellationShader* m_TessellationShader;
 	Texture2D* m_UvTexture, * m_HeightMap;
 	Texture2D *m_GroundTexture, *m_RockTexture, *m_SnowTexture;
+	float m_GrassLevel = 0.4f, m_RockLevel = 0.5f, m_SnowLevel = 0.8f;
 	Camera* m_Camera;
 	Skybox* m_Skybox;
 };

@@ -142,6 +142,9 @@ void GameLayer::OnUpdate(float dt)
 	//m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
 	//m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
+	m_TessellationShader->SetUniform("u_GrassLevel", m_GrassLevel);
+	m_TessellationShader->SetUniform("u_RockLevel", m_RockLevel);
+	m_TessellationShader->SetUniform("u_SnowLevel", m_SnowLevel);
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)planeSize/2.0f, 0, -(float)planeSize / 2.0f));
 	m_TessellationShader->SetUniform("u_Model", model);
 	m_TessellationShader->SetUniform("u_CameraPosition", m_Camera->GetPosition());
@@ -200,8 +203,11 @@ void GameLayer::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Tessellation");
-	ImGui::SliderInt("TessLevel", &m_TessLevel, 1, 64);
+	//ImGui::SliderInt("TessLevel", &m_TessLevel, 1, 64);
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 100.f);
+	ImGui::SliderFloat("GrassLevel", &m_GrassLevel, 0.0f, 1.f);
+	ImGui::SliderFloat("RockLevel", &m_RockLevel, 0.0f, 1.f);
+	ImGui::SliderFloat("SnowLevel", &m_SnowLevel, 0.0f, 1.f);
 	ImGui::End();
 
 	static bool show = true;
