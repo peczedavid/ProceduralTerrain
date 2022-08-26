@@ -34,12 +34,10 @@ int Eval(float x)
 
 }
 
-int GetTessLevel(vec3 _pos, float y)
+int GetTessLevel(vec3 pos)
 {
-   vec3 pos = _pos;
-   pos.y = y;
    vec3 worldPos = vec3(u_Model * vec4(pos, 1.0));
-   float dist = distance(worldPos, u_CameraPosition);
+   float dist = distance(worldPos.xz, u_CameraPosition.xz);
    return Eval(dist);
 }
 
@@ -48,8 +46,7 @@ void main()
    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
    uvsCoord[gl_InvocationID] = v_TexCoords[gl_InvocationID];
 
-   float y = texture(u_Texture, v_TexCoords[gl_InvocationID]).y;
-   int tess = GetTessLevel(gl_in[gl_InvocationID].gl_Position.xyz, y);
+   int tess = GetTessLevel(gl_in[gl_InvocationID].gl_Position.xyz);
    if(tess > 5) maskColors[gl_InvocationID] = vec4(0, 1, 0, 1);
    else if(tess > 1 && tess < 5) maskColors[gl_InvocationID] = vec4(1, 1, 0, 1);
    else maskColors[gl_InvocationID] = vec4(1, 0, 0, 1);

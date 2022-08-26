@@ -20,11 +20,12 @@ private:
 	uint32_t m_VaoCube, m_VboCube, m_EboCube;
 	Plane* m_Plane;
 	int m_TessLevel = 1;
-	float m_MaxHeight = 10.0f;
+	float m_MaxHeight = 25.0f;
 
 	Shader* m_Shader;
 	TessellationShader* m_TessellationShader;
-	Texture2D* m_UvTexture, *m_HeightMap;
+	Texture2D* m_UvTexture, * m_HeightMap;
+	Texture2D *m_GroundTexture, *m_RockTexture, *m_SnowTexture;
 	Camera* m_Camera;
 	Skybox* m_Skybox;
 };

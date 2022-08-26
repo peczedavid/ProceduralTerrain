@@ -11,7 +11,7 @@ public:
 	void LoadData(unsigned char* bytes, GLenum internalFormat, GLenum format);
 
 	void TexUnit(Shader* shader, const char* uniform, uint32_t slot);
-	void Bind();
+	void Bind(uint32_t slot = 0u);
 
 private:
 	uint32_t m_Id;

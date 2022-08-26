@@ -55,7 +55,8 @@ void Texture2D::TexUnit(Shader* shader, const char* uniform, uint32_t slot)
 	glUniform1i(textureUnit, slot);
 }
 
-void Texture2D::Bind()
+void Texture2D::Bind(uint32_t slot)
 {
+	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, m_Id);
 }

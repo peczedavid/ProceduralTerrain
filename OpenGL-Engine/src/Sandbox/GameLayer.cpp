@@ -17,7 +17,7 @@ std::uniform_int_distribution<> distr(10e3, 10e4); // define the range
 siv::PerlinNoise::seed_type seed = distr(gen);
 siv::PerlinNoise perlin{ seed };
 
-float frequency = 0.003f;
+float frequency = 0.001f;
 int octaves = 4;
 
 GameLayer::GameLayer()
@@ -28,6 +28,14 @@ GameLayer::GameLayer()
 		"src/Rendering/Shaders/glsl/terrain.tesc",
 		"src/Rendering/Shaders/glsl/terrain.tese",
 		"src/Rendering/Shaders/glsl/terrain.frag");
+	uint32_t textureUnit = glGetUniformLocation(m_TessellationShader->GetProgramId(), "u_Texture");
+	glUniform1i(textureUnit, 0);
+	textureUnit = glGetUniformLocation(m_TessellationShader->GetProgramId(), "u_GroundTexture");
+	glUniform1i(textureUnit, 1);
+	textureUnit = glGetUniformLocation(m_TessellationShader->GetProgramId(), "u_RockTexture");
+	glUniform1i(textureUnit, 2);
+	textureUnit = glGetUniformLocation(m_TessellationShader->GetProgramId(), "u_SnowTexture");
+	glUniform1i(textureUnit, 3);
 
 	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
@@ -87,6 +95,9 @@ GameLayer::GameLayer()
 
 	m_UvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_UvTexture->TexUnit(m_Shader, "u_Texture", 0);
+	m_GroundTexture = new Texture2D("assets/Textures/ground-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_RockTexture = new Texture2D("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_SnowTexture = new Texture2D("assets/Textures/snow-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 }
@@ -123,7 +134,11 @@ void GameLayer::OnUpdate(float dt)
 	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 	m_TessellationShader->Use();
-	m_HeightMap->Bind();
+	m_HeightMap->Bind(0);
+	m_GroundTexture->Bind(1);
+	m_RockTexture->Bind(2);
+	m_SnowTexture->Bind(3);
+	//m_GroundTexture->Bind();
 	//m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
 	//m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
@@ -175,7 +190,7 @@ void GameLayer::OnImGuiRender()
 		perlin.reseed(seed);
 		GenerateHeightMap();
 	}
-	if (ImGui::SliderFloat("Frequency", &frequency, 0.001, 0.02)) GenerateHeightMap();
+	if (ImGui::SliderFloat("Frequency", &frequency, 0.0001, 0.01)) GenerateHeightMap();
 	if (ImGui::SliderInt("Octaves", &octaves, 1, 8)) GenerateHeightMap();
 	ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
 	ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
@@ -186,7 +201,7 @@ void GameLayer::OnImGuiRender()
 
 	ImGui::Begin("Tessellation");
 	ImGui::SliderInt("TessLevel", &m_TessLevel, 1, 64);
-	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.5f, 15.0f);
+	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 100.f);
 	ImGui::End();
 
 	static bool show = true;
