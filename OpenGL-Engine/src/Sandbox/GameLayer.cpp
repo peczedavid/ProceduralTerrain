@@ -7,7 +7,7 @@
 #include <iostream>
 #include <random>
 
-constexpr uint32_t heighMapSize = 2048u;
+constexpr uint32_t heighMapSize = 1024u;
 constexpr uint32_t planeSize = 250u;
 constexpr uint32_t planeDivision = 25u;
 
