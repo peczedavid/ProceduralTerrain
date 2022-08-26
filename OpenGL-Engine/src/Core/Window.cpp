@@ -29,6 +29,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		Renderer::TogglePolygonMode();
 	}
+
+	if (key == GLFW_KEY_M && action == GLFW_PRESS)
+	{
+		Renderer::ToggleMSAA();
+	}
 }
 
 Window::Window(const WindowProps& props)
@@ -39,6 +44,7 @@ Window::Window(const WindowProps& props)
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	if(props.Maximized)
 		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 

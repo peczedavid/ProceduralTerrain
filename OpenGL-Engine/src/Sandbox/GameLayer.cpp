@@ -7,7 +7,7 @@
 #include <iostream>
 #include <random>
 
-constexpr uint32_t heighMapSize = 1024u;
+constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 250u;
 constexpr uint32_t planeDivision = 25u;
 
@@ -17,7 +17,7 @@ std::uniform_int_distribution<> distr(10e3, 10e4); // define the range
 siv::PerlinNoise::seed_type seed = distr(gen);
 siv::PerlinNoise perlin{ seed };
 
-float frequency = 0.001f;
+float frequency = 0.002f;
 int octaves = 4;
 
 GameLayer::GameLayer()
@@ -42,7 +42,7 @@ GameLayer::GameLayer()
 
 	m_Plane = new Plane(planeSize, planeDivision);
 
-	m_Camera = new Camera(glm::vec3(0, 10, 10), glm::vec3(0, -0.45f, -1.0f));
+	m_Camera = new Camera(glm::vec3(0, 128, 256), glm::vec3(0, -0.45f, -1.0f));
 
 	Shader* skyboxShader = new Shader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
@@ -110,7 +110,7 @@ void GameLayer::OnUpdate(float dt)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	float asp = (float)Application::Get().GetWindow()->GetWidth() / (float)Application::Get().GetWindow()->GetHeight();
-	float fov = 45.0f, nearPlane = 0.1f, farPlane = 500.0f;
+	float fov = 45.0f, nearPlane = 0.1f, farPlane = 1000.0f;
 
 	m_Camera->UpdateMatrix(fov, asp, nearPlane, farPlane);
 	if (!Application::Get().IsCursor())
