@@ -138,9 +138,6 @@ void GameLayer::OnUpdate(float dt)
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
 	m_SnowTexture->Bind(3);
-	//m_GroundTexture->Bind();
-	//m_TessellationShader->SetUniform("u_TessLevelInner", m_TessLevel);
-	//m_TessellationShader->SetUniform("u_TessLevelOuter", m_TessLevel);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	m_TessellationShader->SetUniform("u_GrassLevel", m_GrassLevel);
 	m_TessellationShader->SetUniform("u_RockLevel", m_RockLevel);
@@ -203,7 +200,6 @@ void GameLayer::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Tessellation");
-	//ImGui::SliderInt("TessLevel", &m_TessLevel, 1, 64);
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 100.f);
 	ImGui::SliderFloat("GrassLevel", &m_GrassLevel, 0.0f, 1.f);
 	ImGui::SliderFloat("RockLevel", &m_RockLevel, 0.0f, 1.f);
