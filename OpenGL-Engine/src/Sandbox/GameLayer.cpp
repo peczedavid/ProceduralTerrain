@@ -29,6 +29,7 @@ GameLayer::GameLayer()
 		"src/Rendering/Shaders/glsl/terrain.tesc",
 		"src/Rendering/Shaders/glsl/terrain.tese",
 		"src/Rendering/Shaders/glsl/terrain.frag");
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	m_TessellationShader->TexUnit("u_Texture", 0);
 	m_TessellationShader->TexUnit("u_GroundTexture", 1);
 	m_TessellationShader->TexUnit("u_RockTexture", 2);
@@ -94,8 +95,6 @@ GameLayer::GameLayer()
 	m_GroundTexture = new Texture2D("assets/Textures/ground-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_RockTexture = new Texture2D("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_SnowTexture = new Texture2D("assets/Textures/snow-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-
-	glPatchParameteri(GL_PATCH_VERTICES, 4);
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -140,7 +139,8 @@ void GameLayer::OnUpdate(float dt)
 	m_TessellationShader->SetUniform("u_SnowLevel", m_SnowLevel);
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)planeSize/2.0f, 0, -(float)planeSize / 2.0f));
 	m_TessellationShader->SetUniform("u_Model", model);
-	m_TessellationShader->SetUniform("u_CameraPosition", m_Camera->GetPosition());
+	m_TessellationShader->SetUniform("u_View", m_Camera->GetView());
+	//m_TessellationShader->SetUniform("u_CameraPosition", m_Camera->GetPosition());
 	m_Plane->Render();
 
 	m_Skybox->Render(m_Camera);
