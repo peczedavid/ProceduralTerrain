@@ -128,6 +128,12 @@ void TessellationShader::Use() const
 	glUseProgram(m_ProgramId);
 }
 
+void TessellationShader::TexUnit(const std::string& name, uint32_t slot) const
+{
+	uint32_t textureUnit = glGetUniformLocation(m_ProgramId, name.c_str());
+	glUniform1i(textureUnit, slot);
+}
+
 void TessellationShader::SetUniform(const std::string& name, int value) const
 {
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());

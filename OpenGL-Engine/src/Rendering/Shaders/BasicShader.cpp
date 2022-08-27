@@ -1,4 +1,4 @@
-#include "Rendering/Shaders/Shader.h"
+#include "Rendering/Shaders/BasicShader.h"
 #include<fstream>
 
 std::string ReadSource(const char* fileName) {
@@ -16,7 +16,7 @@ std::string ReadSource(const char* fileName) {
 	throw(errno);
 }
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* outputName)
+BasicShader::BasicShader(const char* vertexPath, const char* fragmentPath, const char* outputName)
 {
 	std::string vertexStr = ReadSource(vertexPath);
 	std::string fragmentStr = ReadSource(fragmentPath);
@@ -43,18 +43,24 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* out
 	glDeleteShader(fragmentShader);
 }
 
-Shader::~Shader()
+BasicShader::~BasicShader()
 {
 	if (m_ProgramId > 0)
 		glDeleteProgram(m_ProgramId);
 }
 
-void Shader::Use() const
+void BasicShader::Use() const
 {
 	glUseProgram(m_ProgramId);
 }
 
-void Shader::SetUniform(const std::string& name, int value) const
+void BasicShader::TexUnit(const std::string& name, uint32_t slot) const
+{
+	uint32_t textureUnit = glGetUniformLocation(m_ProgramId, name.c_str());
+	glUniform1i(textureUnit, slot);
+}
+
+void BasicShader::SetUniform(const std::string& name, int value) const
 {
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
 	if (location >= 0)
@@ -63,7 +69,7 @@ void Shader::SetUniform(const std::string& name, int value) const
 		printf("Uniform %s not found in shader!", name.c_str());
 }
 
-void Shader::SetUniform(const std::string& name, float value) const
+void BasicShader::SetUniform(const std::string& name, float value) const
 {
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
 	if (location >= 0)
@@ -72,7 +78,16 @@ void Shader::SetUniform(const std::string& name, float value) const
 		printf("Uniform %s not found in shader!", name.c_str());
 }
 
-void Shader::SetUniform(const std::string& name, const glm::vec3& value) const
+void BasicShader::SetUniform(const std::string& name, uint32_t value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform1ui(location, value);
+	else
+		printf("Uniform %s not found in shader!", name.c_str());
+}
+
+void BasicShader::SetUniform(const std::string& name, const glm::vec3& value) const
 {
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
 	if (location >= 0)
@@ -81,7 +96,7 @@ void Shader::SetUniform(const std::string& name, const glm::vec3& value) const
 		printf("Uniform %s not found in shader!", name.c_str());
 }
 
-void Shader::SetUniform(const std::string& name, const glm::vec4& value) const
+void BasicShader::SetUniform(const std::string& name, const glm::vec4& value) const
 {
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
 	if (location >= 0)
@@ -90,7 +105,7 @@ void Shader::SetUniform(const std::string& name, const glm::vec4& value) const
 		printf("Uniform %s not found in shader!", name.c_str());
 }
 
-void Shader::SetUniform(const std::string& name, const glm::mat4& value) const
+void BasicShader::SetUniform(const std::string& name, const glm::mat4& value) const
 {
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
 	if (location >= 0)

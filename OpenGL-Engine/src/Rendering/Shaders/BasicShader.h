@@ -2,19 +2,17 @@
 
 #include "Rendering/Shaders/Shader.h"
 
-class TessellationShader : public Shader
+class BasicShader : public Shader
 {
 public:
 
-    TessellationShader(const char* vertexPath,
-        const char* tessControlPath, const char* tessEvalPath,
-        const char* fragmentPath, const char* outputName = "outColor");
-    ~TessellationShader();
+    BasicShader(const char* vertexPath, const char* fragmentPath, const char* outputName = "outColor");
+    ~BasicShader();
 
     void Use() const override;
 
-    inline uint32_t GetProgramId() override  { return m_ProgramId; }
-    inline const uint32_t GetProgramId() const override  { return m_ProgramId; }
+    inline uint32_t GetProgramId() override { return m_ProgramId; }
+    inline const uint32_t GetProgramId() const override { return m_ProgramId; }
 
     void TexUnit(const std::string& name, uint32_t slot) const override;
 
@@ -27,5 +25,4 @@ public:
     void SetUniform(const std::string& name, const glm::mat4& value) const override;
 private:
     uint32_t m_ProgramId;
-
 };

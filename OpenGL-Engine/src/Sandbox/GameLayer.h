@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Layers/Layer.h"
-#include "Rendering/Shaders/Shader.h"
+#include "Rendering/Shaders/BasicShader.h"
 #include "Rendering/Texture2D.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Skybox.h"
@@ -22,7 +22,7 @@ private:
 	int m_TessLevel = 1;
 	float m_MaxHeight = 25.0f;
 
-	Shader* m_Shader;
+	BasicShader* m_Shader;
 	TessellationShader* m_TessellationShader;
 	Texture2D* m_UvTexture, * m_HeightMap;
 	Texture2D *m_GroundTexture, *m_RockTexture, *m_SnowTexture;

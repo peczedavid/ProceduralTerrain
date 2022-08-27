@@ -22,20 +22,17 @@ int octaves = 4;
 
 GameLayer::GameLayer()
 {
-	m_Shader = new Shader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
+	m_Shader = new BasicShader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
+	m_Shader->TexUnit("u_Texture", 0);
 	m_TessellationShader = new TessellationShader(
 		"src/Rendering/Shaders/glsl/terrain.vert",
 		"src/Rendering/Shaders/glsl/terrain.tesc",
 		"src/Rendering/Shaders/glsl/terrain.tese",
 		"src/Rendering/Shaders/glsl/terrain.frag");
-	uint32_t textureUnit = glGetUniformLocation(m_TessellationShader->GetProgramId(), "u_Texture");
-	glUniform1i(textureUnit, 0);
-	textureUnit = glGetUniformLocation(m_TessellationShader->GetProgramId(), "u_GroundTexture");
-	glUniform1i(textureUnit, 1);
-	textureUnit = glGetUniformLocation(m_TessellationShader->GetProgramId(), "u_RockTexture");
-	glUniform1i(textureUnit, 2);
-	textureUnit = glGetUniformLocation(m_TessellationShader->GetProgramId(), "u_SnowTexture");
-	glUniform1i(textureUnit, 3);
+	m_TessellationShader->TexUnit("u_Texture", 0);
+	m_TessellationShader->TexUnit("u_GroundTexture", 1);
+	m_TessellationShader->TexUnit("u_RockTexture", 2);
+	m_TessellationShader->TexUnit("u_SnowTexture", 3);
 
 	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
 	GenerateHeightMap();
@@ -44,7 +41,7 @@ GameLayer::GameLayer()
 
 	m_Camera = new Camera(glm::vec3(0, 128, 256), glm::vec3(0, -0.45f, -1.0f));
 
-	Shader* skyboxShader = new Shader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
+	BasicShader* skyboxShader = new BasicShader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
 
 	// ----------- CUBE GENEREATION START -----------
@@ -94,7 +91,6 @@ GameLayer::GameLayer()
 	// ----------- CUBE GENEREATION END -----------
 
 	m_UvTexture = new Texture2D("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-	m_UvTexture->TexUnit(m_Shader, "u_Texture", 0);
 	m_GroundTexture = new Texture2D("assets/Textures/ground-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_RockTexture = new Texture2D("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_SnowTexture = new Texture2D("assets/Textures/snow-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
