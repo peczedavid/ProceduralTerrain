@@ -29,4 +29,7 @@ private:
 	float m_GrassLevel = 0.25f, m_RockLevel = 0.64f, m_SnowLevel = 0.884f;
 	Camera* m_Camera;
 	Skybox* m_Skybox;
+
+	float m_Gain = 0.5f, m_Lacunarity = 2.0f, m_Amplitude = 0.5f, m_Frequency = 2.0f;
+	float m_Scale = 1.0f;
 };

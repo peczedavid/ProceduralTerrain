@@ -141,6 +141,11 @@ void GameLayer::OnUpdate(float dt)
 	m_TessellationShader->SetUniform("u_Model", model);
 	m_TessellationShader->SetUniform("u_View", m_Camera->GetView());
 	//m_TessellationShader->SetUniform("u_CameraPosition", m_Camera->GetPosition());
+	m_TessellationShader->SetUniform("u_Amplitude", m_Amplitude);
+	m_TessellationShader->SetUniform("u_Gain", m_Gain);
+	m_TessellationShader->SetUniform("u_Frequency", m_Frequency);
+	m_TessellationShader->SetUniform("u_Lacunarity", m_Lacunarity);
+	m_TessellationShader->SetUniform("u_Scale", m_Scale);
 	m_Plane->Render();
 
 	m_Skybox->Render(m_Camera);
@@ -193,6 +198,14 @@ void GameLayer::OnImGuiRender()
 	float my_tex_w = 200.0f;
 	float my_tex_h = 200.0f;
 	ImGui::Image((ImTextureID)m_HeightMap->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+	ImGui::End();
+
+	ImGui::Begin("Noise props");
+	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f); 
+	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 2.5f);
+	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
+	ImGui::SliderFloat("Lacunarity", &m_Lacunarity, 0.01f, 2.5f);
+	ImGui::SliderFloat("Scale", &m_Scale, 0.01f, 2.5f);
 	ImGui::End();
 
 	ImGui::Begin("Tessellation");
