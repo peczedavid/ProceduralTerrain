@@ -3,9 +3,10 @@ precision highp float;
 
 out vec4 outColor;
 
+in float v_Height;
 in vec2 v_TexCoords;
 
-uniform sampler2D u_Texture;
+//uniform sampler2D u_Texture;
 uniform sampler2D u_GroundTexture;
 uniform sampler2D u_RockTexture;
 uniform sampler2D u_SnowTexture;
@@ -25,7 +26,7 @@ float eval(float x, float start, float end)
 
 void main()
 {
-	float height = texture(u_Texture, v_TexCoords).y;
+	//float height = texture(u_Texture, v_TexCoords).y;
 	vec4 groundColor = texture(u_GroundTexture, v_TexCoords);
 	vec4 rockColor = texture(u_RockTexture, v_TexCoords);
 	vec4 snowColor = texture(u_SnowTexture, v_TexCoords);
@@ -36,22 +37,22 @@ void main()
 
 	float weightGround, weightRock, weightSnow;
 
-	if(0 < height && height <= u_GrassLevel)
+	if(0 < v_Height && v_Height <= u_GrassLevel)
 	{
 		weightGround = 1.0;
 		weightRock = 0.0;
 		weightSnow = 0.0;
 	}
-	else if(u_GrassLevel < height && height <= u_RockLevel )
+	else if(u_GrassLevel < v_Height && v_Height <= u_RockLevel )
 	{
-		weightGround = eval(height, u_GrassLevel, u_RockLevel);
+		weightGround = eval(v_Height, u_GrassLevel, u_RockLevel);
 		weightRock = 1.0 - weightGround;
 		weightSnow = 0.0;
 	}
-	else if(u_RockLevel < height && height <= u_SnowLevel)
+	else if(u_RockLevel < v_Height && v_Height <= u_SnowLevel)
 	{
 		weightGround = 0.0;
-		weightRock = eval(height, u_RockLevel, u_SnowLevel);
+		weightRock = eval(v_Height, u_RockLevel, u_SnowLevel);
 		weightSnow = 1.0 - weightRock;
 	}
 	else

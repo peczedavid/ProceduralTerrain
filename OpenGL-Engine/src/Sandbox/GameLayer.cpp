@@ -9,7 +9,7 @@
 
 constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 250u;
-constexpr uint32_t planeDivision = 25u;
+constexpr uint32_t planeDivision = 10u;
 
 std::random_device rd; // obtain a random number from hardware
 std::mt19937 gen(rd()); // seed the generator
@@ -30,7 +30,7 @@ GameLayer::GameLayer()
 		"src/Rendering/Shaders/glsl/terrain.tese",
 		"src/Rendering/Shaders/glsl/terrain.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
-	m_TessellationShader->TexUnit("u_Texture", 0);
+	//m_TessellationShader->TexUnit("u_Texture", 0);
 	m_TessellationShader->TexUnit("u_GroundTexture", 1);
 	m_TessellationShader->TexUnit("u_RockTexture", 2);
 	m_TessellationShader->TexUnit("u_SnowTexture", 3);
@@ -129,7 +129,7 @@ void GameLayer::OnUpdate(float dt)
 	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 	m_TessellationShader->Use();
-	m_HeightMap->Bind(0);
+	//m_HeightMap->Bind(0);
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
 	m_SnowTexture->Bind(3);
