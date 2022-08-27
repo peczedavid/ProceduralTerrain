@@ -33,10 +33,6 @@ void main() {
   vec2 rightUV = uv1 + v * (uv2 - uv1);
   vec2 texCoord = leftUV + u * (rightUV - leftUV);
 
-  vec2 st = texCoord;
-  vec2 tex = vec2(st * u_Scale);
-  v_Height = clamp(fbm(tex), 0.0, 1.0);
-
   vec4 pos0 = gl_in[0].gl_Position;
   vec4 pos1 = gl_in[1].gl_Position;
   vec4 pos2 = gl_in[2].gl_Position;
@@ -45,10 +41,14 @@ void main() {
   vec4 leftPos = pos0 + v * (pos3 - pos0);
   vec4 rightPos = pos1 + v * (pos2 - pos1);
   vec4 pos = leftPos + u * (rightPos - leftPos);
+  vec2 texCustom = pos.xz / 10.0;
+  vec2 st = texCoord;
+  vec2 tex = vec2(st * u_Scale);
+  v_Height = fbm(texCustom * u_Scale);
   pos.y = v_Height * u_MaxLevel;
 
   gl_Position = u_ViewProj * u_Model * pos;
-  v_TexCoords = texCoord;
+  v_TexCoords = texCustom;
 }
 
 float random(in vec2 st) {

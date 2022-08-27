@@ -8,7 +8,7 @@
 #include <random>
 
 constexpr uint32_t heighMapSize = 2048u;
-constexpr uint32_t planeSize = 250u;
+constexpr uint32_t planeSize = 500u;
 constexpr uint32_t planeDivision = 10u;
 
 std::random_device rd; // obtain a random number from hardware
@@ -36,7 +36,7 @@ GameLayer::GameLayer()
 	m_TessellationShader->TexUnit("u_SnowTexture", 3);
 
 	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
-	GenerateHeightMap();
+	//GenerateHeightMap();
 
 	m_Plane = new Plane(planeSize, planeDivision);
 
@@ -147,7 +147,7 @@ void GameLayer::OnUpdate(float dt)
 	m_TessellationShader->SetUniform("u_Lacunarity", m_Lacunarity);
 	m_TessellationShader->SetUniform("u_Scale", m_Scale);
 	m_Plane->Render();
-
+	
 	m_Skybox->Render(m_Camera);
 }
 

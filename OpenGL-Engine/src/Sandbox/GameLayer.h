@@ -20,7 +20,7 @@ private:
 	uint32_t m_VaoCube, m_VboCube, m_EboCube;
 	Plane* m_Plane;
 	int m_TessLevel = 1;
-	float m_MaxHeight = 25.0f;
+	float m_MaxHeight = 41.667f;
 
 	BasicShader* m_Shader;
 	TessellationShader* m_TessellationShader;
@@ -30,6 +30,7 @@ private:
 	Camera* m_Camera;
 	Skybox* m_Skybox;
 
-	float m_Gain = 0.5f, m_Lacunarity = 2.0f, m_Amplitude = 0.5f, m_Frequency = 2.0f;
+	float m_Gain = 0.432f, m_Lacunarity = 1.763f, m_Amplitude = 0.691f, m_Frequency = 0.171f;
+	//float m_Gain = 0.5f, m_Lacunarity = 2.0f, m_Amplitude = 0.5f, m_Frequency = 2.0f;
 	float m_Scale = 1.0f;
 };
