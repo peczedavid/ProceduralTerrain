@@ -33,4 +33,8 @@ private:
 	float m_Gain = 0.432f, m_Lacunarity = 1.763f, m_Amplitude = 0.691f, m_Frequency = 0.171f;
 	//float m_Gain = 0.5f, m_Lacunarity = 2.0f, m_Amplitude = 0.5f, m_Frequency = 2.0f;
 	float m_Scale = 1.0f;
+
+	glm::vec4 m_LightDir = glm::vec4(0.5f, 0.5f, 0.0f, 0.0f);
+
+	float m_Mul = 1.0f, m_Div = 100.f, m_Hei = 165.0f;
 };

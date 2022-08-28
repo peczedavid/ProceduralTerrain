@@ -5,11 +5,14 @@ out vec4 outColor;
 
 in float v_Height;
 in vec2 v_TexCoords;
+in vec4 v_Normal;
 
 //uniform sampler2D u_Texture;
 uniform sampler2D u_GroundTexture;
 uniform sampler2D u_RockTexture;
 uniform sampler2D u_SnowTexture;
+
+uniform vec4 u_LightDir;
 
 uniform float u_GrassLevel;
 uniform float u_RockLevel;
@@ -62,7 +65,15 @@ void main()
 		weightSnow = 1.0;
 	}
 
-	outColor = groundColor * weightGround + 
+	vec3 texColor = (groundColor * weightGround + 
 			   rockColor * weightRock + 
-			   snowColor * weightSnow; 
+			   snowColor * weightSnow).xyz;
+
+	//float cost = max(dot(normalize(v_Normal), normalize(u_LightDir)), 0.0);
+	//texColor *= cost;
+	//outColor.xyz = v_Normal.xyz;//texColor;
+	outColor.xyz = texColor;
+	outColor.w = 1.0;
+
+	//outColor.xyz *= dot(vec4(0.2, 0.8, 0.0, 0.0), vec4(-0.5, -0.5, 0, 1));
 }

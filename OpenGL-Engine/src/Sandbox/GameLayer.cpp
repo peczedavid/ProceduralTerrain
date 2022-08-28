@@ -8,7 +8,7 @@
 #include <random>
 
 constexpr uint32_t heighMapSize = 2048u;
-constexpr uint32_t planeSize = 500u;
+constexpr uint32_t planeSize = 250u;
 constexpr uint32_t planeDivision = 10u;
 
 std::random_device rd; // obtain a random number from hardware
@@ -133,21 +133,31 @@ void GameLayer::OnUpdate(float dt)
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
 	m_SnowTexture->Bind(3);
+	m_TessellationShader->SetUniform("u_LightDir", m_LightDir);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	m_TessellationShader->SetUniform("u_GrassLevel", m_GrassLevel);
 	m_TessellationShader->SetUniform("u_RockLevel", m_RockLevel);
 	m_TessellationShader->SetUniform("u_SnowLevel", m_SnowLevel);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)planeSize/2.0f, 0, -(float)planeSize / 2.0f));
-	m_TessellationShader->SetUniform("u_Model", model);
 	m_TessellationShader->SetUniform("u_View", m_Camera->GetView());
-	//m_TessellationShader->SetUniform("u_CameraPosition", m_Camera->GetPosition());
-	m_TessellationShader->SetUniform("u_Amplitude", m_Amplitude);
-	m_TessellationShader->SetUniform("u_Gain", m_Gain);
-	m_TessellationShader->SetUniform("u_Frequency", m_Frequency);
-	m_TessellationShader->SetUniform("u_Lacunarity", m_Lacunarity);
-	m_TessellationShader->SetUniform("u_Scale", m_Scale);
-	m_Plane->Render();
-	
+	//m_TessellationShader->SetUniform("u_Amplitude", m_Amplitude);
+	//m_TessellationShader->SetUniform("u_Gain", m_Gain);
+	//m_TessellationShader->SetUniform("u_Frequency", m_Frequency);
+	//m_TessellationShader->SetUniform("u_Lacunarity", m_Lacunarity);
+	//m_TessellationShader->SetUniform("u_Scale", m_Scale);
+	m_TessellationShader->SetUniform("u_Mul", m_Mul);
+	m_TessellationShader->SetUniform("u_Div", m_Div);
+	m_TessellationShader->SetUniform("u_Hei", m_Hei);
+
+	for (int32_t x = -2; x < 2; x++)
+	{
+		for (int32_t z = -2; z < 2; z++)
+		{
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (float)planeSize, 0, z * (float)planeSize));
+			m_TessellationShader->SetUniform("u_Model", model);
+			m_Plane->Render();
+		}
+	}
+
 	m_Skybox->Render(m_Camera);
 }
 
@@ -201,15 +211,19 @@ void GameLayer::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Noise props");
-	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f); 
+	/*ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f);
 	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 2.5f);
 	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
 	ImGui::SliderFloat("Lacunarity", &m_Lacunarity, 0.01f, 2.5f);
-	ImGui::SliderFloat("Scale", &m_Scale, 0.01f, 2.5f);
+	ImGui::SliderFloat("Scale", &m_Scale, 0.01f, 2.5f);*/
+	ImGui::SliderFloat("Mul", &m_Mul, 0.001f, 1.0f);
+	ImGui::SliderFloat("Div", &m_Div, 1.0f, 1000.f);
+	ImGui::SliderFloat("Hei", &m_Hei, 1.0f, 1000.0f);
 	ImGui::End();
 
 	ImGui::Begin("Tessellation");
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 100.f);
+	ImGui::SliderFloat3("LightDir", &m_LightDir[0], -5.0f, 5.0f);
 	ImGui::SliderFloat("GrassLevel", &m_GrassLevel, 0.0f, 1.f);
 	ImGui::SliderFloat("RockLevel", &m_RockLevel, 0.0f, 1.f);
 	ImGui::SliderFloat("SnowLevel", &m_SnowLevel, 0.0f, 1.f);
