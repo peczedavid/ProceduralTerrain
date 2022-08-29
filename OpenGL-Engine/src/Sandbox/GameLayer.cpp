@@ -9,7 +9,7 @@
 
 constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 1000u;
-constexpr uint32_t planeDivision = 10u;
+constexpr uint32_t planeDivision = 20u;
 
 std::random_device rd; // obtain a random number from hardware
 std::mt19937 gen(rd()); // seed the generator
@@ -105,7 +105,7 @@ void GameLayer::OnUpdate(float dt)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	float asp = (float)Application::Get().GetWindow()->GetWidth() / (float)Application::Get().GetWindow()->GetHeight();
-	float fov = 45.0f, nearPlane = 0.1f, farPlane = 1000.0f;
+	float fov = 45.0f, nearPlane = 0.1f, farPlane = 3000.0f;
 
 	m_Camera->UpdateMatrix(fov, asp, nearPlane, farPlane);
 	if (!Application::Get().IsCursor())
@@ -132,11 +132,11 @@ void GameLayer::OnUpdate(float dt)
 	//m_HeightMap->Bind(0);
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
-	m_SnowTexture->Bind(3);
+	//m_SnowTexture->Bind(3);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
-	m_TessellationShader->SetUniform("u_GrassLevel", m_GrassLevel);
-	m_TessellationShader->SetUniform("u_RockLevel", m_RockLevel);
-	m_TessellationShader->SetUniform("u_SnowLevel", m_SnowLevel);
+	//m_TessellationShader->SetUniform("u_GrassLevel", m_GrassLevel);
+	//m_TessellationShader->SetUniform("u_RockLevel", m_RockLevel);
+	//m_TessellationShader->SetUniform("u_SnowLevel", m_SnowLevel);
 	m_TessellationShader->SetUniform("u_View", m_Camera->GetView());
 	m_TessellationShader->SetUniform("u_Amplitude", m_Amplitude);
 	m_TessellationShader->SetUniform("u_Gain", m_Gain);
@@ -192,42 +192,42 @@ void GameLayer::OnImGuiRender()
 	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
 	ImGui::End();
 
-	ImGui::Begin("Height map");
-	if (ImGui::Button("Generate")) GenerateHeightMap();
-	static int seedInput = seed;
-	if (ImGui::SliderInt("Seed", &seedInput, 0, 10e4))
-	{
-		seed = seedInput;
-		perlin.reseed(seed);
-		GenerateHeightMap();
-	}
-	if (ImGui::SliderFloat("Frequency", &frequency, 0.0001, 0.01)) GenerateHeightMap();
-	if (ImGui::SliderInt("Octaves", &octaves, 1, 8)) GenerateHeightMap();
-	ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
-	ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
-	float my_tex_w = 200.0f;
-	float my_tex_h = 200.0f;
-	ImGui::Image((ImTextureID)m_HeightMap->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
-	ImGui::End();
+	//ImGui::Begin("Height map");
+	//if (ImGui::Button("Generate")) GenerateHeightMap();
+	//static int seedInput = seed;
+	//if (ImGui::SliderInt("Seed", &seedInput, 0, 10e4))
+	//{
+	//	seed = seedInput;
+	//	perlin.reseed(seed);
+	//	GenerateHeightMap();
+	//}
+	//if (ImGui::SliderFloat("Frequency", &frequency, 0.0001, 0.01)) GenerateHeightMap();
+	//if (ImGui::SliderInt("Octaves", &octaves, 1, 8)) GenerateHeightMap();
+	//ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
+	//ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
+	//float my_tex_w = 200.0f;
+	//float my_tex_h = 200.0f;
+	//ImGui::Image((ImTextureID)m_HeightMap->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+	//ImGui::End();
 
 	ImGui::Begin("Noise props");
 	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f); 
-	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 2.5f);
+	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
 	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
-	ImGui::SliderFloat("Lacunarity", &m_Lacunarity, 0.01f, 2.5f);
+	//ImGui::SliderFloat("Lacunarity", &m_Lacunarity, 0.01f, 2.5f);
 	ImGui::SliderFloat("Scale", &m_Scale, 0.01f, 2.5f);
 	ImGui::SliderFloat("HeightOffset", &m_HeightOffset, 0.0f, 100.0f);
 	ImGui::End();
 
 	ImGui::Begin("Landscape");
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
-	ImGui::SliderFloat("GrassLevel", &m_GrassLevel, 0.0f, 1.f);
-	ImGui::SliderFloat("RockLevel", &m_RockLevel, 0.0f, 1.f);
-	ImGui::SliderFloat("SnowLevel", &m_SnowLevel, 0.0f, 1.f);
+	//ImGui::SliderFloat("GrassLevel", &m_GrassLevel, 0.0f, 1.f);
+	//ImGui::SliderFloat("RockLevel", &m_RockLevel, 0.0f, 1.f);
+	//ImGui::SliderFloat("SnowLevel", &m_SnowLevel, 0.0f, 1.f);
 	ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
 	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
 	ImGui::End();
 
-	static bool show = true;
-	ImGui::ShowDemoWindow(&show);
+	//static bool show = true;
+	//ImGui::ShowDemoWindow(&show);
 }

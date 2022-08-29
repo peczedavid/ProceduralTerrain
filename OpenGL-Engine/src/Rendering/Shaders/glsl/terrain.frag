@@ -64,12 +64,14 @@ void main()
 		weightSnow = 1.0;
 	}
 
-	outColor = groundColor * weightGround + 
-			   rockColor * weightRock + 
-			   snowColor * weightSnow; 
+	float lambda = smoothstep(0.6, 0.7, v_Normal.y);
+	outColor = mix(rockColor, groundColor, lambda);
+			   //groundColor * weightGround + 
+			   //rockColor * weightRock + 
+			   //snowColor * weightSnow; 
 
 	float cost = dot(v_Normal, normalize(vec3(1.0, 1.0, 0.0)));
-	outColor.xyz *= cost;
-	outColor.xyz = mix(vec3(0.6, 0.7, 0.9), outColor.xyz, v_Visibility);
+	outColor.xyz *= cost + vec3(0.7, 0.5, 0.1) * 0.15;
+	outColor.xyz = mix(vec3(0.4, 0.5, 0.6), outColor.xyz, v_Visibility);
 	outColor.w = 1.0;
 }

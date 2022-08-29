@@ -54,9 +54,6 @@ void main() {
   vec3 info = fbmd_9(texCustom * u_Scale);
   v_Height = info.x;
   v_Normal = normalize( vec3(-info.y,1.0,-info.z));
-  //pos.y = v_Height * u_MaxLevel;
-  //pos.xyz += v_Normal * v_Height * u_MaxLevel;
-   // compute patch surface normal
   vec4 uVec = pos2 - pos0;
   vec4 vVec = pos3 - pos0;
   vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
@@ -189,7 +186,7 @@ vec3 fbmd_9( in vec2 x )
     float b = u_Amplitude;
     vec2  d = vec2(0.0);
     mat2  m = mat2(1.0,0.0,0.0,1.0);
-    for( int i=0; i<8; i++ )
+    for( int i=0; i<12; i++ )
     {
         vec3 n = noised(x);
         a += b*n.x;          // accumulate values		
