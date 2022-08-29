@@ -30,7 +30,7 @@ private:
 	Camera* m_Camera;
 	Skybox* m_Skybox;
 
-	float m_Gain = 0.432f, m_Lacunarity = 1.763f, m_Amplitude = 0.691f, m_Frequency = 0.171f;
+	float m_Gain = 0.5f, m_Lacunarity = 1.763f, m_Amplitude = 1.0, m_Frequency = 1.429;
 	//float m_Gain = 0.5f, m_Lacunarity = 2.0f, m_Amplitude = 0.5f, m_Frequency = 2.0f;
-	float m_Scale = 1.0f;
+	float m_Scale = 0.17f;
 };

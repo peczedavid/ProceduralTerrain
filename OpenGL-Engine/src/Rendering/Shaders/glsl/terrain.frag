@@ -4,6 +4,7 @@ precision highp float;
 out vec4 outColor;
 
 in float v_Height;
+in vec3 v_Normal;
 in vec2 v_TexCoords;
 
 //uniform sampler2D u_Texture;
@@ -65,4 +66,8 @@ void main()
 	outColor = groundColor * weightGround + 
 			   rockColor * weightRock + 
 			   snowColor * weightSnow; 
+
+	float cost = dot(v_Normal, normalize(vec3(1.0, 1.0, 0.0)));
+	outColor.xyz *= cost;
+	outColor.w = 1.0;
 }

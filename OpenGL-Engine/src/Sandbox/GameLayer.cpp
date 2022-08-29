@@ -209,7 +209,7 @@ void GameLayer::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Tessellation");
-	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 100.f);
+	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
 	ImGui::SliderFloat("GrassLevel", &m_GrassLevel, 0.0f, 1.f);
 	ImGui::SliderFloat("RockLevel", &m_RockLevel, 0.0f, 1.f);
 	ImGui::SliderFloat("SnowLevel", &m_SnowLevel, 0.0f, 1.f);
