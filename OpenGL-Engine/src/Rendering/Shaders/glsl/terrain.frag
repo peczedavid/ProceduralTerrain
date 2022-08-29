@@ -6,6 +6,7 @@ out vec4 outColor;
 in float v_Height;
 in vec3 v_Normal;
 in vec2 v_TexCoords;
+in float v_Visibility;
 
 //uniform sampler2D u_Texture;
 uniform sampler2D u_GroundTexture;
@@ -38,7 +39,7 @@ void main()
 
 	float weightGround, weightRock, weightSnow;
 
-	if(0 < v_Height && v_Height <= u_GrassLevel)
+	if(v_Height <= u_GrassLevel)
 	{
 		weightGround = 1.0;
 		weightRock = 0.0;
@@ -69,5 +70,6 @@ void main()
 
 	float cost = dot(v_Normal, normalize(vec3(1.0, 1.0, 0.0)));
 	outColor.xyz *= cost;
+	outColor.xyz = mix(vec3(0.6, 0.7, 0.9), outColor.xyz, v_Visibility);
 	outColor.w = 1.0;
 }

@@ -4,6 +4,7 @@ layout(quads, fractional_odd_spacing, ccw) in;
 
 uniform mat4 u_Model;
 uniform mat4 u_ViewProj;
+uniform mat4 u_View;
 uniform float u_MaxLevel;
 
 uniform float u_Lacunarity;
@@ -11,11 +12,15 @@ uniform float u_Gain;
 uniform float u_Frequency;
 uniform float u_Amplitude;
 uniform float u_Scale;
+uniform float u_HeightOffset;
+uniform float u_FogDensity;
+uniform float u_FogGradient;
 
 in vec2 v_UVsCoord[];
 out vec2 v_TexCoords;
 out float v_Height;
 out vec3 v_Normal;
+out float v_Visibility;
 
 float random(in vec2 st);
 float noise(in vec2 st);
@@ -43,16 +48,27 @@ void main() {
   vec4 leftPos = pos0 + v * (pos3 - pos0);
   vec4 rightPos = pos1 + v * (pos2 - pos1);
   vec4 pos = leftPos + u * (rightPos - leftPos);
-  vec2 texCustom = pos.xz / 10.0;
+  vec2 texCustom = (u_Model * pos).xz / 10.0;
   vec2 st = texCoord;
   vec2 tex = vec2(st * u_Scale);
   vec3 info = fbmd_9(texCustom * u_Scale);
-  v_Height = info.x + 0.2;
+  v_Height = info.x;
   v_Normal = normalize( vec3(-info.y,1.0,-info.z));
-  pos.y = v_Height * u_MaxLevel;
+  //pos.y = v_Height * u_MaxLevel;
+  //pos.xyz += v_Normal * v_Height * u_MaxLevel;
+   // compute patch surface normal
+  vec4 uVec = pos2 - pos0;
+  vec4 vVec = pos3 - pos0;
+  vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
+  pos += normal * v_Height * u_MaxLevel;
+  pos.y += u_HeightOffset;
 
   gl_Position = u_ViewProj * u_Model * pos;
   v_TexCoords = texCustom;
+
+  float vertexDistance = length((u_View * u_Model * pos).xyz);
+  v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));
+  v_Visibility = clamp(v_Visibility, 0.0, 1.0);
 }
 
 float random(in vec2 st) {

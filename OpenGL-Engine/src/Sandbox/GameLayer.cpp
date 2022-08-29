@@ -8,7 +8,7 @@
 #include <random>
 
 constexpr uint32_t heighMapSize = 2048u;
-constexpr uint32_t planeSize = 500u;
+constexpr uint32_t planeSize = 1000u;
 constexpr uint32_t planeDivision = 10u;
 
 std::random_device rd; // obtain a random number from hardware
@@ -137,17 +137,27 @@ void GameLayer::OnUpdate(float dt)
 	m_TessellationShader->SetUniform("u_GrassLevel", m_GrassLevel);
 	m_TessellationShader->SetUniform("u_RockLevel", m_RockLevel);
 	m_TessellationShader->SetUniform("u_SnowLevel", m_SnowLevel);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)planeSize/2.0f, 0, -(float)planeSize / 2.0f));
-	m_TessellationShader->SetUniform("u_Model", model);
 	m_TessellationShader->SetUniform("u_View", m_Camera->GetView());
-	//m_TessellationShader->SetUniform("u_CameraPosition", m_Camera->GetPosition());
 	m_TessellationShader->SetUniform("u_Amplitude", m_Amplitude);
 	m_TessellationShader->SetUniform("u_Gain", m_Gain);
 	m_TessellationShader->SetUniform("u_Frequency", m_Frequency);
-	m_TessellationShader->SetUniform("u_Lacunarity", m_Lacunarity);
 	m_TessellationShader->SetUniform("u_Scale", m_Scale);
-	m_Plane->Render();
+	m_TessellationShader->SetUniform("u_HeightOffset", m_HeightOffset);
+	m_TessellationShader->SetUniform("u_FogGradient", m_FogGradient);
+	m_TessellationShader->SetUniform("u_FogDensity", m_FogDensity);
+	//m_Plane->Render();
 	
+	for (int z = -1; z < 2; z++)
+	{
+		for (int x = -1; x < 2; x++)
+		{
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)planeSize, 0, z * (int)planeSize));
+			m_TessellationShader->SetUniform("u_Model", model);
+			m_Plane->Render();
+		}
+	}
+
+
 	m_Skybox->Render(m_Camera);
 }
 
@@ -206,13 +216,16 @@ void GameLayer::OnImGuiRender()
 	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
 	ImGui::SliderFloat("Lacunarity", &m_Lacunarity, 0.01f, 2.5f);
 	ImGui::SliderFloat("Scale", &m_Scale, 0.01f, 2.5f);
+	ImGui::SliderFloat("HeightOffset", &m_HeightOffset, 0.0f, 100.0f);
 	ImGui::End();
 
-	ImGui::Begin("Tessellation");
+	ImGui::Begin("Landscape");
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
 	ImGui::SliderFloat("GrassLevel", &m_GrassLevel, 0.0f, 1.f);
 	ImGui::SliderFloat("RockLevel", &m_RockLevel, 0.0f, 1.f);
 	ImGui::SliderFloat("SnowLevel", &m_SnowLevel, 0.0f, 1.f);
+	ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
+	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
 	ImGui::End();
 
 	static bool show = true;
