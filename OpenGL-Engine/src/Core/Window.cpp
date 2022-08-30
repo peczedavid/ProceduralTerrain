@@ -34,6 +34,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		Renderer::ToggleMSAA();
 	}
+
+	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
+	{
+		Renderer::debugAxis = !Renderer::debugAxis;
+	}
 }
 
 Window::Window(const WindowProps& props)

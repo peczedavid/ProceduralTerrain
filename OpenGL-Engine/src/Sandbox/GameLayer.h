@@ -6,6 +6,7 @@
 #include "Rendering/Skybox.h"
 #include "Rendering/Shaders/TessellationShader.h"
 #include "Rendering/Geometry/Plane.h"
+#include "Rendering/Geometry/Axis.h"
 
 class GameLayer : public Layer
 {
@@ -29,6 +30,7 @@ private:
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
 	Camera* m_Camera;
 	Skybox* m_Skybox;
+	Axis* m_Axis;
 
 	float m_Gain = 0.245f, m_Lacunarity = 1.184f, m_Amplitude = 0.661f, m_Frequency = 2.776f;
 	float m_Scale = 0.100f, m_HeightOffset = 20.726f;

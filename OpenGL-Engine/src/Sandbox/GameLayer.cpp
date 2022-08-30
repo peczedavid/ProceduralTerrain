@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include <iostream>
 #include <random>
+#include "Rendering/Renderer.h"
 
 constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 1000u;
@@ -30,6 +31,8 @@ GameLayer::GameLayer()
 
 	BasicShader* skyboxShader = new BasicShader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
+
+	m_Axis = new Axis();
 
 	// ----------- CUBE GENEREATION START -----------
 	glGenVertexArrays(1, &m_VaoCube);
@@ -113,7 +116,9 @@ void GameLayer::OnUpdate(float dt)
 	model = glm::scale(model, glm::vec3(scale, scale, scale));
 	m_Shader->SetUniform("u_Model", model);
 	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
 	m_Skybox->Render(m_Camera);
+
 	m_TessellationShader->Use();
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
@@ -139,7 +144,8 @@ void GameLayer::OnUpdate(float dt)
 		}
 	}
 
-	
+	if(Renderer::debugAxis)
+		m_Axis->Render(m_Camera);
 }
 
 #if 0 OLD_HEIGHTMAP_GENERATION_CODE
@@ -167,6 +173,7 @@ void GameLayer::GenerateHeightMap()
 #pragma warning (pop)
 }
 #endif
+
 void GameLayer::OnImGuiRender()
 {
 	ImGui::Begin("Info");

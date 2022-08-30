@@ -32,6 +32,9 @@ public:
 	inline glm::vec3& GetOrientation() { return m_Orientation; }
 	inline const glm::vec3& GetOrientation() const { return m_Orientation; }
 
+	inline glm::vec3& GetLookAt() { return m_Position + m_Orientation; }
+	inline const glm::vec3& GetLookAt() const { return m_Position + m_Orientation; }
+
 	inline glm::vec3& GetUp() { return m_Up; }
 	inline const glm::vec3& GetUp() const { return m_Up; }
 
