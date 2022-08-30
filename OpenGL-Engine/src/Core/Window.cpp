@@ -34,6 +34,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		Renderer::ToggleMSAA();
 	}
+
+	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
+	{
+		Renderer::debugAxis = !Renderer::debugAxis;
+	}
 }
 
 Window::Window(const WindowProps& props)
@@ -60,10 +65,11 @@ Window::Window(const WindowProps& props)
 		glfwSetWindowPos(m_Window, x, y);
 	}
 
-	m_VSync = false;
-
 	glfwMakeContextCurrent(m_Window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+	m_VSync = false;
+	glfwSwapInterval(0);
 
 	glfwSetErrorCallback(error_callback);
 	glfwSetKeyCallback(m_Window, key_callback);

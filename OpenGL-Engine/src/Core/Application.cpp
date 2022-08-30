@@ -39,7 +39,7 @@ void Application::Run()
 
 		m_ImGuiLayer->Begin();
 		for (Layer* layer : *m_LayerStack)
-			layer->OnImGuiRender();
+			layer->OnImGuiRender(dt);
 		m_ImGuiLayer->End();
 
 		m_Window->OnUpdate();
