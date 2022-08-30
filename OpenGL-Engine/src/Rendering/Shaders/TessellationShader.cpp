@@ -161,6 +161,15 @@ void TessellationShader::SetUniform(const std::string& name, uint32_t value) con
 		printf("Uniform %s not found in shader!\n", name.c_str());
 }
 
+void TessellationShader::SetUniform(const std::string& name, const glm::vec2& value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform2f(location, value.x, value.y);
+	else
+		printf("Uniform %s not found in shader!\n", name.c_str());
+}
+
 void TessellationShader::SetUniform(const std::string& name, const glm::vec3& value) const
 {
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());

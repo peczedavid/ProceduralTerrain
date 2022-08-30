@@ -3,22 +3,12 @@
 #include <glad/glad.h>
 #include <glm/gtx/transform.hpp>
 #include <imgui.h>
-#include <PerlinNoise.hpp>
 #include <iostream>
 #include <random>
 
 constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 1000u;
 constexpr uint32_t planeDivision = 20u;
-
-std::random_device rd; // obtain a random number from hardware
-std::mt19937 gen(rd()); // seed the generator
-std::uniform_int_distribution<> distr(10e3, 10e4); // define the range
-siv::PerlinNoise::seed_type seed = distr(gen);
-siv::PerlinNoise perlin{ seed };
-
-float frequency = 0.002f;
-int octaves = 4;
 
 GameLayer::GameLayer()
 {
@@ -30,13 +20,9 @@ GameLayer::GameLayer()
 		"src/Rendering/Shaders/glsl/terrain.tese",
 		"src/Rendering/Shaders/glsl/terrain.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
-	//m_TessellationShader->TexUnit("u_Texture", 0);
 	m_TessellationShader->TexUnit("u_GroundTexture", 1);
 	m_TessellationShader->TexUnit("u_RockTexture", 2);
 	m_TessellationShader->TexUnit("u_SnowTexture", 3);
-
-	m_HeightMap = new Texture2D(heighMapSize, heighMapSize, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA);
-	//GenerateHeightMap();
 
 	m_Plane = new Plane(planeSize, planeDivision);
 
@@ -127,16 +113,12 @@ void GameLayer::OnUpdate(float dt)
 	model = glm::scale(model, glm::vec3(scale, scale, scale));
 	m_Shader->SetUniform("u_Model", model);
 	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
+	m_Skybox->Render(m_Camera);
 	m_TessellationShader->Use();
-	//m_HeightMap->Bind(0);
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
 	//m_SnowTexture->Bind(3);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
-	//m_TessellationShader->SetUniform("u_GrassLevel", m_GrassLevel);
-	//m_TessellationShader->SetUniform("u_RockLevel", m_RockLevel);
-	//m_TessellationShader->SetUniform("u_SnowLevel", m_SnowLevel);
 	m_TessellationShader->SetUniform("u_View", m_Camera->GetView());
 	m_TessellationShader->SetUniform("u_Amplitude", m_Amplitude);
 	m_TessellationShader->SetUniform("u_Gain", m_Gain);
@@ -145,11 +127,11 @@ void GameLayer::OnUpdate(float dt)
 	m_TessellationShader->SetUniform("u_HeightOffset", m_HeightOffset);
 	m_TessellationShader->SetUniform("u_FogGradient", m_FogGradient);
 	m_TessellationShader->SetUniform("u_FogDensity", m_FogDensity);
-	//m_Plane->Render();
-	
-	for (int z = -1; z < 2; z++)
+	m_TessellationShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+	int levelSize = 3;
+	for (int z = -(levelSize-2); z < (levelSize - 1); z++)
 	{
-		for (int x = -1; x < 2; x++)
+		for (int x = -(levelSize-2); x < (levelSize - 1); x++)
 		{
 			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)planeSize, 0, z * (int)planeSize));
 			m_TessellationShader->SetUniform("u_Model", model);
@@ -157,10 +139,10 @@ void GameLayer::OnUpdate(float dt)
 		}
 	}
 
-
-	m_Skybox->Render(m_Camera);
+	
 }
 
+#if 0 OLD_HEIGHTMAP_GENERATION_CODE
 void GameLayer::GenerateHeightMap()
 {
 #pragma warning ( push )
@@ -184,7 +166,7 @@ void GameLayer::GenerateHeightMap()
 	delete[] bytes;
 #pragma warning (pop)
 }
-
+#endif
 void GameLayer::OnImGuiRender()
 {
 	ImGui::Begin("Info");
@@ -217,6 +199,7 @@ void GameLayer::OnImGuiRender()
 	//ImGui::SliderFloat("Lacunarity", &m_Lacunarity, 0.01f, 2.5f);
 	ImGui::SliderFloat("Scale", &m_Scale, 0.01f, 2.5f);
 	ImGui::SliderFloat("HeightOffset", &m_HeightOffset, 0.0f, 100.0f);
+	ImGui::SliderFloat2("NoiseOffset", &m_NoiseOffset[0], 0.0f, 10.0f);
 	ImGui::End();
 
 	ImGui::Begin("Landscape");

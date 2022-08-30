@@ -24,7 +24,7 @@ private:
 
 	BasicShader* m_Shader;
 	TessellationShader* m_TessellationShader;
-	Texture2D* m_UvTexture, * m_HeightMap;
+	Texture2D* m_UvTexture;
 	Texture2D *m_GroundTexture, *m_RockTexture, *m_SnowTexture;
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
 	Camera* m_Camera;
@@ -34,4 +34,5 @@ private:
 	float m_Scale = 0.100f, m_HeightOffset = 20.726f;
 	float m_FogDensity = 0.002f;
 	float m_FogGradient = 2.5f;
+	glm::vec2 m_NoiseOffset = glm::vec2(0.0f, 0.0f);
 };

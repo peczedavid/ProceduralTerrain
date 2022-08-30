@@ -20,6 +20,7 @@ public:
     void SetUniform(const std::string& name, float value) const override;
     void SetUniform(const std::string& name, uint32_t value) const override;
 
+    void SetUniform(const std::string& name, const glm::vec2& value) const override;
     void SetUniform(const std::string& name, const glm::vec3& value) const override;
     void SetUniform(const std::string& name, const glm::vec4& value) const override;
     void SetUniform(const std::string& name, const glm::mat4& value) const override;

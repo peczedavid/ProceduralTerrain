@@ -7,6 +7,7 @@ uniform mat4 u_ViewProj;
 uniform mat4 u_View;
 uniform float u_MaxLevel;
 
+uniform vec2 u_NoiseOffset;
 uniform float u_Lacunarity;
 uniform float u_Gain;
 uniform float u_Frequency;
@@ -25,7 +26,7 @@ out float v_Visibility;
 float random(in vec2 st);
 float noise(in vec2 st);
 float fbm(in vec2 st);
-vec3 fbmd_9( in vec2 x );
+vec3 fbmd_9(in vec2 x);
 
 void main() {
   float u = gl_TessCoord.x;
@@ -53,10 +54,10 @@ void main() {
   vec2 tex = vec2(st * u_Scale);
   vec3 info = fbmd_9(texCustom * u_Scale);
   v_Height = info.x;
-  v_Normal = normalize( vec3(-info.y,1.0,-info.z));
+  v_Normal = normalize(vec3(-info.y, 1.0, -info.z));
   vec4 uVec = pos2 - pos0;
   vec4 vVec = pos3 - pos0;
-  vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
+  vec4 normal = normalize(vec4(cross(vVec.xyz, uVec.xyz), 0));
   pos += normal * v_Height * u_MaxLevel;
   pos.y += u_HeightOffset;
 
@@ -72,28 +73,27 @@ float random(in vec2 st) {
   return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-float hash1( vec2 p )
-{
-    p  = 50.0*fract( p*0.3183099 );
-    return fract( p.x*p.y*(p.x+p.y) );
+float hash1(vec2 p) {
+  p = 50.0 * fract(p * 0.3183099);
+  return fract(p.x * p.y * (p.x + p.y));
 }
 
-float noise( in vec2 x )
-{
-    vec2 p = floor(x);
-    vec2 w = fract(x);
-    #if 1
-    vec2 u = w*w*w*(w*(w*6.0-15.0)+10.0);
-    #else
-    vec2 u = w*w*(3.0-2.0*w);
-    #endif
+float noise(in vec2 x) {
+  vec2 p = floor(x);
+  vec2 w = fract(x);
+#if 1
+  vec2 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
+#else
+  vec2 u = w * w * (3.0 - 2.0 * w);
+#endif
 
-    float a = hash1(p+vec2(0,0));
-    float b = hash1(p+vec2(1,0));
-    float c = hash1(p+vec2(0,1));
-    float d = hash1(p+vec2(1,1));
-    
-    return -1.0+2.0*(a + (b-a)*u.x + (c-a)*u.y + (a - b - c + d)*u.x*u.y);
+  float a = hash1(p + vec2(0, 0));
+  float b = hash1(p + vec2(1, 0));
+  float c = hash1(p + vec2(0, 1));
+  float d = hash1(p + vec2(1, 1));
+
+  return -1.0 + 2.0 * (a + (b - a) * u.x + (c - a) * u.y +
+                       (a - b - c + d) * u.x * u.y);
 }
 
 // // 2D Noise based on Morgan McGuire @morgan3d
@@ -118,43 +118,34 @@ float noise( in vec2 x )
 //   return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
 // }
 
+const mat3 m3 = mat3(0.00, 0.80, 0.60, -0.80, 0.36, -0.48, -0.60, -0.48, 0.64);
+const mat3 m3i = mat3(0.00, -0.80, -0.60, 0.80, 0.36, -0.48, 0.60, -0.48, 0.64);
+const mat2 m2 = mat2(0.80, 0.60, -0.60, 0.80);
+const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
 
-const mat3 m3  = mat3( 0.00,  0.80,  0.60,
-                      -0.80,  0.36, -0.48,
-                      -0.60, -0.48,  0.64 );
-const mat3 m3i = mat3( 0.00, -0.80, -0.60,
-                       0.80,  0.36, -0.48,
-                       0.60, -0.48,  0.64 );
-const mat2 m2 = mat2(  0.80,  0.60,
-                      -0.60,  0.80 );
-const mat2 m2i = mat2( 0.80, -0.60,
-                       0.60,  0.80 );
+vec3 noised(in vec2 x) {
+  vec2 p = floor(x);
+  vec2 w = fract(x);
+#if 1
+  vec2 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
+  vec2 du = 30.0 * w * w * (w * (w - 2.0) + 1.0);
+#else
+  vec2 u = w * w * (3.0 - 2.0 * w);
+  vec2 du = 6.0 * w * (1.0 - w);
+#endif
 
-vec3 noised( in vec2 x )
-{
-    vec2 p = floor(x);
-    vec2 w = fract(x);
-    #if 1
-    vec2 u = w*w*w*(w*(w*6.0-15.0)+10.0);
-    vec2 du = 30.0*w*w*(w*(w-2.0)+1.0);
-    #else
-    vec2 u = w*w*(3.0-2.0*w);
-    vec2 du = 6.0*w*(1.0-w);
-    #endif
-    
-    float a = hash1(p+vec2(0,0));
-    float b = hash1(p+vec2(1,0));
-    float c = hash1(p+vec2(0,1));
-    float d = hash1(p+vec2(1,1));
+  float a = hash1(p + vec2(0, 0));
+  float b = hash1(p + vec2(1, 0));
+  float c = hash1(p + vec2(0, 1));
+  float d = hash1(p + vec2(1, 1));
 
-    float k0 = a;
-    float k1 = b - a;
-    float k2 = c - a;
-    float k4 = a - b - c + d;
+  float k0 = a;
+  float k1 = b - a;
+  float k2 = c - a;
+  float k4 = a - b - c + d;
 
-    return vec3( -1.0+2.0*(k0 + k1*u.x + k2*u.y + k4*u.x*u.y), 
-                 2.0*du * vec2( k1 + k4*u.y,
-                            k2 + k4*u.x ) );
+  return vec3(-1.0 + 2.0 * (k0 + k1 * u.x + k2 * u.y + k4 * u.x * u.y),
+              2.0 * du * vec2(k1 + k4 * u.y, k2 + k4 * u.x));
 }
 
 float fbm(in vec2 st) {
@@ -178,23 +169,21 @@ float fbm(in vec2 st) {
   return y;
 }
 
-vec3 fbmd_9( in vec2 x )
-{
-    float f = u_Frequency;
-    float s = u_Gain;
-    float a = 0.0;
-    float b = u_Amplitude;
-    vec2  d = vec2(0.0);
-    mat2  m = mat2(1.0,0.0,0.0,1.0);
-    for( int i=0; i<12; i++ )
-    {
-        vec3 n = noised(x);
-        a += b*n.x;          // accumulate values		
-        d += b*m*n.yz;       // accumulate derivatives
-        b *= s;
-        x = f*m2*x;
-        m = f*m2i*m;
-    }
+vec3 fbmd_9(in vec2 x) {
+  float f = u_Frequency;
+  float s = u_Gain;
+  float a = 0.0;
+  float b = u_Amplitude;
+  vec2 d = vec2(0.0);
+  mat2 m = mat2(1.0, 0.0, 0.0, 1.0);
+  for (int i = 0; i < 32; i++) {
+    vec3 n = noised(x + u_NoiseOffset);
+    a += b * n.x;      // accumulate values
+    d += b * m * n.yz; // accumulate derivatives
+    b *= s;
+    x = f * m2 * x;
+    m = f * m2i * m;
+  }
 
-	return vec3( a, d );
+  return vec3(a, d);
 }
