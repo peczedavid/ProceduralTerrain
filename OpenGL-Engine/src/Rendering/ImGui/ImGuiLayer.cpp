@@ -43,7 +43,7 @@ void ImGuiLayer::OnDetach()
 	ImGui::DestroyContext();
 }
 
-void ImGuiLayer::OnImGuiRender()
+void ImGuiLayer::OnImGuiRender(float dt)
 {
 }
 

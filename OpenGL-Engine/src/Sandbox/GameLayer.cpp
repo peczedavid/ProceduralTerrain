@@ -27,7 +27,7 @@ GameLayer::GameLayer()
 
 	m_Plane = new Plane(planeSize, planeDivision);
 
-	m_Camera = new Camera(glm::vec3(0, 128, 256), glm::vec3(0, -0.45f, -1.0f));
+	m_Camera = new Camera(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 
 	BasicShader* skyboxShader = new BasicShader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
@@ -122,7 +122,6 @@ void GameLayer::OnUpdate(float dt)
 	m_TessellationShader->Use();
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
-	//m_SnowTexture->Bind(3);
 	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	m_TessellationShader->SetUniform("u_View", m_Camera->GetView());
 	m_TessellationShader->SetUniform("u_Amplitude", m_Amplitude);
@@ -174,11 +173,12 @@ void GameLayer::GenerateHeightMap()
 }
 #endif
 
-void GameLayer::OnImGuiRender()
+void GameLayer::OnImGuiRender(float dt)
 {
 	ImGui::Begin("Info");
 	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
 	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
+	ImGui::Text("FPS: %d", int(1.0f / dt));
 	ImGui::End();
 
 	ImGui::Begin("Controls");

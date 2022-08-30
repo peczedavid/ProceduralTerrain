@@ -14,7 +14,7 @@ public:
 	GameLayer();
 
 	void OnUpdate(float dt) override;
-	void OnImGuiRender() override;
+	void OnImGuiRender(float dt) override;
 private:
 	void GenerateHeightMap();
 private:

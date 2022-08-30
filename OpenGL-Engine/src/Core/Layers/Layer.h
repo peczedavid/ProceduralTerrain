@@ -11,7 +11,7 @@ public:
 	virtual void OnAttach() { }
 	virtual void OnDetach() { }
 	virtual void OnUpdate(float dt) { }
-	virtual void OnImGuiRender() { }
+	virtual void OnImGuiRender(float dt) { }
 
 	inline const std::string& GetName() const { return m_Name; }
 protected:
