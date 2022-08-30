@@ -62,12 +62,18 @@ Skybox::Skybox(Shader* shader)
 
 	std::string facesPath[6] =
 	{
-		"assets/Textures/Skybox/skybox_px.png",
+		/*"assets/Textures/Skybox/skybox_px.png",
 		"assets/Textures/Skybox/skybox_nx.png",
 		"assets/Textures/Skybox/skybox_py.png",
 		"assets/Textures/Skybox/skybox_ny.png",
 		"assets/Textures/Skybox/skybox_pz.png",
-		"assets/Textures/Skybox/skybox_nz.png",
+		"assets/Textures/Skybox/skybox_nz.png",*/
+		"assets/Textures/Skybox/right.jpg",
+		"assets/Textures/Skybox/left.jpg",
+		"assets/Textures/Skybox/top.jpg",
+		"assets/Textures/Skybox/bottom.jpg",
+		"assets/Textures/Skybox/front.jpg",
+		"assets/Textures/Skybox/back.jpg",
 	};
 
 	glGenTextures(1, &m_TextureId);

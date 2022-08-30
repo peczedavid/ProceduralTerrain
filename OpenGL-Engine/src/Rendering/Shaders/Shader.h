@@ -9,22 +9,19 @@
 class Shader
 {
 public:
+    virtual void Use() const = 0;
 
-    Shader(const char* vertexPath, const char* fragmentPath, const char* outputName = "outColor");
-    ~Shader();
+    virtual uint32_t GetProgramId() = 0;
+    virtual const uint32_t GetProgramId() const = 0;
 
-    void Use() const;
+    virtual void TexUnit(const std::string& name, uint32_t slot) const = 0;
 
-    inline uint32_t GetProgramId() { return m_ProgramId; }
-    inline const uint32_t GetProgramId() const { return m_ProgramId; }
+    virtual void SetUniform(const std::string& name, int value) const = 0;
+    virtual void SetUniform(const std::string& name, uint32_t value) const = 0;
+    virtual void SetUniform(const std::string& name, float value) const = 0;
 
-    void SetUniform(const std::string& name, int value) const;
-    void SetUniform(const std::string& name, float value) const;
-
-    void SetUniform(const std::string& name, const glm::vec3& value) const;
-    void SetUniform(const std::string& name, const glm::vec4& value) const;
-    void SetUniform(const std::string& name, const glm::mat4& value) const;
-private:
-    uint32_t m_ProgramId;
-
+    virtual void SetUniform(const std::string& name, const glm::vec2& value) const = 0;
+    virtual void SetUniform(const std::string& name, const glm::vec3& value) const = 0;
+    virtual void SetUniform(const std::string& name, const glm::vec4& value) const = 0;
+    virtual void SetUniform(const std::string& name, const glm::mat4& value) const = 0;
 };

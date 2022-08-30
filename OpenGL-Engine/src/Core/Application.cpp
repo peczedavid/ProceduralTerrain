@@ -4,7 +4,7 @@
 Application* Application::s_Instance = nullptr;
 
 Application::Application(const WindowProps& props)
-	: m_Cursor(true)
+	: m_Cursor(false)
 {
 	m_Window = new Window(props);
 	m_Window->SetCursor(m_Cursor);
@@ -39,7 +39,7 @@ void Application::Run()
 
 		m_ImGuiLayer->Begin();
 		for (Layer* layer : *m_LayerStack)
-			layer->OnImGuiRender();
+			layer->OnImGuiRender(dt);
 		m_ImGuiLayer->End();
 
 		m_Window->OnUpdate();

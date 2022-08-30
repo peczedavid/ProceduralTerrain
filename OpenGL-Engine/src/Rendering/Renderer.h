@@ -1,20 +1,16 @@
 #pragma once
 #include <glad/glad.h>
 
-// Might become a namespace
 namespace Renderer
 {
-	static bool wireframe = false;
+	extern bool debugAxis;
 
-	static void TogglePolygonMode()
-	{
-		wireframe = !wireframe;
-		glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
-	}
+	extern bool wireframe;
 
-	static void SetOpenGLConfig()
-	{
-		glEnable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
-	}
+	void TogglePolygonMode();
+
+	extern bool multisample;
+	void ToggleMSAA();
+
+	void SetOpenGLConfig();
 };

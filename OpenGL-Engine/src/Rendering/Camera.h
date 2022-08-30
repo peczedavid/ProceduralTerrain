@@ -17,7 +17,7 @@ private:
 	glm::mat4 m_Proj;
 	glm::mat4 m_CameraMatrix;
 
-	float m_BaseSpeed = 3.f;
+	float m_BaseSpeed = 40.f;
 	float m_SpeedMultiplier = 1.f;
 	float m_Speed = m_BaseSpeed * m_SpeedMultiplier;
 	float m_Sensitivity = 50.f;
@@ -31,6 +31,9 @@ public:
 
 	inline glm::vec3& GetOrientation() { return m_Orientation; }
 	inline const glm::vec3& GetOrientation() const { return m_Orientation; }
+
+	inline glm::vec3& GetLookAt() { return m_Position + m_Orientation; }
+	inline const glm::vec3& GetLookAt() const { return m_Position + m_Orientation; }
 
 	inline glm::vec3& GetUp() { return m_Up; }
 	inline const glm::vec3& GetUp() const { return m_Up; }
