@@ -176,7 +176,7 @@ vec3 fbmd_9(in vec2 x) {
   float b = u_Amplitude;
   vec2 d = vec2(0.0);
   mat2 m = mat2(1.0, 0.0, 0.0, 1.0);
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 16; i++) {
     vec3 n = noised(x + u_NoiseOffset);
     a += b * n.x;      // accumulate values
     d += b * m * n.yz; // accumulate derivatives
