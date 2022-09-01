@@ -78,46 +78,6 @@ float hash1(vec2 p) {
   return fract(p.x * p.y * (p.x + p.y));
 }
 
-float noise(in vec2 x) {
-  vec2 p = floor(x);
-  vec2 w = fract(x);
-#if 1
-  vec2 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
-#else
-  vec2 u = w * w * (3.0 - 2.0 * w);
-#endif
-
-  float a = hash1(p + vec2(0, 0));
-  float b = hash1(p + vec2(1, 0));
-  float c = hash1(p + vec2(0, 1));
-  float d = hash1(p + vec2(1, 1));
-
-  return -1.0 + 2.0 * (a + (b - a) * u.x + (c - a) * u.y +
-                       (a - b - c + d) * u.x * u.y);
-}
-
-// // 2D Noise based on Morgan McGuire @morgan3d
-// // https://www.shadertoy.com/view/4dS3Wd
-// float noise(in vec2 st) {
-//   vec2 i = floor(st);
-//   vec2 f = fract(st);
-
-//   // Four corners in 2D of a tile
-//   float a = random(i);
-//   float b = random(i + vec2(1.0, 0.0));
-//   float c = random(i + vec2(0.0, 1.0));
-//   float d = random(i + vec2(1.0, 1.0));
-
-//   // Smooth Interpolation
-
-//   // Cubic Hermine Curve.  Same as SmoothStep()
-//   vec2 u = f * f * (3.0 - 2.0 * f);
-//   // u = smoothstep(0.,1.,f);
-
-//   // Mix 4 coorners percentages
-//   return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-// }
-
 const mat3 m3 = mat3(0.00, 0.80, 0.60, -0.80, 0.36, -0.48, -0.60, -0.48, 0.64);
 const mat3 m3i = mat3(0.00, -0.80, -0.60, 0.80, 0.36, -0.48, 0.60, -0.48, 0.64);
 const mat2 m2 = mat2(0.80, 0.60, -0.60, 0.80);
@@ -148,27 +108,6 @@ vec3 noised(in vec2 x) {
               2.0 * du * vec2(k1 + k4 * u.y, k2 + k4 * u.x));
 }
 
-float fbm(in vec2 st) {
-  // Properties
-  const int octaves = 8;
-  float lacunarity = u_Lacunarity;
-  float gain = u_Gain;
-
-  // Initial values
-  float amplitude = u_Amplitude;
-  float frequency = u_Frequency;
-  float y = 0.0;
-
-  // Loop of octaves
-  vec2 offset = vec2(0.0, 0.0);
-  for (int i = 0; i < octaves; i++) {
-    y += amplitude * noise(frequency * (st + offset));
-    frequency *= lacunarity;
-    amplitude *= gain;
-  }
-  return y;
-}
-
 vec3 fbmd_9(in vec2 x) {
   float f = u_Frequency;
   float s = u_Gain;
@@ -176,7 +115,7 @@ vec3 fbmd_9(in vec2 x) {
   float b = u_Amplitude;
   vec2 d = vec2(0.0);
   mat2 m = mat2(1.0, 0.0, 0.0, 1.0);
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 16; i++) {
     vec3 n = noised(x + u_NoiseOffset);
     a += b * n.x;      // accumulate values
     d += b * m * n.yz; // accumulate derivatives

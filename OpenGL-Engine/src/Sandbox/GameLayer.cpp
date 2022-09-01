@@ -10,22 +10,33 @@
 constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 1000u;
 constexpr uint32_t planeDivision = 20u;
+constexpr uint32_t waterPlaneSize = 1000u;
+constexpr uint32_t waterPlaneDivision = 100u;
 
 GameLayer::GameLayer()
 {
 	m_Shader = new BasicShader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
 	m_Shader->TexUnit("u_Texture", 0);
-	m_TessellationShader = new TessellationShader(
-		"src/Rendering/Shaders/glsl/terrain.vert",
-		"src/Rendering/Shaders/glsl/terrain.tesc",
-		"src/Rendering/Shaders/glsl/terrain.tese",
-		"src/Rendering/Shaders/glsl/terrain.frag");
+	m_TerrainShader = new TessellationShader(
+		"src/Rendering/Shaders/glsl/terrain/terrain.vert",
+		"src/Rendering/Shaders/glsl/terrain/terrain.tesc",
+		"src/Rendering/Shaders/glsl/terrain/terrain.tese",
+		"src/Rendering/Shaders/glsl/terrain/terrain.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
-	m_TessellationShader->TexUnit("u_GroundTexture", 1);
-	m_TessellationShader->TexUnit("u_RockTexture", 2);
-	m_TessellationShader->TexUnit("u_SnowTexture", 3);
+	m_TerrainShader->TexUnit("u_GroundTexture", 1);
+	m_TerrainShader->TexUnit("u_RockTexture", 2);
+	m_TerrainShader->TexUnit("u_SnowTexture", 3);
+
+	m_WaterShader = new TessellationShader(
+		"src/Rendering/Shaders/glsl/water/water.vert",
+		"src/Rendering/Shaders/glsl/water/water.tesc",
+		"src/Rendering/Shaders/glsl/water/water.tese",
+		"src/Rendering/Shaders/glsl/water/water.frag");
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
+	m_WaterShader->TexUnit("u_WaterTexture", 0);
 
 	m_Plane = new Plane(planeSize, planeDivision);
+	m_WaterPlane = new Plane(waterPlaneSize, waterPlaneDivision);
 
 	m_Camera = new Camera(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 
@@ -84,6 +95,7 @@ GameLayer::GameLayer()
 	m_GroundTexture = new Texture2D("assets/Textures/ground-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_RockTexture = new Texture2D("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_SnowTexture = new Texture2D("assets/Textures/snow-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_WaterTexture = new Texture2D("assets/Textures/water-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -100,8 +112,8 @@ void GameLayer::OnUpdate(float dt)
 	if (!Application::Get().IsCursor())
 		m_Camera->Update(dt);
 
-	m_TessellationShader->Use();
-	m_TessellationShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
+	m_TerrainShader->Use();
+	m_TerrainShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 	m_Shader->Use();
 	m_Shader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 
@@ -119,29 +131,58 @@ void GameLayer::OnUpdate(float dt)
 
 	m_Skybox->Render(m_Camera);
 
-	m_TessellationShader->Use();
+	m_TerrainShader->Use();
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
-	m_TessellationShader->SetUniform("u_MaxLevel", m_MaxHeight);
-	m_TessellationShader->SetUniform("u_View", m_Camera->GetView());
-	m_TessellationShader->SetUniform("u_Amplitude", m_Amplitude);
-	m_TessellationShader->SetUniform("u_Gain", m_Gain);
-	m_TessellationShader->SetUniform("u_Frequency", m_Frequency);
-	m_TessellationShader->SetUniform("u_Scale", m_Scale);
-	m_TessellationShader->SetUniform("u_HeightOffset", m_HeightOffset);
-	m_TessellationShader->SetUniform("u_FogGradient", m_FogGradient);
-	m_TessellationShader->SetUniform("u_FogDensity", m_FogDensity);
-	m_TessellationShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+	m_TerrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
+	m_TerrainShader->SetUniform("u_View", m_Camera->GetView());
+	m_TerrainShader->SetUniform("u_Amplitude", m_Amplitude);
+	m_TerrainShader->SetUniform("u_Gain", m_Gain);
+	m_TerrainShader->SetUniform("u_Frequency", m_Frequency);
+	m_TerrainShader->SetUniform("u_Scale", m_Scale);
+	m_TerrainShader->SetUniform("u_HeightOffset", m_HeightOffset);
+	m_TerrainShader->SetUniform("u_FogGradient", m_FogGradient);
+	m_TerrainShader->SetUniform("u_FogDensity", m_FogDensity);
+	m_TerrainShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+	m_TerrainShader->SetUniform("u_NormalView", m_NormalView ? 1 : 0);
 	int levelSize = 3;
 	for (int z = -(levelSize-2); z < (levelSize - 1); z++)
 	{
 		for (int x = -(levelSize-2); x < (levelSize - 1); x++)
 		{
 			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)planeSize, 0, z * (int)planeSize));
-			m_TessellationShader->SetUniform("u_Model", model);
+			m_TerrainShader->SetUniform("u_Model", model);
 			m_Plane->Render();
 		}
 	}
+
+	m_WaterShader->Use();
+	m_WaterTexture->Bind(0);
+	m_WaterShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
+	m_WaterShader->SetUniform("u_View", m_Camera->GetView());
+	m_WaterShader->SetUniform("u_FogGradient", m_FogGradient);
+	m_WaterShader->SetUniform("u_FogDensity", m_FogDensity);
+	m_WaterShader->SetUniform("u_WaveA", m_WaveA);
+	m_WaterShader->SetUniform("u_WaveB", m_WaveB);
+	m_WaterShader->SetUniform("u_WaveC", m_WaveC);
+	m_WaterShader->SetUniform("u_Time", t);
+
+#if 0
+	for (int z = -(levelSize - 2); z < (levelSize - 1); z++)
+	{
+		for (int x = -(levelSize - 2); x < (levelSize - 1); x++)
+		{
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)waterPlaneSize, m_WaterLevel, z * (int)waterPlaneSize));
+			m_WaterShader->SetUniform("u_Model", model);
+			m_WaterPlane->Render();
+		}
+	}
+#else
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize/2.f, m_WaterLevel, -(float)waterPlaneSize /2.f));
+	m_WaterShader->SetUniform("u_Model", model);
+	m_WaterPlane->Render();
+#endif
+	
 
 	if(Renderer::debugAxis)
 		m_Axis->Render(m_Camera);
@@ -178,7 +219,20 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::Begin("Info");
 	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
 	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
-	ImGui::Text("FPS: %d", int(1.0f / dt));
+	static uint32_t FPS = 0u;
+	static float lastFPSUpdate = 0.0f;
+	static float sumDt = 0.0f;
+	static uint32_t numFrames = 0u;
+	lastFPSUpdate += dt;
+	sumDt += dt;
+	numFrames++;
+	if (lastFPSUpdate >= 0.5f) {
+		lastFPSUpdate = 0.0f;
+		FPS = (float)(numFrames) / sumDt;
+		numFrames = 0u;
+		sumDt = 0.0f;
+	}
+	ImGui::Text("FPS: %d", FPS);
 	ImGui::End();
 
 	ImGui::Begin("Controls");
@@ -197,7 +251,7 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f); 
 	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
 	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
-	ImGui::SliderFloat("Scale", &m_Scale, 0.01f, 2.5f);
+	ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 0.3f);
 	ImGui::SliderFloat("HeightOffset", &m_HeightOffset, 0.0f, 100.0f);
 	ImGui::SliderFloat2("NoiseOffset", &m_NoiseOffset[0], 0.0f, 10.0f);
 	ImGui::End();
@@ -206,5 +260,19 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
 	ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
 	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
+	ImGui::Checkbox("Normals", &m_NormalView);
+	ImGui::End();
+
+	ImGui::Begin("Water");
+	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 50.0f);
+	ImGui::SliderFloat("A - Steepness", &m_WaveA[2], 0.0f, 1.0f);
+	ImGui::SliderFloat("A - Wavelength", &m_WaveA[3], 10.0f, 75.0f);
+	ImGui::SliderFloat2("A - Direction", &m_WaveA[0], -1.0f, 1.0f);
+	ImGui::SliderFloat("B - Steepness", &m_WaveB[2], 0.0f, 1.0f);
+	ImGui::SliderFloat("B - Wavelength", &m_WaveB[3], 10.0f, 75.0f);
+	ImGui::SliderFloat2("B - Direction", &m_WaveB[0], -1.0f, 1.0f);
+	ImGui::SliderFloat("C - Steepness", &m_WaveC[2], 0.0f, 1.0f);
+	ImGui::SliderFloat("C - Wavelength", &m_WaveC[3], 10.0f, 75.0f);
+	ImGui::SliderFloat2("C - Direction", &m_WaveC[0], -1.0f, 1.0f);
 	ImGui::End();
 }

@@ -16,13 +16,15 @@ void window_size_callback(GLFWwindow* window, int width, int height)
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	auto& app = Application::Get();
+
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
-		Application::Get().SetCursor(!Application::Get().IsCursor());
-		glfwSetInputMode(window, GLFW_CURSOR, Application::Get().IsCursor() ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+		app.SetCursor(!Application::Get().IsCursor());
+		glfwSetInputMode(window, GLFW_CURSOR, app.IsCursor() ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 	}
 
 	if (key == GLFW_KEY_F && action == GLFW_PRESS)
@@ -38,6 +40,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
 	{
 		Renderer::debugAxis = !Renderer::debugAxis;
+	}
+
+	if(key == GLFW_KEY_F1 && action == GLFW_PRESS)
+	{
+		app.ToggleImGui();
 	}
 }
 
@@ -68,8 +75,8 @@ Window::Window(const WindowProps& props)
 	glfwMakeContextCurrent(m_Window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-	m_VSync = false;
-	glfwSwapInterval(0);
+	m_VSync = true;
+	glfwSwapInterval(1);
 
 	glfwSetErrorCallback(error_callback);
 	glfwSetKeyCallback(m_Window, key_callback);
