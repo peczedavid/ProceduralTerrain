@@ -11,6 +11,7 @@ uniform mat4 u_ViewProj;
 
 
 in vec2 v_UVsCoord[];
+out vec3 v_WorldPos;
 out vec3 v_Normal;
 out vec2 v_TexCoords;
 out float v_Visibility;
@@ -18,9 +19,39 @@ out float v_Visibility;
 uniform float u_Time;
 uniform float u_FogDensity;
 uniform float u_FogGradient;
-uniform float u_Steepness;
-uniform float u_WaveLength;
-uniform vec2 u_Direction;
+
+uniform vec4 u_WaveA;
+uniform vec4 u_WaveB;
+uniform vec4 u_WaveC;
+
+vec3 GerstnerWave(vec4 wave, vec3 pos, inout vec3 tangent, inout vec3 binormal)
+{
+  float steepness = wave.z;
+  float waveLength = wave.w;
+  float k = 2 * M_PI / waveLength;
+  float c = sqrt(9.81 / k);
+  vec2 d = normalize(wave.xy);
+  float f = k * (dot(d, pos.xz) - u_Time * c);
+  float a = steepness / k;
+
+  tangent += vec3(
+    -d.x * d.x * (steepness * sin(f)),
+    d.x * (steepness * cos(f)),
+    -d.x * d.y * (steepness * sin(f))
+  );
+
+  binormal += vec3(
+    -d.x * d.y * (steepness * sin(f)),
+    d.y * (steepness* cos(f)),
+    -d.y * d.y * (steepness * sin(f))
+  );
+
+  return vec3(
+    d.x * (a * cos(f)),
+    a * sin(f),
+    d.y * (a * cos(f))
+  );
+}
 
 void main() {
   float u = gl_TessCoord.x;
@@ -44,31 +75,15 @@ void main() {
   vec4 rightPos = pos1 + v * (pos2 - pos1);
   vec4 pos = leftPos + u * (rightPos - leftPos);
 
-  float k = 2 * M_PI / u_WaveLength;
-  float c = sqrt(M_GRAVITY / k);
-  vec2 d = normalize(u_Direction);
-  float f = k * (dot(d, pos.xz) - u_Time * c);
-  float a = u_Steepness / k;
-
-  pos.x += d.x * (a * cos(f));
-  pos.y = a * sin(f);
-  pos.z += d.y * (a * cos(f));
-
-  // Chain rule
-  vec3 tangent = normalize(vec3(
-    1.0 - d.x * d.x * (u_Steepness * sin(f)),
-    d.x * (u_Steepness* cos(f)),
-    -d.x * d.y * (u_Steepness * sin(f))
-  ));
-
-  vec3 binormal = normalize(vec3(
-    -d.x * d.y * (u_Steepness * sin(f)),
-    d.y * (u_Steepness* cos(f)),
-    1.0 - d.y * d.y * (u_Steepness * sin(f))
-  ));
+  vec3 tangent = vec3(1.0, 0.0, 0.0);
+  vec3 binormal = vec3(0.0, 0.0, 1.0);
+  pos.xyz += GerstnerWave(u_WaveA, pos.xyz, tangent, binormal);
+  pos.xyz += GerstnerWave(u_WaveB, pos.xyz, tangent, binormal);
+  pos.xyz += GerstnerWave(u_WaveC, pos.xyz, tangent, binormal);
 
   gl_Position = u_ViewProj * u_Model * pos;
-  v_TexCoords = texCoord * 25.0;
+  v_WorldPos = gl_Position.xyz;
+  v_TexCoords = texCoord * 35.0;
   v_Normal = vec3(cross(binormal, tangent));
 
   float vertexDistance = length((u_View * u_Model * pos).xyz);

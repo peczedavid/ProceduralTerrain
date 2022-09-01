@@ -41,10 +41,10 @@ private:
 	glm::vec2 m_NoiseOffset = glm::vec2(0.0f, 0.0f);
 	
 	Plane* m_WaterPlane;
-	float m_WaterLevel = 0.0f;
-	float m_Steepness = 0.5f;
-	float m_WaveLength = 25.0f;
-	glm::vec2 m_FlowDirection = glm::vec2(1.0f, 0.0f);
+	float m_WaterLevel = -15.0f;
+	glm::vec4 m_WaveA = glm::vec4(1.0f, 1.0f, 0.125f, 60.0f);
+	glm::vec4 m_WaveB = glm::vec4(1.0f, 0.6f, 0.125f, 31.0f);
+	glm::vec4 m_WaveC = glm::vec4(1.0f, 1.3f, 0.125f, 18.0f);
 
 	bool m_NormalView = false;
 };

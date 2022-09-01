@@ -10,8 +10,8 @@
 constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 1000u;
 constexpr uint32_t planeDivision = 20u;
-constexpr uint32_t waterPlaneSize = 500u;
-constexpr uint32_t waterPlaneDivision = 25u;
+constexpr uint32_t waterPlaneSize = 1000u;
+constexpr uint32_t waterPlaneDivision = 100u;
 
 GameLayer::GameLayer()
 {
@@ -157,14 +157,14 @@ void GameLayer::OnUpdate(float dt)
 	}
 
 	m_WaterShader->Use();
-	//m_WaterTexture->Bind(0);
+	m_WaterTexture->Bind(0);
 	m_WaterShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 	m_WaterShader->SetUniform("u_View", m_Camera->GetView());
 	m_WaterShader->SetUniform("u_FogGradient", m_FogGradient);
 	m_WaterShader->SetUniform("u_FogDensity", m_FogDensity);
-	m_WaterShader->SetUniform("u_Steepness", m_Steepness);
-	m_WaterShader->SetUniform("u_WaveLength", m_WaveLength);
-	m_WaterShader->SetUniform("u_Direction", m_FlowDirection);
+	m_WaterShader->SetUniform("u_WaveA", m_WaveA);
+	m_WaterShader->SetUniform("u_WaveB", m_WaveB);
+	m_WaterShader->SetUniform("u_WaveC", m_WaveC);
 	m_WaterShader->SetUniform("u_Time", t);
 
 #if 0
@@ -265,8 +265,14 @@ void GameLayer::OnImGuiRender(float dt)
 
 	ImGui::Begin("Water");
 	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 50.0f);
-	ImGui::SliderFloat("Steepness", &m_Steepness, 0.0f, 1.0f);
-	ImGui::SliderFloat("Wavelength", &m_WaveLength, 10.0f, 75.0f);
-	ImGui::SliderFloat2("Direction", &m_FlowDirection[0], -1.0f, 1.0f);
+	ImGui::SliderFloat("A - Steepness", &m_WaveA[2], 0.0f, 1.0f);
+	ImGui::SliderFloat("A - Wavelength", &m_WaveA[3], 10.0f, 75.0f);
+	ImGui::SliderFloat2("A - Direction", &m_WaveA[0], -1.0f, 1.0f);
+	ImGui::SliderFloat("B - Steepness", &m_WaveB[2], 0.0f, 1.0f);
+	ImGui::SliderFloat("B - Wavelength", &m_WaveB[3], 10.0f, 75.0f);
+	ImGui::SliderFloat2("B - Direction", &m_WaveB[0], -1.0f, 1.0f);
+	ImGui::SliderFloat("C - Steepness", &m_WaveC[2], 0.0f, 1.0f);
+	ImGui::SliderFloat("C - Wavelength", &m_WaveC[3], 10.0f, 75.0f);
+	ImGui::SliderFloat2("C - Direction", &m_WaveC[0], -1.0f, 1.0f);
 	ImGui::End();
 }
