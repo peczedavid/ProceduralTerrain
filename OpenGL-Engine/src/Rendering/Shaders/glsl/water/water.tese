@@ -20,6 +20,7 @@ uniform float u_FogDensity;
 uniform float u_FogGradient;
 uniform float u_Steepness;
 uniform float u_WaveLength;
+uniform vec2 u_Direction;
 
 void main() {
   float u = gl_TessCoord.x;
@@ -45,20 +46,30 @@ void main() {
 
   float k = 2 * M_PI / u_WaveLength;
   float c = sqrt(M_GRAVITY / k);
-  float f = k * (pos.x - u_Time * c);
+  vec2 d = normalize(u_Direction);
+  float f = k * (dot(d, pos.xz) - u_Time * c);
   float a = u_Steepness / k;
-  pos.x += a * cos(f);
+
+  pos.x += d.x * (a * cos(f));
   pos.y = a * sin(f);
+  pos.z += d.y * (a * cos(f));
+
   // Chain rule
   vec3 tangent = normalize(vec3(
-    1.0 - u_Steepness * sin(f),
-    u_Steepness* cos(f),
-    0.0
+    1.0 - d.x * d.x * (u_Steepness * sin(f)),
+    d.x * (u_Steepness* cos(f)),
+    -d.x * d.y * (u_Steepness * sin(f))
+  ));
+
+  vec3 binormal = normalize(vec3(
+    -d.x * d.y * (u_Steepness * sin(f)),
+    d.y * (u_Steepness* cos(f)),
+    1.0 - d.y * d.y * (u_Steepness * sin(f))
   ));
 
   gl_Position = u_ViewProj * u_Model * pos;
   v_TexCoords = texCoord * 25.0;
-  v_Normal = vec3(-tangent.y, tangent.x, 0.0);
+  v_Normal = vec3(cross(binormal, tangent));
 
   float vertexDistance = length((u_View * u_Model * pos).xyz);
   v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));

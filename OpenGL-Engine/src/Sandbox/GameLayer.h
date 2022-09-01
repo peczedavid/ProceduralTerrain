@@ -44,6 +44,7 @@ private:
 	float m_WaterLevel = 0.0f;
 	float m_Steepness = 0.5f;
 	float m_WaveLength = 25.0f;
+	glm::vec2 m_FlowDirection = glm::vec2(1.0f, 0.0f);
 
 	bool m_NormalView = false;
 };

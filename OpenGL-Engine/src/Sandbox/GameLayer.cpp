@@ -164,6 +164,7 @@ void GameLayer::OnUpdate(float dt)
 	m_WaterShader->SetUniform("u_FogDensity", m_FogDensity);
 	m_WaterShader->SetUniform("u_Steepness", m_Steepness);
 	m_WaterShader->SetUniform("u_WaveLength", m_WaveLength);
+	m_WaterShader->SetUniform("u_Direction", m_FlowDirection);
 	m_WaterShader->SetUniform("u_Time", t);
 
 #if 0
@@ -266,5 +267,6 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 50.0f);
 	ImGui::SliderFloat("Steepness", &m_Steepness, 0.0f, 1.0f);
 	ImGui::SliderFloat("Wavelength", &m_WaveLength, 10.0f, 75.0f);
+	ImGui::SliderFloat2("Direction", &m_FlowDirection[0], -1.0f, 1.0f);
 	ImGui::End();
 }
