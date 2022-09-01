@@ -2,16 +2,24 @@
 
 layout(quads, fractional_odd_spacing, ccw) in;
 
+#define M_PI 3.1415926535897932384626433832795
+#define M_GRAVITY 9.81
+
 uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform mat4 u_ViewProj;
 
+
 in vec2 v_UVsCoord[];
+out vec3 v_Normal;
 out vec2 v_TexCoords;
 out float v_Visibility;
 
+uniform float u_Time;
 uniform float u_FogDensity;
 uniform float u_FogGradient;
+uniform float u_Steepness;
+uniform float u_WaveLength;
 
 void main() {
   float u = gl_TessCoord.x;
@@ -35,8 +43,22 @@ void main() {
   vec4 rightPos = pos1 + v * (pos2 - pos1);
   vec4 pos = leftPos + u * (rightPos - leftPos);
 
+  float k = 2 * M_PI / u_WaveLength;
+  float c = sqrt(M_GRAVITY / k);
+  float f = k * (pos.x - u_Time * c);
+  float a = u_Steepness / k;
+  pos.x += a * cos(f);
+  pos.y = a * sin(f);
+  // Chain rule
+  vec3 tangent = normalize(vec3(
+    1.0 - u_Steepness * sin(f),
+    u_Steepness* cos(f),
+    0.0
+  ));
+
   gl_Position = u_ViewProj * u_Model * pos;
   v_TexCoords = texCoord * 25.0;
+  v_Normal = vec3(-tangent.y, tangent.x, 0.0);
 
   float vertexDistance = length((u_View * u_Model * pos).xyz);
   v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));

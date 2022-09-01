@@ -38,8 +38,12 @@ private:
 	float m_Scale = 0.100f, m_HeightOffset = 20.726f;
 	float m_FogDensity = 0.002f;
 	float m_FogGradient = 2.5f;
-	float m_WaterLevel = -25.0f;
 	glm::vec2 m_NoiseOffset = glm::vec2(0.0f, 0.0f);
 	
+	Plane* m_WaterPlane;
+	float m_WaterLevel = 0.0f;
+	float m_Steepness = 0.5f;
+	float m_WaveLength = 25.0f;
+
 	bool m_NormalView = false;
 };

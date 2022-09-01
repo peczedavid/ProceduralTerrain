@@ -10,6 +10,8 @@
 constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 1000u;
 constexpr uint32_t planeDivision = 20u;
+constexpr uint32_t waterPlaneSize = 500u;
+constexpr uint32_t waterPlaneDivision = 25u;
 
 GameLayer::GameLayer()
 {
@@ -34,6 +36,7 @@ GameLayer::GameLayer()
 	m_WaterShader->TexUnit("u_WaterTexture", 0);
 
 	m_Plane = new Plane(planeSize, planeDivision);
+	m_WaterPlane = new Plane(waterPlaneSize, waterPlaneDivision);
 
 	m_Camera = new Camera(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 
@@ -154,21 +157,31 @@ void GameLayer::OnUpdate(float dt)
 	}
 
 	m_WaterShader->Use();
-	m_WaterTexture->Bind(0);
+	//m_WaterTexture->Bind(0);
 	m_WaterShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 	m_WaterShader->SetUniform("u_View", m_Camera->GetView());
 	m_WaterShader->SetUniform("u_FogGradient", m_FogGradient);
 	m_WaterShader->SetUniform("u_FogDensity", m_FogDensity);
+	m_WaterShader->SetUniform("u_Steepness", m_Steepness);
+	m_WaterShader->SetUniform("u_WaveLength", m_WaveLength);
+	m_WaterShader->SetUniform("u_Time", t);
 
+#if 0
 	for (int z = -(levelSize - 2); z < (levelSize - 1); z++)
 	{
 		for (int x = -(levelSize - 2); x < (levelSize - 1); x++)
 		{
-			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)planeSize, m_WaterLevel, z * (int)planeSize));
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)waterPlaneSize, m_WaterLevel, z * (int)waterPlaneSize));
 			m_WaterShader->SetUniform("u_Model", model);
-			m_Plane->Render();
+			m_WaterPlane->Render();
 		}
 	}
+#else
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize/2.f, m_WaterLevel, -(float)waterPlaneSize /2.f));
+	m_WaterShader->SetUniform("u_Model", model);
+	m_WaterPlane->Render();
+#endif
+	
 
 	if(Renderer::debugAxis)
 		m_Axis->Render(m_Camera);
@@ -246,7 +259,12 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
 	ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
 	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
-	ImGui::SliderFloat("WaterLevel", &m_WaterLevel, -50.0f, 50.0f);
 	ImGui::Checkbox("Normals", &m_NormalView);
+	ImGui::End();
+
+	ImGui::Begin("Water");
+	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 50.0f);
+	ImGui::SliderFloat("Steepness", &m_Steepness, 0.0f, 1.0f);
+	ImGui::SliderFloat("Wavelength", &m_WaveLength, 10.0f, 75.0f);
 	ImGui::End();
 }
