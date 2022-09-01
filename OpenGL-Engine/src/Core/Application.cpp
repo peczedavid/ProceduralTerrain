@@ -4,7 +4,7 @@
 Application* Application::s_Instance = nullptr;
 
 Application::Application(const WindowProps& props)
-	: m_Cursor(false)
+	: m_Cursor(false), m_ImGui(true)
 {
 	m_Window = new Window(props);
 	m_Window->SetCursor(m_Cursor);
@@ -37,10 +37,13 @@ void Application::Run()
 		for (Layer* layer : *m_LayerStack)
 			layer->OnUpdate(dt);
 
-		m_ImGuiLayer->Begin();
-		for (Layer* layer : *m_LayerStack)
-			layer->OnImGuiRender(dt);
-		m_ImGuiLayer->End();
+		if (m_ImGui)
+		{
+			m_ImGuiLayer->Begin();
+			for (Layer* layer : *m_LayerStack)
+				layer->OnImGuiRender(dt);
+			m_ImGuiLayer->End();
+		}
 
 		m_Window->OnUpdate();
 	}
@@ -56,4 +59,9 @@ void Application::PushOverlay(Layer* overlay)
 {
 	m_LayerStack->PushOverlay(overlay);
 	overlay->OnAttach();
+}
+
+void Application::ToggleImGui()
+{
+	m_ImGui = !m_ImGui;
 }

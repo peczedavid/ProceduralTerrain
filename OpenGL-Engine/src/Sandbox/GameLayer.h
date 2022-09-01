@@ -24,9 +24,11 @@ private:
 	float m_MaxHeight = 56.845;
 
 	BasicShader* m_Shader;
-	TessellationShader* m_TessellationShader;
+	TessellationShader* m_TerrainShader;
+	TessellationShader* m_WaterShader;
 	Texture2D* m_UvTexture;
 	Texture2D *m_GroundTexture, *m_RockTexture, *m_SnowTexture;
+	Texture2D* m_WaterTexture;
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
 	Camera* m_Camera;
 	Skybox* m_Skybox;
@@ -37,4 +39,12 @@ private:
 	float m_FogDensity = 0.002f;
 	float m_FogGradient = 2.5f;
 	glm::vec2 m_NoiseOffset = glm::vec2(0.0f, 0.0f);
+	
+	Plane* m_WaterPlane;
+	float m_WaterLevel = -15.0f;
+	glm::vec4 m_WaveA = glm::vec4(1.0f, 1.0f, 0.125f, 60.0f);
+	glm::vec4 m_WaveB = glm::vec4(1.0f, 0.6f, 0.125f, 31.0f);
+	glm::vec4 m_WaveC = glm::vec4(1.0f, 1.3f, 0.125f, 18.0f);
+
+	bool m_NormalView = false;
 };

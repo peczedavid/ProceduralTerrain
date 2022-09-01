@@ -5,7 +5,7 @@
 Axis::Axis()
 	: m_Model(glm::mat4(1.0f))
 {
-	m_Shader = new BasicShader("src/Rendering/Shaders/glsl/coordsys.vert", "src/Rendering/Shaders/glsl/coordsys.frag");
+	m_Shader = new BasicShader("src/Rendering/Shaders/glsl/axis/axis.vert", "src/Rendering/Shaders/glsl/axis/axis.frag");
 
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);
@@ -45,7 +45,7 @@ void Axis::Render(Camera* camera)
 	glm::vec3 orientation = camera->GetOrientation();
 	constexpr float pi2 = glm::pi<float>() / 2.0f;
 	m_Model = glm::mat4(1.0f);
-	m_Model = glm::scale(m_Model, glm::vec3(1.0f, 16.0f / 10.0f, 10.0f / 16.0f) * 0.075f);
+	m_Model = glm::scale(m_Model, glm::vec3(1.0f, 16.0f / 10.0f, 10.0f / 16.0f) * 0.05f);
 	m_Model = glm::rotate(m_Model, orientation.y * pi2, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::vec2 horizontalOrientation = glm::normalize(glm::vec2(orientation.x, orientation.z));
 	if (horizontalOrientation.y /*orientation.z*/ < 0.0f)
@@ -59,7 +59,7 @@ void Axis::Render(Camera* camera)
 	}
 	m_Shader->SetUniform("u_Model", m_Model);
 	glBindVertexArray(m_Vao);
-	glLineWidth(4.0f);
+	glLineWidth(3.5f);
 	glDrawArrays(GL_LINES, 0, 6);
 	glLineWidth(1.0f);
 }
