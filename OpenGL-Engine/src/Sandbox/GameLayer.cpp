@@ -45,6 +45,8 @@ GameLayer::GameLayer()
 
 	m_Axis = new Axis();
 
+	m_FullscreenQuad = new FullscreenQuad();
+
 	// ----------- CUBE GENEREATION START -----------
 	glGenVertexArrays(1, &m_VaoCube);
 	glGenBuffers(1, &m_VboCube);
@@ -96,14 +98,22 @@ GameLayer::GameLayer()
 	m_RockTexture = new Texture2D("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_SnowTexture = new Texture2D("assets/Textures/snow-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_WaterTexture = new Texture2D("assets/Textures/water-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+
+	Window* window = Application::Get().GetWindow();
+	m_FrameBuffer = new FrameBuffer(window->GetWidth(), window->GetHeight());
+	m_PostProcessShader = new BasicShader(
+		"src/Rendering/Shaders/glsl/postprocess.vert",
+		"src/Rendering/Shaders/glsl/postprocess.frag"
+	);
+	m_PostProcessShader->TexUnit("u_ScreenTexture", 0);
+	FrameBuffer::Default();
 }
 
 void GameLayer::OnUpdate(float dt)
 {
-	static float t = 0.0f; t += dt;
+	RenderStart();
 
-	glClearColor(0.2f, 0.1f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	static float t = 0.0f; t += dt;
 
 	float asp = (float)Application::Get().GetWindow()->GetWidth() / (float)Application::Get().GetWindow()->GetHeight();
 	float fov = 45.0f, nearPlane = 0.1f, farPlane = 3000.0f;
@@ -144,11 +154,11 @@ void GameLayer::OnUpdate(float dt)
 	m_TerrainShader->SetUniform("u_FogGradient", m_FogGradient);
 	m_TerrainShader->SetUniform("u_FogDensity", m_FogDensity);
 	m_TerrainShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
-	m_TerrainShader->SetUniform("u_NormalView", m_NormalView ? 1 : 0);
+	m_TerrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
 	int levelSize = 3;
-	for (int z = -(levelSize-2); z < (levelSize - 1); z++)
+	for (int z = -(levelSize - 2); z < (levelSize - 1); z++)
 	{
-		for (int x = -(levelSize-2); x < (levelSize - 1); x++)
+		for (int x = -(levelSize - 2); x < (levelSize - 1); x++)
 		{
 			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)planeSize, 0, z * (int)planeSize));
 			m_TerrainShader->SetUniform("u_Model", model);
@@ -166,6 +176,7 @@ void GameLayer::OnUpdate(float dt)
 	m_WaterShader->SetUniform("u_WaveB", m_WaveB);
 	m_WaterShader->SetUniform("u_WaveC", m_WaveC);
 	m_WaterShader->SetUniform("u_Time", t);
+	m_WaterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);
 
 #if 0
 	for (int z = -(levelSize - 2); z < (levelSize - 1); z++)
@@ -175,17 +186,18 @@ void GameLayer::OnUpdate(float dt)
 			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)waterPlaneSize, m_WaterLevel, z * (int)waterPlaneSize));
 			m_WaterShader->SetUniform("u_Model", model);
 			m_WaterPlane->Render();
-		}
+}
 	}
 #else
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize/2.f, m_WaterLevel, -(float)waterPlaneSize /2.f));
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
 	m_WaterShader->SetUniform("u_Model", model);
 	m_WaterPlane->Render();
 #endif
-	
 
-	if(Renderer::debugAxis)
+	if (Renderer::debugAxis)
 		m_Axis->Render(m_Camera);
+
+	RenderEnd();
 }
 
 #if 0 OLD_HEIGHTMAP_GENERATION_CODE
@@ -248,7 +260,7 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::End();
 
 	ImGui::Begin("Noise props");
-	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f); 
+	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f);
 	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
 	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
 	ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 0.3f);
@@ -260,11 +272,12 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
 	ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
 	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
-	ImGui::Checkbox("Normals", &m_NormalView);
+	ImGui::Checkbox("Normals", &m_TerrainNormals);
 	ImGui::End();
 
 	ImGui::Begin("Water");
 	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 50.0f);
+	ImGui::Checkbox("Normals", &m_WaterNormals);
 	ImGui::SliderFloat("A - Steepness", &m_WaveA[2], 0.0f, 1.0f);
 	ImGui::SliderFloat("A - Wavelength", &m_WaveA[3], 10.0f, 75.0f);
 	ImGui::SliderFloat2("A - Direction", &m_WaveA[0], -1.0f, 1.0f);
@@ -275,4 +288,26 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("C - Wavelength", &m_WaveC[3], 10.0f, 75.0f);
 	ImGui::SliderFloat2("C - Direction", &m_WaveC[0], -1.0f, 1.0f);
 	ImGui::End();
+}
+
+void GameLayer::RenderStart()
+{
+	m_FrameBuffer->Bind();
+	glClearColor(0.2f, 0.1f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+}
+
+void GameLayer::RenderEnd()
+{
+	FrameBuffer::Default();
+	m_PostProcessShader->Use();
+	m_PostProcessShader->SetUniform("u_Orientation", m_Camera->GetOrientation());
+	bool wireframe = Renderer::wireframe;
+	if (Renderer::wireframe) Renderer::TogglePolygonMode();
+	glDisable(GL_DEPTH_TEST);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_FrameBuffer->GetTextureId());
+	m_FullscreenQuad->Render();
+	if (wireframe) Renderer::TogglePolygonMode();
 }

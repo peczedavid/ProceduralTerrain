@@ -33,8 +33,8 @@ void main()
 	float lambda = smoothstep(0.6, 0.7, v_Normal.y);
 	outColor = mix(rockColor, groundColor, lambda);
 
-	float cost = dot(v_Normal, normalize(vec3(1.0, 1.0, 0.0)));
-	outColor.xyz *= cost + vec3(0.7, 0.5, 0.1) * 0.15;
+	float cost = dot(v_Normal, normalize(vec3(0.254, 0.341, 0.905)));
+	outColor.xyz *= cost;
 	outColor.xyz = mix(vec3(0.4, 0.5, 0.6), outColor.xyz, v_Visibility);
 	if(u_NormalView == 1)
 		outColor.rgb = vec3(v_Normal + 0.7) / 1.7;

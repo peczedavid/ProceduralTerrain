@@ -7,6 +7,8 @@
 #include "Rendering/Shaders/TessellationShader.h"
 #include "Rendering/Geometry/Plane.h"
 #include "Rendering/Geometry/Axis.h"
+#include "Rendering/FrameBuffer.h"
+#include "Rendering/Geometry/FullscreenQuad.h"
 
 class GameLayer : public Layer
 {
@@ -17,6 +19,8 @@ public:
 	void OnImGuiRender(float dt) override;
 private:
 	void GenerateHeightMap();
+	void RenderStart();
+	void RenderEnd();
 private:
 	uint32_t m_VaoCube, m_VboCube, m_EboCube;
 	Plane* m_Plane;
@@ -46,5 +50,10 @@ private:
 	glm::vec4 m_WaveB = glm::vec4(1.0f, 0.6f, 0.125f, 31.0f);
 	glm::vec4 m_WaveC = glm::vec4(1.0f, 1.3f, 0.125f, 18.0f);
 
-	bool m_NormalView = false;
+	bool m_TerrainNormals = false;
+	bool m_WaterNormals = false;
+
+	BasicShader* m_PostProcessShader;
+	FrameBuffer* m_FrameBuffer;
+	FullscreenQuad* m_FullscreenQuad;
 };

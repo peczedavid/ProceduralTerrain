@@ -72,6 +72,13 @@ Window::Window(const WindowProps& props)
 		glfwSetWindowPos(m_Window, x, y);
 	}
 
+	if (props.Maximized)
+	{
+		int width, height;
+		glfwGetWindowSize(m_Window, &width, &height);
+		m_Width = width, m_Height = height;
+	}
+
 	glfwMakeContextCurrent(m_Window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
