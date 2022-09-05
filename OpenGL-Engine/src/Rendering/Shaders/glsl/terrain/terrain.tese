@@ -41,7 +41,7 @@ void main() {
   vec4 rightPos = pos1 + v * (pos2 - pos1);
   vec4 pos = leftPos + u * (rightPos - leftPos);
   vec2 texCustom = (u_Model * pos).xz;
-  vec3 info = texture(u_NoiseTexture, texCustom/vec2(textureSize(u_NoiseTexture, 0))).xyz;
+  vec3 info = texture(u_NoiseTexture, fract(abs(texCustom)/vec2(textureSize(u_NoiseTexture, 0)))).xyz;
   v_Height = info.x;
   v_Normal = normalize(vec3(-info.y, 1.0, -info.z));
   vec4 uVec = pos2 - pos0;

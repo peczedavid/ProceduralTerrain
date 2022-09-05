@@ -166,7 +166,8 @@ void GameLayer::OnUpdate(float dt)
 	}
 #else
 	m_ComputeShader->GetTexture()->Bind(0);
-	m_TerrainShader->SetUniform("u_Model", glm::mat4(1.0f));
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f * (int)planeSize, 0, -2.0f * (int)planeSize));
+	m_TerrainShader->SetUniform("u_Model", model);
 	m_Plane->Render();
 #endif
 
