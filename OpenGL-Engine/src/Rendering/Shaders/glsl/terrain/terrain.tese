@@ -42,9 +42,10 @@ void main() {
   vec4 pos = leftPos + u * (rightPos - leftPos);
   vec2 texCustom = (u_Model * pos).xz;
   //vec2 uvCustom = fract(abs(texCustom)/vec2(textureSize(u_NoiseTexture, 0)));
-  vec2 uvCustom = fract(texCustom/vec2(textureSize(u_NoiseTexture, 0)));
+  //vec2 uvCustom = fract(texCustom/vec2(textureSize(u_NoiseTexture, 0)));
+  vec2 uvCustom = texCoord;
   if(uvCustom.x < 0) uvCustom.x = 1 - uvCustom.x;
-  if(uvCustom.y < 0) uvCustom.y = 1 - uvCustom.y;
+  uvCustom.y = 1 - uvCustom.y;
   vec3 info = texture(u_NoiseTexture, uvCustom).xyz;
   v_Height = info.x;
   v_Normal = normalize(vec3(-info.y, 1.0, -info.z));
