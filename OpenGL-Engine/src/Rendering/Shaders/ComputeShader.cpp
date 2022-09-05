@@ -19,7 +19,7 @@ std::string ReadComputeSource(const char* fileName) {
 
 ComputeShader::ComputeShader(const char* computePath)
 {
-	m_Texture = new Texture2D(1024, 1024, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	//m_Texture = new Texture2D(1024, 1024, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 
 	std::string computeStr = ReadComputeSource(computePath);
 
@@ -60,10 +60,10 @@ ComputeShader::~ComputeShader()
 		glDeleteProgram(m_ProgramId);
 }
 
-void ComputeShader::Dispatch(GLenum barrier)
+void ComputeShader::Dispatch(const glm::uvec3& dimensions, GLenum barrier)
 {
 	glUseProgram(m_ProgramId);
-	glDispatchCompute(ceil(m_Texture->GetWidth() / 8), ceil(m_Texture->GetHeight() / 4), 1);
+	glDispatchCompute(dimensions.x, dimensions.y, dimensions.z);
 	glMemoryBarrier(barrier);
 }
 

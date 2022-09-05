@@ -6,8 +6,9 @@
 #include <iostream>
 #include <random>
 #include "Rendering/Renderer.h"
+//#include <Windows.h>
+//#include <dxgi1_4.h>
 
-//constexpr uint32_t heighMapSize = 2048u;
 constexpr uint32_t planeSize = 1024u;
 constexpr uint32_t planeDivision = 25u;
 constexpr uint32_t waterPlaneSize = 1000u;
@@ -109,7 +110,21 @@ GameLayer::GameLayer()
 	m_PostProcessShader->TexUnit("u_ScreenTexture", 0);
 	FrameBuffer::Default();
 
+	m_HeightMap1 = new Texture2D(planeSize, planeSize, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_HeightMap2 = new Texture2D(planeSize, planeSize, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/noise.comp");
+	m_ComputeShader->Use();
+	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
+	m_ComputeShader->SetUniform("u_Gain", m_Gain);
+	m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
+	m_ComputeShader->SetUniform("u_Scale", m_Scale);
+	m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+
+	for (int z = -1; z <= 1; z++)
+		for (int x = -1; x <= 1; x++)
+			m_HeightMaps.push_back(new Texture2D(planeSize, planeSize, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F));
+
+	this->GenerateTerrain();
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -153,20 +168,27 @@ void GameLayer::OnUpdate(float dt)
 	m_TerrainShader->SetUniform("u_FogGradient", m_FogGradient);
 	m_TerrainShader->SetUniform("u_FogDensity", m_FogDensity);
 	m_TerrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
-#if 0
-	int levelSize = 3;
-	for (int z = -(levelSize - 2); z < (levelSize - 1); z++)
+
+#if 1
+	for (int z = -1; z <= 1; z++)
 	{
-		for (int x = -(levelSize - 2); x < (levelSize - 1); x++)
+		for (int x = -1; x <= 1; x++)
 		{
+			int index = (z + 1) * 3 + (x + 1);
+			m_HeightMaps[index]->Bind(0);
 			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)planeSize, 0, z * (int)planeSize));
 			m_TerrainShader->SetUniform("u_Model", model);
 			m_Plane->Render();
 		}
 	}
 #else
-	m_ComputeShader->GetTexture()->Bind(0);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f * (int)planeSize, 0, -2.0f * (int)planeSize));
+	//m_ComputeShader->GetTexture()->Bind(0);
+	m_HeightMap1->Bind(0);
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+	m_TerrainShader->SetUniform("u_Model", model);
+	m_Plane->Render();
+	m_HeightMap2->Bind(0);
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(planeSize, 0, 0));
 	m_TerrainShader->SetUniform("u_Model", model);
 	m_Plane->Render();
 #endif
@@ -191,7 +213,7 @@ void GameLayer::OnUpdate(float dt)
 			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)waterPlaneSize, m_WaterLevel, z * (int)waterPlaneSize));
 			m_WaterShader->SetUniform("u_Model", model);
 			m_WaterPlane->Render();
-}
+		}
 	}
 #else
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
@@ -233,22 +255,28 @@ void GameLayer::GenerateHeightMap()
 
 void GameLayer::OnImGuiRender(float dt)
 {
-	ImGui::Begin("Texture");
-	if (ImGui::Button("Generate")) {
-		m_ComputeShader->Use();
-		m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
-		m_ComputeShader->SetUniform("u_Gain", m_Gain);
-		m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
-		m_ComputeShader->SetUniform("u_Scale", m_Scale);
-		m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
-		m_ComputeShader->Dispatch();
-	}
-	float my_tex_w = 256.0f;
-	float my_tex_h = 256.0f;
-	ImVec2 uv_min = ImVec2(0.0f, 1.0f);                 // Top-left
-	ImVec2 uv_max = ImVec2(1.0f, 0.0f);                 // Lower-right
-	ImGui::Image((ImTextureID)m_ComputeShader->GetTexture()->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
-	ImGui::End();
+	//ImGui::Begin("Texture");
+	//if (ImGui::Button("Generate")) {
+	//	m_ComputeShader->Use();
+	//	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
+	//	m_ComputeShader->SetUniform("u_Gain", m_Gain);
+	//	m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
+	//	m_ComputeShader->SetUniform("u_Scale", m_Scale);
+	//	m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+
+	//	m_ComputeShader->SetUniform("u_WorldOffset", glm::vec2(0.0f, 0.0f));
+	//	m_HeightMap1->BindImage();
+	//	m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 8), ceil(planeSize / 4), 1));
+	//	m_ComputeShader->SetUniform("u_WorldOffset", glm::vec2((int)planeSize, 0.0f));
+	//	m_HeightMap2->BindImage();
+	//	m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 8), ceil(planeSize / 4), 1));
+	//}
+	//float my_tex_w = 256.0f;
+	//float my_tex_h = 256.0f;
+	//ImVec2 uv_min = ImVec2(0.0f, 1.0f);                 // Top-left
+	//ImVec2 uv_max = ImVec2(1.0f, 0.0f);                 // Lower-right
+	//ImGui::Image((ImTextureID)m_HeightMap1->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+	//ImGui::End();
 
 	ImGui::Begin("Info");
 	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
@@ -291,6 +319,7 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::End();
 
 	ImGui::Begin("Landscape");
+	if (ImGui::Button("Generate")) this->GenerateTerrain();
 	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
 	ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
 	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
@@ -332,4 +361,25 @@ void GameLayer::RenderEnd()
 	glBindTexture(GL_TEXTURE_2D, m_FrameBuffer->GetTextureId());
 	m_FullscreenQuad->Render();
 	if (wireframe) Renderer::TogglePolygonMode();
+}
+
+void GameLayer::GenerateTerrain()
+{
+	m_ComputeShader->Use();
+	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
+	m_ComputeShader->SetUniform("u_Gain", m_Gain);
+	m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
+	m_ComputeShader->SetUniform("u_Scale", m_Scale);
+	m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+
+	for (int z = -1; z <= 1; z++)
+	{
+		for (int x = -1; x <= 1; x++)
+		{
+			int index = (z + 1) * 3 + (x + 1);
+			m_ComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * (int)planeSize, z * (int)planeSize));
+			m_HeightMaps[index]->BindImage();
+			m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 8), ceil(planeSize / 4), 1));
+		}
+	}
 }

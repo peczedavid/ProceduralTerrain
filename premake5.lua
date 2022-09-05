@@ -68,7 +68,9 @@ project "OpenGL-Engine"
         "GLFW",
         "Glad",
         "ImGui",
-        "opengl32.lib"
+        "opengl32.lib",
+        "Dxgi.lib",
+        "Dxgi.dll"
     }
 
     filter "system:windows"

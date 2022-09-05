@@ -23,6 +23,8 @@ private:
 	void GenerateHeightMap();
 	void RenderStart();
 	void RenderEnd();
+
+	void GenerateTerrain();
 private:
 	uint32_t m_VaoCube, m_VboCube, m_EboCube;
 	Plane* m_Plane;
@@ -30,6 +32,9 @@ private:
 	float m_MaxHeight = 115.0f;
 
 	ComputeShader* m_ComputeShader;
+	Texture2D* m_HeightMap1;
+	Texture2D* m_HeightMap2;
+	std::vector<Texture2D*> m_HeightMaps;
 
 	BasicShader* m_Shader;
 	TessellationShader* m_TerrainShader;
