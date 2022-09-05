@@ -196,7 +196,7 @@ void GameLayer::OnUpdate(float dt)
 	m_Plane->Render();
 #endif
 
-	m_WaterShader->Use();
+	/*m_WaterShader->Use();
 	m_WaterTexture->Bind(0);
 	m_WaterShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 	m_WaterShader->SetUniform("u_View", m_Camera->GetView());
@@ -206,7 +206,7 @@ void GameLayer::OnUpdate(float dt)
 	m_WaterShader->SetUniform("u_WaveB", m_WaveB);
 	m_WaterShader->SetUniform("u_WaveC", m_WaveC);
 	m_WaterShader->SetUniform("u_Time", t);
-	m_WaterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);
+	m_WaterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);*/
 
 #if 0
 	for (int z = -(levelSize - 2); z < (levelSize - 1); z++)
@@ -219,9 +219,9 @@ void GameLayer::OnUpdate(float dt)
 		}
 	}
 #else
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
-	m_WaterShader->SetUniform("u_Model", model);
-	m_WaterPlane->Render();
+	//model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
+	//m_WaterShader->SetUniform("u_Model", model);
+	//m_WaterPlane->Render();
 #endif
 
 	if (Renderer::debugAxis)

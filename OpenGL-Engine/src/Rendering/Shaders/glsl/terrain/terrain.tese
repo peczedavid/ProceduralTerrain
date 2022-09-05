@@ -40,7 +40,8 @@ void main() {
   vec4 leftPos = pos0 + v * (pos3 - pos0);
   vec4 rightPos = pos1 + v * (pos2 - pos1);
   vec4 pos = leftPos + u * (rightPos - leftPos);
-  vec2 texCustom = (u_Model * pos).xz;
+  vec4 worldPos = u_Model * pos;
+  //vec2 texCustom = worldPos.xz;
   //vec2 uvCustom = fract(abs(texCustom)/vec2(textureSize(u_NoiseTexture, 0)));
   //vec2 uvCustom = fract(texCustom/vec2(textureSize(u_NoiseTexture, 0)));
   vec2 uvCustom = texCoord;
@@ -52,11 +53,11 @@ void main() {
   vec4 uVec = pos2 - pos0;
   vec4 vVec = pos3 - pos0;
   vec4 normal = normalize(vec4(cross(vVec.xyz, uVec.xyz), 0));
-  pos += normal * v_Height * u_MaxLevel;
-  pos.y += u_HeightOffset;
+  worldPos += normal * v_Height * u_MaxLevel;
+  worldPos.y += u_HeightOffset;
 
-  gl_Position = u_ViewProj * u_Model * pos;
-  v_TexCoords = texCustom;
+  gl_Position = u_ViewProj * worldPos;
+  v_TexCoords = worldPos.xz / 10.0;
 
   float vertexDistance = length((u_View * u_Model * pos).xyz);
   v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));

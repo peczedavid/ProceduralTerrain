@@ -83,7 +83,7 @@ Window::Window(const WindowProps& props)
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
 	m_VSync = true;
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 
 	glfwSetErrorCallback(error_callback);
 	glfwSetKeyCallback(m_Window, key_callback);

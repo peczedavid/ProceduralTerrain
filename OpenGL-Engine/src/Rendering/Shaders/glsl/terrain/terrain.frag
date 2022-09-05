@@ -30,7 +30,7 @@ void main()
 {
 	vec4 groundColor = texture(u_GroundTexture, v_TexCoords);
 	vec4 rockColor = texture(u_RockTexture, v_TexCoords);
-	float lambda = smoothstep(0.6, 0.7, v_Normal.y);
+	float lambda = smoothstep(0.625, 0.725, v_Normal.y);
 	outColor = mix(rockColor, groundColor, lambda);
 
 	float cost = dot(v_Normal, normalize(vec3(0.254, 0.341, 0.905)));
