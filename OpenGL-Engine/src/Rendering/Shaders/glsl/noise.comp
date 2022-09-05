@@ -17,9 +17,9 @@ void main()
     //vec2 st = fragCoord / resolution;
 
     vec3 noiseData = fbmd_9(fragCoord * u_Scale / 10.0);
-    noiseData *= 0.5;
-    noiseData += 0.5;
-    vec4 fragColor = vec4(noiseData.y, 0.0, noiseData.z, 1.0);
+    noiseData.x *= 0.5;
+    noiseData.x += 0.5;
+    vec4 fragColor = vec4(noiseData, 1.0);
 
     imageStore(u_Texture, ivec2(fragCoord), fragColor);
 }

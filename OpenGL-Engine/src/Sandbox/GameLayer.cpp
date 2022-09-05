@@ -7,9 +7,9 @@
 #include <random>
 #include "Rendering/Renderer.h"
 
-constexpr uint32_t heighMapSize = 2048u;
-constexpr uint32_t planeSize = 512u;
-constexpr uint32_t planeDivision = 10u;
+//constexpr uint32_t heighMapSize = 2048u;
+constexpr uint32_t planeSize = 1024u;
+constexpr uint32_t planeDivision = 25u;
 constexpr uint32_t waterPlaneSize = 1000u;
 constexpr uint32_t waterPlaneDivision = 100u;
 
@@ -23,6 +23,7 @@ GameLayer::GameLayer()
 		"src/Rendering/Shaders/glsl/terrain/terrain.tese",
 		"src/Rendering/Shaders/glsl/terrain/terrain.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
+	m_TerrainShader->TexUnit("u_NoiseTexture", 0);
 	m_TerrainShader->TexUnit("u_GroundTexture", 1);
 	m_TerrainShader->TexUnit("u_RockTexture", 2);
 	m_TerrainShader->TexUnit("u_SnowTexture", 3);
@@ -148,14 +149,9 @@ void GameLayer::OnUpdate(float dt)
 	m_RockTexture->Bind(2);
 	m_TerrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	m_TerrainShader->SetUniform("u_View", m_Camera->GetView());
-	m_TerrainShader->SetUniform("u_Amplitude", m_Amplitude);
-	m_TerrainShader->SetUniform("u_Gain", m_Gain);
-	m_TerrainShader->SetUniform("u_Frequency", m_Frequency);
-	m_TerrainShader->SetUniform("u_Scale", m_Scale);
 	m_TerrainShader->SetUniform("u_HeightOffset", m_HeightOffset);
 	m_TerrainShader->SetUniform("u_FogGradient", m_FogGradient);
 	m_TerrainShader->SetUniform("u_FogDensity", m_FogDensity);
-	m_TerrainShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
 	m_TerrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
 #if 0
 	int levelSize = 3;
@@ -169,6 +165,7 @@ void GameLayer::OnUpdate(float dt)
 		}
 	}
 #else
+	m_ComputeShader->GetTexture()->Bind(0);
 	m_TerrainShader->SetUniform("u_Model", glm::mat4(1.0f));
 	m_Plane->Render();
 #endif
