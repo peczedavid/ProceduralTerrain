@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Core/Layers/Layer.h"
 #include "Rendering/Shaders/BasicShader.h"
 #include "Rendering/Texture2D.h"
@@ -9,6 +10,7 @@
 #include "Rendering/Geometry/Axis.h"
 #include "Rendering/FrameBuffer.h"
 #include "Rendering/Geometry/FullscreenQuad.h"
+#include "Rendering/Shaders/ComputeShader.h"
 
 class GameLayer : public Layer
 {
@@ -26,6 +28,8 @@ private:
 	Plane* m_Plane;
 	int m_TessLevel = 1;
 	float m_MaxHeight = 56.845;
+
+	ComputeShader* m_ComputeShader;
 
 	BasicShader* m_Shader;
 	TessellationShader* m_TerrainShader;

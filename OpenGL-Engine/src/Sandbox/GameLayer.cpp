@@ -8,8 +8,8 @@
 #include "Rendering/Renderer.h"
 
 constexpr uint32_t heighMapSize = 2048u;
-constexpr uint32_t planeSize = 1000u;
-constexpr uint32_t planeDivision = 20u;
+constexpr uint32_t planeSize = 512u;
+constexpr uint32_t planeDivision = 10u;
 constexpr uint32_t waterPlaneSize = 1000u;
 constexpr uint32_t waterPlaneDivision = 100u;
 
@@ -107,6 +107,8 @@ GameLayer::GameLayer()
 	);
 	m_PostProcessShader->TexUnit("u_ScreenTexture", 0);
 	FrameBuffer::Default();
+
+	m_ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/noise.comp");
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -155,6 +157,7 @@ void GameLayer::OnUpdate(float dt)
 	m_TerrainShader->SetUniform("u_FogDensity", m_FogDensity);
 	m_TerrainShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
 	m_TerrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
+#if 0
 	int levelSize = 3;
 	for (int z = -(levelSize - 2); z < (levelSize - 1); z++)
 	{
@@ -165,6 +168,10 @@ void GameLayer::OnUpdate(float dt)
 			m_Plane->Render();
 		}
 	}
+#else
+	m_TerrainShader->SetUniform("u_Model", glm::mat4(1.0f));
+	m_Plane->Render();
+#endif
 
 	m_WaterShader->Use();
 	m_WaterTexture->Bind(0);
@@ -191,7 +198,7 @@ void GameLayer::OnUpdate(float dt)
 #else
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
 	m_WaterShader->SetUniform("u_Model", model);
-	m_WaterPlane->Render();
+	//m_WaterPlane->Render();
 #endif
 
 	if (Renderer::debugAxis)
@@ -228,6 +235,23 @@ void GameLayer::GenerateHeightMap()
 
 void GameLayer::OnImGuiRender(float dt)
 {
+	ImGui::Begin("Texture");
+	if (ImGui::Button("Generate")) {
+		m_ComputeShader->Use();
+		m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
+		m_ComputeShader->SetUniform("u_Gain", m_Gain);
+		m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
+		m_ComputeShader->SetUniform("u_Scale", m_Scale);
+		m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+		m_ComputeShader->Dispatch();
+	}
+	float my_tex_w = 256.0f;
+	float my_tex_h = 256.0f;
+	ImVec2 uv_min = ImVec2(0.0f, 1.0f);                 // Top-left
+	ImVec2 uv_max = ImVec2(1.0f, 0.0f);                 // Lower-right
+	ImGui::Image((ImTextureID)m_ComputeShader->GetTexture()->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+	ImGui::End();
+
 	ImGui::Begin("Info");
 	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
 	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);

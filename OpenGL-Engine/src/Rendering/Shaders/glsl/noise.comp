@@ -2,59 +2,78 @@
 layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
 layout(rgba32f, binding = 0) uniform image2D u_Texture;
 
-#define PI 3.14159265358979323846
+uniform float u_Amplitude;
+uniform float u_Gain;
+uniform float u_Frequency;
+uniform float u_Scale;
+uniform vec2 u_NoiseOffset;
 
-float random (in vec2 st) {
-    return fract(sin(dot(st.xy,
-                         vec2(12.9898,78.233)))*
-        43758.5453123);
-}
-
-// Based on Morgan McGuire @morgan3d
-// https://www.shadertoy.com/view/4dS3Wd
-float noise (in vec2 st) {
-    vec2 i = floor(st);
-    vec2 f = fract(st);
-
-    // Four corners in 2D of a tile
-    float a = random(i);
-    float b = random(i + vec2(1.0, 0.0));
-    float c = random(i + vec2(0.0, 1.0));
-    float d = random(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-
-    return mix(a, b, u.x) +
-            (c - a)* u.y * (1.0 - u.x) +
-            (d - b) * u.x * u.y;
-}
-
-#define OCTAVES 6
-float fbm (in vec2 st) {
-    // Initial values
-    float value = 0.0;
-    float amplitude = .5;
-    float frequency = 0.;
-    //
-    // Loop of octaves
-    for (int i = 0; i < OCTAVES; i++) {
-        value += amplitude * noise(st);
-        st *= 2.;
-        amplitude *= .5;
-    }
-    return value;
-}
+vec3 fbmd_9(in vec2 x);
 
 void main()
 {
-    vec2 resolution = vec2(imageSize(u_Texture));
+    //vec2 resolution = vec2(imageSize(u_Texture));
     vec2 fragCoord = gl_GlobalInvocationID.xy;
+    //vec2 st = fragCoord / resolution;
 
-    vec2 st = fragCoord / resolution;
-    vec3 color = vec3(fbm(st*3.0));
-	vec4 fragColor = vec4(color, 1.0);
-
-    // vec4 fragColor = vec4(st.x, st.y, 0.0, 1.0);
+    vec3 noiseData = fbmd_9(fragCoord * u_Scale / 10.0);
+    noiseData *= 0.5;
+    noiseData += 0.5;
+    vec4 fragColor = vec4(noiseData.y, 0.0, noiseData.z, 1.0);
 
     imageStore(u_Texture, ivec2(fragCoord), fragColor);
+}
+
+float hash1(vec2 p) {
+  p = 50.0 * fract(p * 0.3183099);
+  return fract(p.x * p.y * (p.x + p.y));
+}
+
+const mat3 m3 = mat3(0.00, 0.80, 0.60, -0.80, 0.36, -0.48, -0.60, -0.48, 0.64);
+const mat3 m3i = mat3(0.00, -0.80, -0.60, 0.80, 0.36, -0.48, 0.60, -0.48, 0.64);
+const mat2 m2 = mat2(0.80, 0.60, -0.60, 0.80);
+const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
+
+vec3 noised(in vec2 x) {
+  vec2 p = floor(x);
+  vec2 w = fract(x);
+#if 1
+  vec2 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
+  vec2 du = 30.0 * w * w * (w * (w - 2.0) + 1.0);
+#else
+  vec2 u = w * w * (3.0 - 2.0 * w);
+  vec2 du = 6.0 * w * (1.0 - w);
+#endif
+
+  float a = hash1(p + vec2(0, 0));
+  float b = hash1(p + vec2(1, 0));
+  float c = hash1(p + vec2(0, 1));
+  float d = hash1(p + vec2(1, 1));
+
+  float k0 = a;
+  float k1 = b - a;
+  float k2 = c - a;
+  float k4 = a - b - c + d;
+
+  return vec3(-1.0 + 2.0 * (k0 + k1 * u.x + k2 * u.y + k4 * u.x * u.y),
+              2.0 * du * vec2(k1 + k4 * u.y, k2 + k4 * u.x));
+}
+
+vec3 fbmd_9(in vec2 x) {
+  float f = u_Frequency;
+  float s = u_Gain;
+  float a = 0.0;
+  float b = u_Amplitude;
+  vec2 d = vec2(0.0);
+  mat2 m = mat2(1.0, 0.0, 0.0, 1.0);
+  for (int i = 0; i < 16; i++) {
+    vec3 n = noised(x + u_NoiseOffset);
+    a += b * n.x;      // accumulate values
+    d += b * m * n.yz; // accumulate derivatives
+    b *= s;
+    x = f * m2 * x;
+    m = f * m2i * m;
+  }
+
+  return vec3(a, d);
 }

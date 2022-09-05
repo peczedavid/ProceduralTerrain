@@ -8,7 +8,6 @@ uniform mat4 u_View;
 uniform float u_MaxLevel;
 
 uniform vec2 u_NoiseOffset;
-uniform float u_Lacunarity;
 uniform float u_Gain;
 uniform float u_Frequency;
 uniform float u_Amplitude;
@@ -16,6 +15,8 @@ uniform float u_Scale;
 uniform float u_HeightOffset;
 uniform float u_FogDensity;
 uniform float u_FogGradient;
+
+//uniform sampler2D u_HeightMap;
 
 in vec2 v_UVsCoord[];
 out vec2 v_TexCoords;
