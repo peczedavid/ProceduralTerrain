@@ -1,3 +1,6 @@
+// TODO: - offset terrain height relative to amplitude so it starts at 0
+//		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
+
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
 #include <glad/glad.h>
@@ -218,7 +221,7 @@ void GameLayer::OnUpdate(float dt)
 #else
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
 	m_WaterShader->SetUniform("u_Model", model);
-	//m_WaterPlane->Render();
+	m_WaterPlane->Render();
 #endif
 
 	if (Renderer::debugAxis)
@@ -327,7 +330,7 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::End();
 
 	ImGui::Begin("Water");
-	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 50.0f);
+	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 100.0f);
 	ImGui::Checkbox("Normals", &m_WaterNormals);
 	ImGui::SliderFloat("A - Steepness", &m_WaveA[2], 0.0f, 1.0f);
 	ImGui::SliderFloat("A - Wavelength", &m_WaveA[3], 10.0f, 75.0f);
