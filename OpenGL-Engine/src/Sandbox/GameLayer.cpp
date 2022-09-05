@@ -9,8 +9,8 @@
 #include <iostream>
 #include <random>
 #include "Rendering/Renderer.h"
-//#include <Windows.h>
-//#include <dxgi1_4.h>
+#include <Windows.h>
+#include <dxgi1_4.h>
 
 constexpr uint32_t planeSize = 1024u;
 constexpr uint32_t planeDivision = 25u;
@@ -341,6 +341,25 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("C - Steepness", &m_WaveC[2], 0.0f, 1.0f);
 	ImGui::SliderFloat("C - Wavelength", &m_WaveC[3], 10.0f, 75.0f);
 	ImGui::SliderFloat2("C - Direction", &m_WaveC[0], -1.0f, 1.0f);
+	ImGui::End();
+
+	ImGui::Begin("Device info");
+	static IDXGIFactory4* pFactory;
+	CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)&pFactory);
+	static IDXGIAdapter3* adapter;
+	pFactory->EnumAdapters(0, reinterpret_cast<IDXGIAdapter**>(&adapter));
+	static DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo;
+	adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
+	const size_t usedVRAM = videoMemoryInfo.CurrentUsage / 1024 / 1024;
+	const size_t maxVRAM = videoMemoryInfo.Budget / 1024 / 1024;
+	ImGui::Text("Vendor: %s", glGetString(GL_VENDOR));
+	ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
+	ImGui::Text("Version: %s", glGetString(GL_VERSION));
+	int versionMajor, versionMinor;
+	glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
+	glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+	ImGui::Text("OpenGL %d.%d", versionMajor, versionMinor);
+	ImGui::Text("VRAM: %d/%d MB", usedVRAM, maxVRAM);
 	ImGui::End();
 }
 
