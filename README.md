@@ -15,6 +15,6 @@
 ![Sample1](files/Sample1.png)
 
 ## Requirements :computer:
-- Visual Studio 2022 (MSVC C++ compiler)
+- Visual Studio 2022 (MSVC C++17 compiler)
 - OpenGL 4.6 compatible driver
 - Windows 10 or higher
