@@ -1,5 +1,6 @@
 // TODO: - offset terrain height relative to amplitude so it starts at 0
 //		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
+//		 - handle framebuffer resize event
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
