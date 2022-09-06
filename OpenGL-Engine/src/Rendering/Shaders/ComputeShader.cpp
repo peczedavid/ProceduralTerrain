@@ -1,5 +1,5 @@
 #include "Rendering/Shaders/ComputeShader.h"
-#include<fstream>
+#include <fstream>
 #include <vector>
 
 std::string ReadComputeSource(const char* fileName) {
@@ -19,7 +19,7 @@ std::string ReadComputeSource(const char* fileName) {
 
 ComputeShader::ComputeShader(const char* computePath)
 {
-	m_Texture = new Texture2D(512, 512, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	//m_Texture = new Texture2D(1024, 1024, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 
 	std::string computeStr = ReadComputeSource(computePath);
 
@@ -60,9 +60,77 @@ ComputeShader::~ComputeShader()
 		glDeleteProgram(m_ProgramId);
 }
 
-void ComputeShader::Dispatch(GLenum barrier)
+void ComputeShader::Dispatch(const glm::uvec3& dimensions, GLenum barrier)
 {
 	glUseProgram(m_ProgramId);
-	glDispatchCompute(ceil(m_Texture->GetWidth() / 8), ceil(m_Texture->GetHeight() / 4), 1);
+	glDispatchCompute(dimensions.x, dimensions.y, dimensions.z);
 	glMemoryBarrier(barrier);
+}
+
+void ComputeShader::Use() const
+{
+	glUseProgram(m_ProgramId);
+}
+
+void ComputeShader::SetUniform(const std::string& name, int value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform1i(location, value);
+	else
+		printf("Uniform %s not found in shader!\n", name.c_str());
+}
+
+void ComputeShader::SetUniform(const std::string& name, float value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform1f(location, value);
+	else
+		printf("Uniform %s not found in shader!\n", name.c_str());
+}
+
+void ComputeShader::SetUniform(const std::string& name, uint32_t value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform1ui(location, value);
+	else
+		printf("Uniform %s not found in shader!\n", name.c_str());
+}
+
+void ComputeShader::SetUniform(const std::string& name, const glm::vec2& value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform2f(location, value.x, value.y);
+	else
+		printf("Uniform %s not found in shader!\n", name.c_str());
+}
+
+void ComputeShader::SetUniform(const std::string& name, const glm::vec3& value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform3f(location, value.x, value.y, value.z);
+	else
+		printf("Uniform %s not found in shader!\n", name.c_str());
+}
+
+void ComputeShader::SetUniform(const std::string& name, const glm::vec4& value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniform4f(location, value.x, value.y, value.z, value.w);
+	else
+		printf("Uniform %s not found in shader!\n", name.c_str());
+}
+
+void ComputeShader::SetUniform(const std::string& name, const glm::mat4& value) const
+{
+	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	if (location >= 0)
+		glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+	else
+		printf("Uniform %s not found in shader!\n", name.c_str());
 }

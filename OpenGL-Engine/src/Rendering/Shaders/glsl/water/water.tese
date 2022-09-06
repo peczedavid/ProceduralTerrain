@@ -84,7 +84,7 @@ void main() {
   gl_Position = u_ViewProj * u_Model * pos;
   v_WorldPos = gl_Position.xyz;
   v_TexCoords = texCoord * 35.0;
-  v_Normal = vec3(cross(binormal, tangent));
+  v_Normal = normalize(vec3(cross(binormal, tangent)));
 
   float vertexDistance = length((u_View * u_Model * pos).xyz);
   v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));

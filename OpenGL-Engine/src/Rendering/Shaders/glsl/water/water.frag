@@ -9,14 +9,24 @@ in float v_Visibility;
 in vec2 v_TexCoords;
 
 uniform sampler2D u_WaterTexture;
+uniform int u_NormalView;
 
-void main()
-{
-	vec3 lightDirection = normalize(vec3(1.0, 1.0, 0.0));
+vec4 shade() {
+	vec4 pixelColor;
 
-	vec3 waterColor = texture(u_WaterTexture, v_TexCoords).rgb; //vec3(0.42, 0.69, 0.77);
+	vec3 lightDirection = normalize(vec3(0.254, 0.341, 0.905));
+	vec3 waterColor = texture(u_WaterTexture, v_TexCoords).rgb;
 	float cost = dot(v_Normal, lightDirection);
 	waterColor *= cost;
-	outColor.xyz = mix(vec3(0.4, 0.5, 0.6), waterColor, v_Visibility);
-	outColor.w = 0.9;
+	pixelColor.xyz = mix(vec3(0.4, 0.5, 0.6), waterColor, v_Visibility);
+	pixelColor.w = 0.9;
+	
+	return pixelColor;
+}
+
+void main() {
+	if(u_NormalView == 1)
+		outColor = vec4(vec3(v_Normal + 0.7) / 1.7, 1.0);
+	else
+		outColor = shade();
 }

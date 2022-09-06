@@ -22,6 +22,9 @@ private:
 	float m_Speed = m_BaseSpeed * m_SpeedMultiplier;
 	float m_Sensitivity = 50.f;
 public:
+	inline glm::vec3& GetRight() { return glm::cross(glm::normalize(m_Orientation), glm::normalize(m_Up)); }
+	inline const glm::vec3& GetRight() const { return glm::cross(glm::normalize(m_Orientation), glm::normalize(m_Up)); }
+
 	inline glm::mat4& GetMatrix() { return m_CameraMatrix; }
 	inline const glm::mat4& GetMatrix() const { return m_CameraMatrix; }
 

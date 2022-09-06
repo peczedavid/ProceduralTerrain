@@ -35,7 +35,6 @@ Texture2D::Texture2D(uint32_t width, uint32_t height, GLenum filter, GLenum wrap
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 	glTextureStorage2D(m_Id, 1, internalFormat, m_Width, m_Height);
-	glBindImageTexture(0, m_Id, 0, GL_FALSE, 0, GL_WRITE_ONLY, internalFormat);
 }
 
 Texture2D::~Texture2D()
@@ -59,4 +58,9 @@ void Texture2D::Bind(uint32_t slot)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, m_Id);
+}
+
+void Texture2D::BindImage()
+{
+	glBindImageTexture(0, m_Id, 0, GL_FALSE, 0, GL_WRITE_ONLY, m_InternalFormat);
 }

@@ -12,7 +12,8 @@ namespace Renderer
 		glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 	}
 
-	bool Renderer::multisample = true;
+	// TODO: make work with framebuffer
+	bool Renderer::multisample = false;
 	void ToggleMSAA()
 	{
 		multisample = !multisample;
