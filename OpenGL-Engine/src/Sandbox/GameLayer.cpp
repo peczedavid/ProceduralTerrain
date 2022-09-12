@@ -309,6 +309,8 @@ void GameLayer::OnScreenshot()
 {
 	uint8_t* data = new uint8_t[m_ViewportSize.y * m_ViewportSize.x * 3];
 	m_FrameBuffer->Bind();
+	// GL_PACK_ALIGMENT: OpenGL memory to RAM
+	// 1: 1 byte per color channel
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glReadPixels(0, 0, m_ViewportSize.x, m_ViewportSize.y, GL_RGB, GL_UNSIGNED_BYTE, data);
 	FrameBuffer::Default();
