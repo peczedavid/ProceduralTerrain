@@ -307,40 +307,13 @@ void GameLayer::OnImGuiRender(float dt)
 
 void GameLayer::OnScreenshot()
 {
-	//uint8_t* data = new uint8_t[m_ViewportSize.y * m_ViewportSize.x * 3];
-	//glBindTexture(GL_TEXTURE_2D, m_FrameBuffer->GetTextureId());
-	//glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	//int index = 0;
-	//for (int j = 0; j < m_ViewportSize.y; j++)
-	//{
-	//	for (int i = 0; i < m_ViewportSize.x; ++i)
-	//	{
-	//		// RGB
-	//		data[index++] = (unsigned char)(255.0 * i / m_ViewportSize.x);
-	//		data[index++] = (unsigned char)(255.0 * j / m_ViewportSize.y);
-	//		data[index++] = (unsigned char)(255.0 * 0.0);
-	//	}
-	//}
-	//stbi_flip_vertically_on_write(1);
-	//stbi_write_png("stbpng.png", m_ViewportSize.x, m_ViewportSize.y, 3, data, m_ViewportSize.x * 3);
-	//delete[] data;
 	uint8_t* data = new uint8_t[m_ViewportSize.y * m_ViewportSize.x * 3];
-	glBindTexture(GL_TEXTURE_2D, m_FrameBuffer->GetTextureId());
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	int index = 0;
-	for (int j = 0; j < m_ViewportSize.y; j++)
-	{
-		for (int i = 0; i < m_ViewportSize.x; ++i)
-		{
-			// RGB
-			data[index + 0];
-			data[index + 1];
-			data[index + 2];
-			index += 3;
-		}
-	}
-	//stbi_flip_vertically_on_write(1);
-	stbi_write_png("stbpng.png", m_ViewportSize.x, m_ViewportSize.y, 3, data, m_ViewportSize.x * 3);
+	m_FrameBuffer->Bind();
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadPixels(0, 0, m_ViewportSize.x, m_ViewportSize.y, GL_RGB, GL_UNSIGNED_BYTE, data);
+	FrameBuffer::Default();
+	stbi_flip_vertically_on_write(1);
+	stbi_write_png("screenshot.png", m_ViewportSize.x, m_ViewportSize.y, 3, data, m_ViewportSize.x * 3);
 	delete[] data;
 	printf("Screenshot taken\n");
 }
