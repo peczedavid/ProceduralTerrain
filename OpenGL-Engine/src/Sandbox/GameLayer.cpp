@@ -14,6 +14,8 @@
 #include <dxgi1_4.h>
 #include <stb_image_write.h>
 #include <stb_image.h>
+#include <ctime>
+#include <sstream>
 
 constexpr uint32_t planeSize = 1024u;
 constexpr uint32_t planeDivision = 25u;
@@ -229,6 +231,7 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::Text("Debug info - F3");
 	ImGui::Text("Wireframe - F");
 	ImGui::Text("Cursor - Tab");
+	ImGui::Text("Close - Escape");
 	ImGui::End();
 
 	ImGui::Begin("Noise props");
@@ -342,10 +345,21 @@ void GameLayer::OnScreenshot()
 	glPixelStorei(GL_PACK_ALIGNMENT, 1); // OpenGL memory to RAM, 1 byte per color channel
 	glReadPixels(0, 0, m_ViewportSize.x, m_ViewportSize.y, GL_RGB, GL_UNSIGNED_BYTE, data);
 	FrameBuffer::Default();
+	std::time_t t = std::time(0);
+	std::tm* now = std::localtime(&t);
+	std::ostringstream oss;
+	oss << "screenshots/"
+	    << (now->tm_year + 1900) << '-'
+		<< (now->tm_mon + 1) << '-'
+		<< now->tm_mday << '_'
+		<< now->tm_hour << '-'
+		<< now->tm_min << '-'
+		<< now->tm_sec
+		<< ".png";
+	const std::string title = oss.str();
 	stbi_flip_vertically_on_write(1);
-	stbi_write_png("screenshot.png", m_ViewportSize.x, m_ViewportSize.y, 3, data, m_ViewportSize.x * 3);
+	stbi_write_png(title.c_str(), m_ViewportSize.x, m_ViewportSize.y, 3, data, m_ViewportSize.x * 3);
 	delete[] data;
-	printf("Screenshot taken\n");
 }
 
 void GameLayer::RenderStart()
