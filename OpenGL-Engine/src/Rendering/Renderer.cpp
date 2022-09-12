@@ -2,7 +2,7 @@
 
 namespace Renderer
 {
-	bool Renderer::debugAxis = false;
+	bool Renderer::debugView = false;
 
 	bool Renderer::wireframe = false;
 

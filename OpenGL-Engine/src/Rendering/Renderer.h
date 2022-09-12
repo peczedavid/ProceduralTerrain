@@ -3,7 +3,7 @@
 
 namespace Renderer
 {
-	extern bool debugAxis;
+	extern bool debugView;
 
 	extern bool wireframe;
 

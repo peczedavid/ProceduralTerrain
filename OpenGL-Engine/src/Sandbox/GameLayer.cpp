@@ -165,7 +165,7 @@ void GameLayer::OnUpdate(float dt)
 	//m_WaterPlane->Render();
 #endif
 
-	if (Renderer::debugAxis)
+	if (Renderer::debugView)
 		m_Axis->Render(m_Camera);
 
 	RenderEnd();
@@ -199,7 +199,7 @@ void GameLayer::GenerateHeightMap()
 
 void GameLayer::OnImGuiRender(float dt)
 {
-	ImGui::Begin("Info");
+	/*ImGui::Begin("Info");
 	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
 	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
 	static uint32_t FPS = 0u;
@@ -216,7 +216,7 @@ void GameLayer::OnImGuiRender(float dt)
 		sumDt = 0.0f;
 	}
 	ImGui::Text("FPS: %d", FPS);
-	ImGui::End();
+	ImGui::End();*/
 
 	ImGui::Begin("Controls");
 	ImGui::Text("Move - WASD");
@@ -225,7 +225,8 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::Text("Move down - C");
 	ImGui::Text("Fast - Shift");
 	ImGui::Text("Slow - Ctrl");
-	ImGui::Text("Debug axis - F3");
+	ImGui::Text("Screenshot - F2");
+	ImGui::Text("Debug info - F3");
 	ImGui::Text("Wireframe - F");
 	ImGui::Text("Cursor - Tab");
 	ImGui::End();
@@ -285,12 +286,41 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::Text("Height: %.0fpx", m_ViewportSize.y);
 	ImGui::End();
 
+	if (Renderer::debugView)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+		ImGui::SetNextWindowBgAlpha(0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::Begin("Debug overaly", (bool*)1, window_flags);
+		const glm::vec3 cameraPos = m_Camera->GetPosition();
+		ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.y);
+		const glm::vec3 cameraOri = m_Camera->GetOrientation();
+		ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.y);
+		static uint32_t FPS = 0u;
+		static float lastFPSUpdate = 0.0f;
+		static float sumDt = 0.0f;
+		static uint32_t numFrames = 0u;
+		lastFPSUpdate += dt;
+		sumDt += dt;
+		numFrames++;
+		if (lastFPSUpdate >= 0.5f) {
+			lastFPSUpdate = 0.0f;
+			FPS = (float)(numFrames) / sumDt;
+			numFrames = 0u;
+			sumDt = 0.0f;
+		}
+		ImGui::Text("%d FPS", FPS);
+		ImGui::End();
+		ImGui::PopStyleVar();
+	}
+
 	ImGui::Begin("Vendor info");
 	static IDXGIFactory4* pFactory{};
 	CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)&pFactory);
 	static IDXGIAdapter3* adapter{};
 	pFactory->EnumAdapters(0, reinterpret_cast<IDXGIAdapter**>(&adapter));
-	static DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo;
+	static DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo{};
 	adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
 	const size_t usedVRAM = videoMemoryInfo.CurrentUsage / 1024 / 1024;
 	const size_t maxVRAM = videoMemoryInfo.Budget / 1024 / 1024;
@@ -309,9 +339,7 @@ void GameLayer::OnScreenshot()
 {
 	uint8_t* data = new uint8_t[m_ViewportSize.y * m_ViewportSize.x * 3];
 	m_FrameBuffer->Bind();
-	// GL_PACK_ALIGMENT: OpenGL memory to RAM
-	// 1: 1 byte per color channel
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1); // OpenGL memory to RAM, 1 byte per color channel
 	glReadPixels(0, 0, m_ViewportSize.x, m_ViewportSize.y, GL_RGB, GL_UNSIGNED_BYTE, data);
 	FrameBuffer::Default();
 	stbi_flip_vertically_on_write(1);
