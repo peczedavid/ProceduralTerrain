@@ -1,6 +1,5 @@
 // TODO: - offset terrain height relative to amplitude so it starts at 0
 //		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
-
 //		 - axis, fix length (use proj only?)
 
 #include "Sandbox/GameLayer.h"
@@ -14,6 +13,7 @@
 #include <Windows.h>
 #include <dxgi1_4.h>
 #include <stb_image_write.h>
+#include <stb_image.h>
 
 constexpr uint32_t planeSize = 1024u;
 constexpr uint32_t planeDivision = 25u;
@@ -217,7 +217,7 @@ void GameLayer::OnImGuiRender(float dt)
 	}
 	ImGui::Text("FPS: %d", FPS);
 	ImGui::End();
-	
+
 	ImGui::Begin("Controls");
 	ImGui::Text("Move - WASD");
 	ImGui::Text("Look around - Mouse");
@@ -229,7 +229,7 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::Text("Wireframe - F");
 	ImGui::Text("Cursor - Tab");
 	ImGui::End();
-	
+
 	ImGui::Begin("Noise props");
 	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f);
 	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
@@ -246,7 +246,7 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
 	ImGui::Checkbox("Normals", &m_TerrainNormals);
 	ImGui::End();
-	
+
 	ImGui::Begin("Water");
 	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 100.0f);
 	ImGui::Checkbox("Normals", &m_WaterNormals);
@@ -307,12 +307,42 @@ void GameLayer::OnImGuiRender(float dt)
 
 void GameLayer::OnScreenshot()
 {
-	printf("Taking screenshot\n");
-	const size_t dataSize = m_ViewportSize.y * m_ViewportSize.x * 3;
-	uint32_t* data = new uint32_t[dataSize];
-	glGetTextureImage(m_FrameBuffer->GetTextureId(), 0, GL_RGB, GL_UNSIGNED_INT, dataSize * 4, data);
+	//uint8_t* data = new uint8_t[m_ViewportSize.y * m_ViewportSize.x * 3];
+	//glBindTexture(GL_TEXTURE_2D, m_FrameBuffer->GetTextureId());
+	//glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	//int index = 0;
+	//for (int j = 0; j < m_ViewportSize.y; j++)
+	//{
+	//	for (int i = 0; i < m_ViewportSize.x; ++i)
+	//	{
+	//		// RGB
+	//		data[index++] = (unsigned char)(255.0 * i / m_ViewportSize.x);
+	//		data[index++] = (unsigned char)(255.0 * j / m_ViewportSize.y);
+	//		data[index++] = (unsigned char)(255.0 * 0.0);
+	//	}
+	//}
+	//stbi_flip_vertically_on_write(1);
+	//stbi_write_png("stbpng.png", m_ViewportSize.x, m_ViewportSize.y, 3, data, m_ViewportSize.x * 3);
+	//delete[] data;
+	uint8_t* data = new uint8_t[m_ViewportSize.y * m_ViewportSize.x * 3];
+	glBindTexture(GL_TEXTURE_2D, m_FrameBuffer->GetTextureId());
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	int index = 0;
+	for (int j = 0; j < m_ViewportSize.y; j++)
+	{
+		for (int i = 0; i < m_ViewportSize.x; ++i)
+		{
+			// RGB
+			data[index + 0];
+			data[index + 1];
+			data[index + 2];
+			index += 3;
+		}
+	}
+	//stbi_flip_vertically_on_write(1);
 	stbi_write_png("stbpng.png", m_ViewportSize.x, m_ViewportSize.y, 3, data, m_ViewportSize.x * 3);
 	delete[] data;
+	printf("Screenshot taken\n");
 }
 
 void GameLayer::RenderStart()
