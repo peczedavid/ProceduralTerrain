@@ -17,6 +17,8 @@ public:
 
 	static inline Application& Get() { return *s_Instance; }
 	inline Window* GetWindow() { return m_Window; }
+public:
+	void OnResize(uint32_t width, uint32_t height);
 private:
 	LayerStack* m_LayerStack;
 	Window* m_Window;

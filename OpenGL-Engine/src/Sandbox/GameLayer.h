@@ -19,6 +19,8 @@ public:
 
 	void OnUpdate(float dt) override;
 	void OnImGuiRender(float dt) override;
+public:
+	void OnResize(uint32_t width, uint32_t height) override;
 private:
 	void GenerateHeightMap();
 	void RenderStart();

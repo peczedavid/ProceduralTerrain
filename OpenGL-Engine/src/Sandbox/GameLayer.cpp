@@ -259,29 +259,6 @@ void GameLayer::GenerateHeightMap()
 
 void GameLayer::OnImGuiRender(float dt)
 {
-	//ImGui::Begin("Texture");
-	//if (ImGui::Button("Generate")) {
-	//	m_ComputeShader->Use();
-	//	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
-	//	m_ComputeShader->SetUniform("u_Gain", m_Gain);
-	//	m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
-	//	m_ComputeShader->SetUniform("u_Scale", m_Scale);
-	//	m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
-
-	//	m_ComputeShader->SetUniform("u_WorldOffset", glm::vec2(0.0f, 0.0f));
-	//	m_HeightMap1->BindImage();
-	//	m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 8), ceil(planeSize / 4), 1));
-	//	m_ComputeShader->SetUniform("u_WorldOffset", glm::vec2((int)planeSize, 0.0f));
-	//	m_HeightMap2->BindImage();
-	//	m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 8), ceil(planeSize / 4), 1));
-	//}
-	//float my_tex_w = 256.0f;
-	//float my_tex_h = 256.0f;
-	//ImVec2 uv_min = ImVec2(0.0f, 1.0f);                 // Top-left
-	//ImVec2 uv_max = ImVec2(1.0f, 0.0f);                 // Lower-right
-	//ImGui::Image((ImTextureID)m_HeightMap1->GetId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
-	//ImGui::End();
-
 	ImGui::Begin("Info");
 	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
 	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
@@ -362,6 +339,11 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::Text("OpenGL %d.%d", versionMajor, versionMinor);
 	ImGui::Text("VRAM: %d/%d MB", usedVRAM, maxVRAM);
 	ImGui::End();
+}
+
+void GameLayer::OnResize(uint32_t width, uint32_t height)
+{
+	m_FrameBuffer->Resize(width, height);
 }
 
 void GameLayer::RenderStart()

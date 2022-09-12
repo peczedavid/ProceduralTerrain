@@ -39,6 +39,14 @@ void FrameBuffer::Bind()
 
 void FrameBuffer::Resize(uint32_t width, uint32_t height)
 {
+	glBindTexture(GL_TEXTURE_2D, m_TextureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, m_RenderBufferId);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
 void FrameBuffer::Default()

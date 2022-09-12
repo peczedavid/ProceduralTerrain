@@ -10,8 +10,7 @@ void error_callback(int error, const char* description)
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	Application::Get().GetWindow()->SetWidth(width);
-	Application::Get().GetWindow()->SetHeight(height);
+	Application::Get().OnResize(width, height);
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

@@ -65,3 +65,12 @@ void Application::ToggleImGui()
 {
 	m_ImGui = !m_ImGui;
 }
+
+void Application::OnResize(uint32_t width, uint32_t height)
+{
+	m_Window->SetWidth(width);
+	m_Window->SetWidth(height);
+
+	for (Layer* layer : *m_LayerStack)
+		layer->OnResize(width, height);
+}
