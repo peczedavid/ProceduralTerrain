@@ -201,25 +201,6 @@ void GameLayer::GenerateHeightMap()
 
 void GameLayer::OnImGuiRender(float dt)
 {
-	/*ImGui::Begin("Info");
-	ImGui::DragFloat3("Camera position", &m_Camera->GetPosition()[0], 0.01f, -500.0f, 500.0f);
-	ImGui::DragFloat3("Camera orientation", &m_Camera->GetOrientation()[0], 0.01f, -0.99f, 0.99f);
-	static uint32_t FPS = 0u;
-	static float lastFPSUpdate = 0.0f;
-	static float sumDt = 0.0f;
-	static uint32_t numFrames = 0u;
-	lastFPSUpdate += dt;
-	sumDt += dt;
-	numFrames++;
-	if (lastFPSUpdate >= 0.5f) {
-		lastFPSUpdate = 0.0f;
-		FPS = (float)(numFrames) / sumDt;
-		numFrames = 0u;
-		sumDt = 0.0f;
-	}
-	ImGui::Text("FPS: %d", FPS);
-	ImGui::End();*/
-
 	ImGui::Begin("Controls");
 	ImGui::Text("Move - WASD");
 	ImGui::Text("Look around - Mouse");
@@ -284,11 +265,6 @@ void GameLayer::OnImGuiRender(float dt)
 	}
 	ImGui::End();
 
-	ImGui::Begin("Viewport info");
-	ImGui::Text("Width: %.0fpx", m_ViewportSize.x);
-	ImGui::Text("Height: %.0fpx", m_ViewportSize.y);
-	ImGui::End();
-
 	static uint32_t FPS = 0u;
 	static float lastFPSUpdate = 0.0f;
 	static float sumDt = 0.0f;
@@ -308,7 +284,8 @@ void GameLayer::OnImGuiRender(float dt)
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 		ImGui::SetNextWindowBgAlpha(0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		ImGui::Begin("Debug overaly", (bool*)1, window_flags);
+		ImGui::Begin("Debug overaly", &Renderer::debugView, window_flags);
+		ImGui::Text("Viewport size: %.0fx%.0f", m_ViewportSize.x, m_ViewportSize.y);
 		const glm::vec3 cameraPos = m_Camera->GetPosition();
 		ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.y);
 		const glm::vec3 cameraOri = m_Camera->GetOrientation();
