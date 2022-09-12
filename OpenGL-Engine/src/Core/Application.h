@@ -13,17 +13,15 @@ public:
 	void PushLayer(Layer* layer);
 	void PushOverlay(Layer* overlay);
 
-	void ToggleImGui();
-
 	static inline Application& Get() { return *s_Instance; }
 	inline Window* GetWindow() { return m_Window; }
 public:
 	void OnResize(uint32_t width, uint32_t height);
+	void OnScreenshot();
 private:
 	LayerStack* m_LayerStack;
 	Window* m_Window;
 	bool m_Cursor;
-	bool m_ImGui;
 	ImGuiLayer* m_ImGuiLayer;
 
 	static Application* s_Instance;

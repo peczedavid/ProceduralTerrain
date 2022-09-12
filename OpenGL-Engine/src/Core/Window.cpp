@@ -10,7 +10,6 @@ void error_callback(int error, const char* description)
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	Application::Get().OnResize(width, height);
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -31,19 +30,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		Renderer::TogglePolygonMode();
 	}
 
-	if (key == GLFW_KEY_M && action == GLFW_PRESS)
+	if (key == GLFW_KEY_F2 && action == GLFW_PRESS)
 	{
-		Renderer::ToggleMSAA();
+		app.OnScreenshot();
 	}
 
 	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
 	{
 		Renderer::debugAxis = !Renderer::debugAxis;
-	}
-
-	if(key == GLFW_KEY_F1 && action == GLFW_PRESS)
-	{
-		app.ToggleImGui();
 	}
 }
 

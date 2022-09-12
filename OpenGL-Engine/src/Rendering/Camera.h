@@ -6,8 +6,10 @@ class Camera {
 public:
 	Camera(const glm::vec3& position, const glm::vec3& orientation = { 0.0f, 0.0f, -1.0f});
 
-	void UpdateMatrix(float fovDeg, float asp, float nearPlane, float farPlane);
+	void UpdateMatrix(float fovDeg, float nearPlane, float farPlane);
 	void Update(float dt);
+
+	void Resize(uint32_t width, uint32_t height);
 private:
 	glm::vec3 m_Position;
 	glm::vec3 m_Orientation;
@@ -16,6 +18,8 @@ private:
 	glm::mat4 m_View;
 	glm::mat4 m_Proj;
 	glm::mat4 m_CameraMatrix;
+
+	uint32_t m_Width, m_Height;
 
 	float m_BaseSpeed = 40.f;
 	float m_SpeedMultiplier = 1.f;

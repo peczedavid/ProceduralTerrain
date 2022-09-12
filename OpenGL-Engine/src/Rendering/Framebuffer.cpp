@@ -20,7 +20,6 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height)
 	glGenRenderbuffers(1, &m_RenderBufferId);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_RenderBufferId);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-	//glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RenderBufferId);
 
 	uint32_t status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -39,14 +38,12 @@ void FrameBuffer::Bind()
 
 void FrameBuffer::Resize(uint32_t width, uint32_t height)
 {
+	glViewport(0, 0, width, height);
 	glBindTexture(GL_TEXTURE_2D, m_TextureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
 	glBindRenderbuffer(GL_RENDERBUFFER, m_RenderBufferId);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
 void FrameBuffer::Default()

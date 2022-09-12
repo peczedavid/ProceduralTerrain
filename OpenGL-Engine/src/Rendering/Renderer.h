@@ -9,8 +9,5 @@ namespace Renderer
 
 	void TogglePolygonMode();
 
-	extern bool multisample;
-	void ToggleMSAA();
-
 	void SetOpenGLConfig();
 };
