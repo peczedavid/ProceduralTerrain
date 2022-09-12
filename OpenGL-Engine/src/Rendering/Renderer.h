@@ -3,14 +3,11 @@
 
 namespace Renderer
 {
-	extern bool debugAxis;
+	extern bool debugView;
 
 	extern bool wireframe;
 
 	void TogglePolygonMode();
-
-	extern bool multisample;
-	void ToggleMSAA();
 
 	void SetOpenGLConfig();
 };

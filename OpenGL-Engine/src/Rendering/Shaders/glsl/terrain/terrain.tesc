@@ -13,10 +13,10 @@ void main() {
   v_UVsCoord[gl_InvocationID] = v_TexCoords[gl_InvocationID];
 
   if (gl_InvocationID == 0) {
-    const int MIN_TESS_LEVEL = 1;
+    const int MIN_TESS_LEVEL = 4;
     const int MAX_TESS_LEVEL = 64;
-    const float MIN_DISTANCE = 50;
-    const float MAX_DISTANCE = 500;
+    const float MIN_DISTANCE = 25;
+    const float MAX_DISTANCE = 1000;
 
     mat4 transform = u_View * u_Model;
 

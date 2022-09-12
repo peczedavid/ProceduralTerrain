@@ -19,6 +19,8 @@ public:
 
 	void OnUpdate(float dt) override;
 	void OnImGuiRender(float dt) override;
+
+	void OnScreenshot() override;
 private:
 	void GenerateHeightMap();
 	void RenderStart();
@@ -26,21 +28,17 @@ private:
 
 	void GenerateTerrain();
 private:
-	uint32_t m_VaoCube, m_VboCube, m_EboCube;
-	Plane* m_Plane;
+	Plane* m_GroundPlane;
 	int m_TessLevel = 1;
 	float m_MaxHeight = 115.0f;
 
 	ComputeShader* m_ComputeShader;
-	Texture2D* m_HeightMap1;
-	Texture2D* m_HeightMap2;
 	std::vector<Texture2D*> m_HeightMaps;
 
 	BasicShader* m_Shader;
 	TessellationShader* m_TerrainShader;
 	TessellationShader* m_WaterShader;
-	Texture2D* m_UvTexture;
-	Texture2D *m_GroundTexture, *m_RockTexture, *m_SnowTexture;
+	Texture2D *m_GroundTexture, *m_RockTexture;
 	Texture2D* m_WaterTexture;
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
 	Camera* m_Camera;
@@ -62,7 +60,8 @@ private:
 	bool m_TerrainNormals = false;
 	bool m_WaterNormals = false;
 
-	BasicShader* m_PostProcessShader;
 	FrameBuffer* m_FrameBuffer;
+	BasicShader* m_PostProcessShader;
 	FullscreenQuad* m_FullscreenQuad;
+	glm::vec2 m_ViewportSize = glm::vec2(1, 1);
 };
