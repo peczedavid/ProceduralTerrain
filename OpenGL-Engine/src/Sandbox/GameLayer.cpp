@@ -1,6 +1,6 @@
 // TODO: - offset terrain height relative to amplitude so it starts at 0
 //		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
-//		 - axis, fix length (use proj only?)
+//		 - axis, fix length
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
@@ -289,6 +289,19 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::Text("Height: %.0fpx", m_ViewportSize.y);
 	ImGui::End();
 
+	static uint32_t FPS = 0u;
+	static float lastFPSUpdate = 0.0f;
+	static float sumDt = 0.0f;
+	static uint32_t numFrames = 0u;
+	lastFPSUpdate += dt;
+	sumDt += dt;
+	numFrames++;
+	if (lastFPSUpdate >= 0.5f) {
+		lastFPSUpdate = 0.0f;
+		FPS = (float)(numFrames) / sumDt;
+		numFrames = 0u;
+		sumDt = 0.0f;
+	}
 	if (Renderer::debugView)
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -300,19 +313,6 @@ void GameLayer::OnImGuiRender(float dt)
 		ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.y);
 		const glm::vec3 cameraOri = m_Camera->GetOrientation();
 		ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.y);
-		static uint32_t FPS = 0u;
-		static float lastFPSUpdate = 0.0f;
-		static float sumDt = 0.0f;
-		static uint32_t numFrames = 0u;
-		lastFPSUpdate += dt;
-		sumDt += dt;
-		numFrames++;
-		if (lastFPSUpdate >= 0.5f) {
-			lastFPSUpdate = 0.0f;
-			FPS = (float)(numFrames) / sumDt;
-			numFrames = 0u;
-			sumDt = 0.0f;
-		}
 		ImGui::Text("%d FPS", FPS);
 		ImGui::End();
 		ImGui::PopStyleVar();
