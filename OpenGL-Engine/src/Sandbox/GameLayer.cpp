@@ -202,17 +202,17 @@ void GameLayer::GenerateHeightMap()
 void GameLayer::OnImGuiRender(float dt)
 {
 	ImGui::Begin("Controls");
-	ImGui::Text("Move - WASD");
-	ImGui::Text("Look around - Mouse");
-	ImGui::Text("Move up - Space");
-	ImGui::Text("Move down - C");
-	ImGui::Text("Fast - Shift");
-	ImGui::Text("Slow - Ctrl");
-	ImGui::Text("Screenshot - F2");
-	ImGui::Text("Debug info - F3");
-	ImGui::Text("Wireframe - F");
-	ImGui::Text("Cursor - Tab");
-	ImGui::Text("Close - Escape");
+	ImGui::Text("WASD - Move");
+	ImGui::Text("Mouse - Look around");
+	ImGui::Text("Space - Move up");
+	ImGui::Text("C - Move down");
+	ImGui::Text("Shift - Fast");
+	ImGui::Text("Ctrl - Slow");
+	ImGui::Text("F2 - Screenshot");
+	ImGui::Text("F3 - Debug info");
+	ImGui::Text("F - Wireframe");
+	ImGui::Text("Tab - Cursor");
+	ImGui::Text("Esc - Close");
 	ImGui::End();
 
 	ImGui::Begin("Noise props");

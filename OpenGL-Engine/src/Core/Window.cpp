@@ -75,7 +75,7 @@ Window::Window(const WindowProps& props)
 	glfwMakeContextCurrent(m_Window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-	m_VSync = true;
+	m_VSync = false;
 	glfwSwapInterval(m_VSync ? 1 : 0);
 
 	glfwSetErrorCallback(error_callback);
