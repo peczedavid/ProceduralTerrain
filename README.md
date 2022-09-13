@@ -12,9 +12,9 @@
 `Build and run with Visual Studio 2022. Release mode recommended.`
 
 ## Current look :mount_fuji:
-![Sample1](files/Sample1.png)
+![Sample1](files/sample-pic-1.png)
 
-## Requirements :computer:
+## Recommended :computer:
 - Visual Studio 2022 (MSVC C++17 compiler)
 - OpenGL 4.6 compatible driver
 - Windows 10 or higher
