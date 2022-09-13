@@ -198,6 +198,8 @@ void GameLayer::GenerateHeightMap()
 }
 #endif
 
+void DrawImage(uint32_t textureId);
+
 void GameLayer::OnImGuiRender(float dt)
 {
 	ImGui::Begin("Controls");
@@ -263,6 +265,18 @@ void GameLayer::OnImGuiRender(float dt)
 	}
 	ImGui::End();
 
+	ImGui::Begin("Textures");
+	for (int i = 2; i >= 0; i--)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			DrawImage(m_HeightMaps[i * 3 + j]->GetId());
+			if (j < 2)
+				ImGui::SameLine();
+		}
+	}
+	ImGui::End();
+
 	static uint32_t FPS = 0u;
 	static float lastFPSUpdate = 0.0f;
 	static float sumDt = 0.0f;
@@ -324,7 +338,7 @@ void GameLayer::OnScreenshot()
 	std::tm* now = std::localtime(&t);
 	std::ostringstream oss;
 	oss << "screenshots/"
-	    << (now->tm_year + 1900) << '-'
+		<< (now->tm_year + 1900) << '-'
 		<< (now->tm_mon + 1) << '-'
 		<< now->tm_mday << '_'
 		<< now->tm_hour << '-'
@@ -379,5 +393,39 @@ void GameLayer::GenerateTerrain()
 			m_HeightMaps[index]->BindImage();
 			m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 8), ceil(planeSize / 4), 1));
 		}
+	}
+}
+
+void DrawImage(uint32_t textureId)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	ImTextureID my_tex_id = (ImTextureID)textureId;
+	float my_tex_w = 200.0f;
+	float my_tex_h = 200.0f;
+	{
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
+		ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
+		ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			float region_sz = 32.0f;
+			float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
+			float region_y = io.MousePos.y - pos.y;
+			region_y = my_tex_h - region_y;
+			region_y = region_y - region_sz * 0.5f;
+			float zoom = 7.0f;
+			if (region_x < 0.0f) { region_x = 0.0f; }
+			else if (region_x > my_tex_w - region_sz) { region_x = my_tex_w - region_sz; }
+			if (region_y < 0.0f) { region_y = 0.0f; }
+			else if (region_y > my_tex_h - region_sz) { region_y = my_tex_h - region_sz; }
+			ImGui::Text("Min: (%.2f, %.2f)", region_x, region_y);
+			ImGui::Text("Max: (%.2f, %.2f)", region_x + region_sz, region_y + region_sz);
+			ImVec2 uv0 = ImVec2((region_x) / my_tex_w, (region_y + region_sz) / my_tex_h);
+			ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y) / my_tex_h);
+			ImGui::Image(my_tex_id, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
+			ImGui::EndTooltip();
+}
 	}
 }
