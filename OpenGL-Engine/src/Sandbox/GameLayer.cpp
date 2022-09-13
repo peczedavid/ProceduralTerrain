@@ -103,7 +103,7 @@ void GameLayer::OnUpdate(float dt)
 
 	m_Skybox->Render(m_Camera);
 
-	glm::mat4 model = glm::mat4(1.0f);
+	static glm::mat4 model;
 
 	m_TerrainShader->Use();
 	m_GroundTexture->Bind(1);
@@ -114,7 +114,6 @@ void GameLayer::OnUpdate(float dt)
 	m_TerrainShader->SetUniform("u_FogDensity", m_FogDensity);
 	m_TerrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
 
-#if 1
 	for (int z = -1; z <= 1; z++)
 	{
 		for (int x = -1; x <= 1; x++)
@@ -126,19 +125,9 @@ void GameLayer::OnUpdate(float dt)
 			m_GroundPlane->Render();
 		}
 	}
-#else
-	//m_ComputeShader->GetTexture()->Bind(0);
-	m_HeightMap1->Bind(0);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-	m_TerrainShader->SetUniform("u_Model", model);
-	m_Plane->Render();
-	m_HeightMap2->Bind(0);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(planeSize, 0, 0));
-	m_TerrainShader->SetUniform("u_Model", model);
-	m_Plane->Render();
-#endif
 
-	/*m_WaterShader->Use();
+#if 0
+	m_WaterShader->Use();
 	m_WaterTexture->Bind(0);
 	m_WaterShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 	m_WaterShader->SetUniform("u_View", m_Camera->GetView());
@@ -148,22 +137,10 @@ void GameLayer::OnUpdate(float dt)
 	m_WaterShader->SetUniform("u_WaveB", m_WaveB);
 	m_WaterShader->SetUniform("u_WaveC", m_WaveC);
 	m_WaterShader->SetUniform("u_Time", t);
-	m_WaterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);*/
-
-#if 0
-	for (int z = -(levelSize - 2); z < (levelSize - 1); z++)
-	{
-		for (int x = -(levelSize - 2); x < (levelSize - 1); x++)
-		{
-			model = glm::translate(glm::mat4(1.0f), glm::vec3(x * (int)waterPlaneSize, m_WaterLevel, z * (int)waterPlaneSize));
-			m_WaterShader->SetUniform("u_Model", model);
-			m_WaterPlane->Render();
-		}
-	}
-#else
-	//model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
-	//m_WaterShader->SetUniform("u_Model", model);
-	//m_WaterPlane->Render();
+	m_WaterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
+	m_WaterShader->SetUniform("u_Model", model);
+	m_WaterPlane->Render();
 #endif
 
 	if (Renderer::debugView)
@@ -308,11 +285,16 @@ void GameLayer::OnImGuiRender(float dt)
 	}
 
 	ImGui::Begin("Vendor info");
+	static bool firstRun = true;
 	static IDXGIFactory4* pFactory{};
-	CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)&pFactory);
 	static IDXGIAdapter3* adapter{};
-	pFactory->EnumAdapters(0, reinterpret_cast<IDXGIAdapter**>(&adapter));
 	static DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo{};
+	if (firstRun)
+	{
+		CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)&pFactory);
+		pFactory->EnumAdapters(0, reinterpret_cast<IDXGIAdapter**>(&adapter));
+		firstRun = false;
+	}
 	adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
 	const size_t usedVRAM = videoMemoryInfo.CurrentUsage / 1024 / 1024;
 	const size_t maxVRAM = videoMemoryInfo.Budget / 1024 / 1024;

@@ -45,14 +45,11 @@ void main() {
   texCoord.y = 1 - texCoord.y;
   vec3 vertexInfo = texture(u_NoiseTexture, texCoord).xyz;
   v_Height = vertexInfo.x;
-  vec4 uVec = pos2 - pos0;
-  vec4 vVec = pos3 - pos0;
-  vec4 patchNormal = normalize(vec4(cross(vVec.xyz, uVec.xyz), 0));
-  v_Normal = mix(patchNormal, normalize(vec4(-vertexInfo.y, 1.0, -vertexInfo.z, 0.0)), 0.7);
-  worldPos += patchNormal * v_Height * u_MaxLevel;
+  worldPos.y = v_Height * u_MaxLevel;
 
   gl_Position = u_ViewProj * worldPos;
-  v_TexCoords = worldPos.xz / 10.0;
+  v_Normal = normalize(vec4(-vertexInfo.y, 1.0, -vertexInfo.z, 0.0));
+  v_TexCoords = worldPos.xz / 12.5;
 
   float vertexDistance = length((u_View * worldPos).xyz);
   v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));
