@@ -179,78 +179,100 @@ void DrawImage(uint32_t textureId);
 
 void GameLayer::OnImGuiRender(float dt)
 {
-	ImGui::Begin("Controls");
-	ImGui::Text("WASD - Move");
-	ImGui::Text("Mouse - Look around");
-	ImGui::Text("Space - Move up");
-	ImGui::Text("C - Move down");
-	ImGui::Text("Shift - Fast");
-	ImGui::Text("Ctrl - Slow");
-	ImGui::Text("F2 - Screenshot");
-	ImGui::Text("F3 - Debug info");
-	ImGui::Text("F - Wireframe");
-	ImGui::Text("Tab - Cursor");
-	ImGui::Text("Esc - Close");
-	ImGui::End();
-
-	ImGui::Begin("Noise props");
-	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f);
-	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
-	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
-	ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 0.3f);
-	ImGui::SliderFloat2("NoiseOffset", &m_NoiseOffset[0], 0.0f, 10.0f);
-	ImGui::End();
-
-	ImGui::Begin("Landscape");
-	if (ImGui::Button("Generate")) this->GenerateTerrain();
-	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
-	ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
-	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
-	ImGui::Checkbox("Normals", &m_TerrainNormals);
-	ImGui::End();
-
-	ImGui::Begin("Water");
-	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 100.0f);
-	ImGui::Checkbox("Normals", &m_WaterNormals);
-	ImGui::SliderFloat("A - Steepness", &m_WaveA[2], 0.0f, 1.0f);
-	ImGui::SliderFloat("A - Wavelength", &m_WaveA[3], 10.0f, 75.0f);
-	ImGui::SliderFloat2("A - Direction", &m_WaveA[0], -1.0f, 1.0f);
-	ImGui::SliderFloat("B - Steepness", &m_WaveB[2], 0.0f, 1.0f);
-	ImGui::SliderFloat("B - Wavelength", &m_WaveB[3], 10.0f, 75.0f);
-	ImGui::SliderFloat2("B - Direction", &m_WaveB[0], -1.0f, 1.0f);
-	ImGui::SliderFloat("C - Steepness", &m_WaveC[2], 0.0f, 1.0f);
-	ImGui::SliderFloat("C - Wavelength", &m_WaveC[3], 10.0f, 75.0f);
-	ImGui::SliderFloat2("C - Direction", &m_WaveC[0], -1.0f, 1.0f);
-	ImGui::End();
-
-	ImGui::Begin("Viewport");
-	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	float my_tex_w = viewportPanelSize.x;
-	float my_tex_h = viewportPanelSize.y;
-	if (m_ViewportSize.x != viewportPanelSize.x || m_ViewportSize.y != viewportPanelSize.y)
+	if (ImGui::Begin("Controls"))
 	{
-		m_FrameBuffer->Resize(my_tex_w, my_tex_h);
-		m_Camera->Resize(my_tex_w, my_tex_h);
-		m_ViewportSize.x = viewportPanelSize.x;
-		m_ViewportSize.y = viewportPanelSize.y;
-	}
-	else
-	{
-		ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
-		ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
-		ImGui::Image((ImTextureID)m_FrameBuffer->GetTextureId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+		ImGui::Text("WASD - Move");
+		ImGui::Text("Mouse - Look around");
+		ImGui::Text("Space - Move up");
+		ImGui::Text("C - Move down");
+		ImGui::Text("Shift - Fast");
+		ImGui::Text("Ctrl - Slow");
+		ImGui::Text("F2 - Screenshot");
+		ImGui::Text("F3 - Debug info");
+		ImGui::Text("F - Wireframe");
+		ImGui::Text("Tab - Cursor");
+		ImGui::Text("Esc - Close");
 	}
 	ImGui::End();
 
-	ImGui::Begin("Textures");
-	for (int i = 2; i >= 0; i--)
+	if (ImGui::Begin("Noise props"))
 	{
-		for (int j = 0; j < 3; j++)
+		ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f);
+		ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
+		ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
+		ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 0.3f);
+		ImGui::SliderFloat2("NoiseOffset", &m_NoiseOffset[0], 0.0f, 10.0f);
+	}
+	ImGui::End();
+
+	if (ImGui::Begin("Landscape"))
+	{
+		if (ImGui::Button("Generate")) this->GenerateTerrain();
+		ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
+		ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
+		ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
+		ImGui::Checkbox("Normals", &m_TerrainNormals);
+	}
+	ImGui::End();
+
+	if (ImGui::Begin("Water"))
+	{
+		ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 100.0f);
+		ImGui::Checkbox("Normals", &m_WaterNormals);
+		ImGui::SliderFloat("A - Steepness", &m_WaveA[2], 0.0f, 1.0f);
+		ImGui::SliderFloat("A - Wavelength", &m_WaveA[3], 10.0f, 75.0f);
+		ImGui::SliderFloat2("A - Direction", &m_WaveA[0], -1.0f, 1.0f);
+		ImGui::SliderFloat("B - Steepness", &m_WaveB[2], 0.0f, 1.0f);
+		ImGui::SliderFloat("B - Wavelength", &m_WaveB[3], 10.0f, 75.0f);
+		ImGui::SliderFloat2("B - Direction", &m_WaveB[0], -1.0f, 1.0f);
+		ImGui::SliderFloat("C - Steepness", &m_WaveC[2], 0.0f, 1.0f);
+		ImGui::SliderFloat("C - Wavelength", &m_WaveC[3], 10.0f, 75.0f);
+		ImGui::SliderFloat2("C - Direction", &m_WaveC[0], -1.0f, 1.0f);
+	}
+	ImGui::End();
+
+	if (ImGui::Begin("Viewport"))
+	{
+		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		float my_tex_w = viewportPanelSize.x;
+		float my_tex_h = viewportPanelSize.y;
+		if (m_ViewportSize.x != viewportPanelSize.x || m_ViewportSize.y != viewportPanelSize.y)
 		{
-			DrawImage(m_HeightMaps[i * 3 + j]->GetId());
-			if (j < 2)
-				ImGui::SameLine();
+			m_FrameBuffer->Resize(my_tex_w, my_tex_h);
+			m_Camera->Resize(my_tex_w, my_tex_h);
+			m_ViewportSize.x = viewportPanelSize.x;
+			m_ViewportSize.y = viewportPanelSize.y;
 		}
+		else
+		{
+			ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
+			ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
+			ImGui::Image((ImTextureID)m_FrameBuffer->GetTextureId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+		}
+	}
+	ImGui::End();
+
+	if (ImGui::Begin("Textures"))
+	{
+		for (int i = 2; i >= 0; i--)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				DrawImage(m_HeightMaps[i * 3 + j]->GetId());
+				if (j < 2)
+					ImGui::SameLine();
+			}
+		}
+	}
+	ImGui::End();
+
+	if (ImGui::Begin("Waves"))
+	{
+		constexpr int size = 500;
+		static float values[size] = { };
+		for (int i = 0; i < size; i++)
+			values[i] = sinf(i / 10.0f);
+		ImGui::PlotLines("Sin", values, size, 0, 0, -1.0f, 1.0f, ImVec2(0.0, 80.0f));
 	}
 	ImGui::End();
 
@@ -284,7 +306,6 @@ void GameLayer::OnImGuiRender(float dt)
 		ImGui::PopStyleVar();
 	}
 
-	ImGui::Begin("Vendor info");
 	static bool firstRun = true;
 	static IDXGIFactory4* pFactory{};
 	static IDXGIAdapter3* adapter{};
@@ -295,17 +316,20 @@ void GameLayer::OnImGuiRender(float dt)
 		pFactory->EnumAdapters(0, reinterpret_cast<IDXGIAdapter**>(&adapter));
 		firstRun = false;
 	}
-	adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
-	const size_t usedVRAM = videoMemoryInfo.CurrentUsage / 1024 / 1024;
-	const size_t maxVRAM = videoMemoryInfo.Budget / 1024 / 1024;
-	ImGui::Text("Vendor: %s", glGetString(GL_VENDOR));
-	ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
-	ImGui::Text("Version: %s", glGetString(GL_VERSION));
-	int versionMajor, versionMinor;
-	glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
-	glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-	ImGui::Text("OpenGL %d.%d", versionMajor, versionMinor);
-	ImGui::Text("VRAM: %d/%d MB", usedVRAM, maxVRAM);
+	if (ImGui::Begin("Vendor info"))
+	{
+		adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
+		const size_t usedVRAM = videoMemoryInfo.CurrentUsage / 1024 / 1024;
+		const size_t maxVRAM = videoMemoryInfo.Budget / 1024 / 1024;
+		ImGui::Text("Vendor: %s", glGetString(GL_VENDOR));
+		ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
+		ImGui::Text("Version: %s", glGetString(GL_VERSION));
+		int versionMajor, versionMinor;
+		glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
+		glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+		ImGui::Text("OpenGL %d.%d", versionMajor, versionMinor);
+		ImGui::Text("VRAM: %d/%d MB", usedVRAM, maxVRAM);
+	}
 	ImGui::End();
 }
 
@@ -408,6 +432,6 @@ void DrawImage(uint32_t textureId)
 			ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y) / my_tex_h);
 			ImGui::Image(my_tex_id, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
 			ImGui::EndTooltip();
-}
+		}
 	}
 }
