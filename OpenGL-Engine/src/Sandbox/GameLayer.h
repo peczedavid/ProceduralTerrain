@@ -30,7 +30,7 @@ private:
 private:
 	Plane* m_GroundPlane;
 	int m_TessLevel = 1;
-	float m_MaxHeight = 115.0f;
+	float m_MaxHeight = 87.0f;
 
 	ComputeShader* m_ComputeShader;
 	std::vector<Texture2D*> m_HeightMaps;
@@ -45,8 +45,8 @@ private:
 	Skybox* m_Skybox;
 	Axis* m_Axis;
 
-	float m_Gain = 0.245f, m_Lacunarity = 1.184f, m_Amplitude = 0.488f, m_Frequency = 2.776f;
-	float m_Scale = 0.100f, m_HeightOffset = 20.726f;
+	float m_Gain = 0.245f, m_Lacunarity = 1.184f, m_Amplitude = 0.385f, m_Frequency = 2.776f;
+	float m_Scale = 0.100f;
 	float m_FogDensity = 0.002f;
 	float m_FogGradient = 2.5f;
 	glm::vec2 m_NoiseOffset = glm::vec2(0.0f, 0.0f);

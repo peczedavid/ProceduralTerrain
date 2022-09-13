@@ -110,7 +110,6 @@ void GameLayer::OnUpdate(float dt)
 	m_RockTexture->Bind(2);
 	m_TerrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	m_TerrainShader->SetUniform("u_View", m_Camera->GetView());
-	m_TerrainShader->SetUniform("u_HeightOffset", m_HeightOffset);
 	m_TerrainShader->SetUniform("u_FogGradient", m_FogGradient);
 	m_TerrainShader->SetUniform("u_FogDensity", m_FogDensity);
 	m_TerrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
@@ -220,7 +219,6 @@ void GameLayer::OnImGuiRender(float dt)
 	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
 	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
 	ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 0.3f);
-	ImGui::SliderFloat("HeightOffset", &m_HeightOffset, 0.0f, 100.0f);
 	ImGui::SliderFloat2("NoiseOffset", &m_NoiseOffset[0], 0.0f, 10.0f);
 	ImGui::End();
 
