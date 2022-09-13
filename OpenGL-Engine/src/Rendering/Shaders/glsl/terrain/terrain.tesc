@@ -14,16 +14,16 @@ void main() {
 
   if (gl_InvocationID == 0) {
     const int MIN_TESS_LEVEL = 1;
-    const int MAX_TESS_LEVEL = 64;
-    const float MIN_DISTANCE = 50;
-    const float MAX_DISTANCE = 500;
+    const int MAX_TESS_LEVEL = 28;
+    const float MIN_DISTANCE = 75;
+    const float MAX_DISTANCE = 800;
 
     mat4 transform = u_View * u_Model;
 
     vec4 eyeSpacePos00 = transform * gl_in[0].gl_Position;
     vec4 eyeSpacePos01 = transform * gl_in[1].gl_Position;
-    vec4 eyeSpacePos10 = transform * gl_in[3].gl_Position;
     vec4 eyeSpacePos11 = transform * gl_in[2].gl_Position;
+    vec4 eyeSpacePos10 = transform * gl_in[3].gl_Position;
 
     float distance00 = clamp((abs(eyeSpacePos00.z) - MIN_DISTANCE) /
                                  (MAX_DISTANCE - MIN_DISTANCE),

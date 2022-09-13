@@ -10,8 +10,6 @@ void error_callback(int error, const char* description)
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	Application::Get().GetWindow()->SetWidth(width);
-	Application::Get().GetWindow()->SetHeight(height);
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -32,19 +30,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		Renderer::TogglePolygonMode();
 	}
 
-	if (key == GLFW_KEY_M && action == GLFW_PRESS)
+	if (key == GLFW_KEY_F2 && action == GLFW_PRESS)
 	{
-		Renderer::ToggleMSAA();
+		app.OnScreenshot();
 	}
 
 	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
 	{
-		Renderer::debugAxis = !Renderer::debugAxis;
-	}
-
-	if(key == GLFW_KEY_F1 && action == GLFW_PRESS)
-	{
-		app.ToggleImGui();
+		Renderer::debugView = !Renderer::debugView;
 	}
 }
 
@@ -82,8 +75,8 @@ Window::Window(const WindowProps& props)
 	glfwMakeContextCurrent(m_Window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-	m_VSync = true;
-	glfwSwapInterval(0);
+	m_VSync = false;
+	glfwSwapInterval(m_VSync ? 1 : 0);
 
 	glfwSetErrorCallback(error_callback);
 	glfwSetKeyCallback(m_Window, key_callback);

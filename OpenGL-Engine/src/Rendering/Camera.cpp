@@ -10,7 +10,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& orientation)
 {
 }
 
-void Camera::UpdateMatrix(float fovDeg, float asp, float nearPlane, float farPlane)
+void Camera::UpdateMatrix(float fovDeg, float nearPlane, float farPlane)
 {
 	m_Proj = glm::mat4(1.0f);
 	m_View = glm::mat4(1.0f);
@@ -18,21 +18,16 @@ void Camera::UpdateMatrix(float fovDeg, float asp, float nearPlane, float farPla
 	m_View = glm::lookAt(m_Position, m_Position + m_Orientation, m_Up);
 	m_Proj = glm::perspective(
 		glm::radians(fovDeg),
-		asp,
+		(float)m_Width / (float)m_Height,
 		nearPlane,
 		farPlane
 	);
-
 	m_CameraMatrix = m_Proj * m_View;
 }
 
 void Camera::Update(float dt)
 {
-	Window* window = Application::Get().GetWindow();
-	uint32_t width = window->GetWidth();
-	uint32_t height = window->GetHeight();
 	GLFWwindow* glfwWindow = Application::Get().GetWindow()->GetNativeWindow();
-	
 
 	if (glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS)
 	{
@@ -83,19 +78,18 @@ void Camera::Update(float dt)
 
 	m_Speed = m_BaseSpeed * m_SpeedMultiplier;
 
-	// Make static bool here
 	static bool firstLook = true;
 	if (firstLook)
 	{
-		glfwSetCursorPos(glfwWindow, (width / 2), (height / 2));
+		glfwSetCursorPos(glfwWindow, (m_Width / 2), (m_Height / 2));
 		firstLook = false;
 	}
 
 	double mouseX, mouseY;
 	glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
 
-	float rotX = m_Sensitivity * (float)(mouseY - (height / 2)) / height;
-	float rotY = m_Sensitivity * (float)(mouseX - (width / 2)) / width;
+	float rotX = m_Sensitivity * (float)(mouseY - (m_Height / 2)) / m_Height;
+	float rotY = m_Sensitivity * (float)(mouseX - (m_Width / 2)) / m_Width;
 
 	glm::vec3 newOrientation = glm::rotate(m_Orientation, glm::radians(-rotX), glm::normalize(glm::cross(m_Orientation, m_Up)));
 	if (!(glm::angle(newOrientation, m_Up) <= glm::radians(5.f) || glm::angle(newOrientation, -m_Up) < glm::radians(5.f)))
@@ -105,5 +99,11 @@ void Camera::Update(float dt)
 
 	m_Orientation = glm::rotate(m_Orientation, glm::radians(-rotY), m_Up);
 
-	glfwSetCursorPos(glfwWindow, (width / 2), (height / 2));
+	glfwSetCursorPos(glfwWindow, (m_Width / 2), (m_Height / 2));
+}
+
+void Camera::Resize(uint32_t width, uint32_t height)
+{
+	m_Width = width;
+	m_Height = height;
 }
