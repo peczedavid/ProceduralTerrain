@@ -435,3 +435,37 @@ void DrawImage(uint32_t textureId)
 		}
 	}
 }
+
+/*
+std::vector<int>& FFT(std::vector<int>& P)
+{
+	const size_t n = P.size();
+	if (n == 1)
+		return P;
+
+	float w = powf(E, (2.0f * PI) / n);
+	std::vector<int> Pe, Po;
+	for (size_t i = 0; i < n; i++)
+	{
+		if (i % 2 == 0)
+			Pe.push_back(P[i]);
+		else
+			Po.push_back(P[i]);
+	}
+	std::vector<int> ye, yo;
+	ye = FFT(Pe);
+	yo = FFT(Po);
+
+	std::vector<int> y;
+	for (size_t i = 0; i < n; i++)
+		y.push_back(0);
+
+	for (size_t j = 0; j < (n / 2); j++)
+	{
+		y[j] = ye[j] + powf(w, j) * yo[j];
+		y[j + n / 2] = ye[j] - powf(w, j) * yo[j];
+	}
+
+	return y;
+}
+*/
