@@ -1,12 +1,91 @@
 #version 460 core
+
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
 layout(rgba32f, binding = 0) uniform image2D u_H0k;
 layout(rgba32f, binding = 1) uniform image2D u_H0minusk;
 
+float rand(vec2 co){
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+// 2D Noise based on Morgan McGuire @morgan3d
+// https://www.shadertoy.com/view/4dS3Wd
+float noise (in vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+
+    // Four corners in 2D of a tile
+    float a = rand(i);
+    float b = rand(i + vec2(1.0, 0.0));
+    float c = rand(i + vec2(0.0, 1.0));
+    float d = rand(i + vec2(1.0, 1.0));
+
+    // Smooth Interpolation
+    vec2 u = smoothstep(0.,1.,f);
+
+    // Mix 4 coorners percentages
+    return mix(a, b, u.x) +
+            (c - a)* u.y * (1.0 - u.x) +
+            (d - b) * u.x * u.y;
+}
+
+#define PI 3.141592653589793238
+
+int N = 256;
+int L = 1000;
+float A = 20;
+vec2 w = vec2(1, 0);
+float windspeed = 26;
+
+const float g = 9.81;
+
+vec4 gaussRND()
+{
+    vec2 coords = vec2(gl_GlobalInvocationID.xy);
+
+    float noise00 = clamp(noise(coords + vec2(11, 17)) + 0.00001, 0, 1);
+    float noise01 = clamp(noise(coords + vec2(3, 7)) + 0.00001, 0, 1);
+    float noise02 = clamp(noise(coords + vec2(19, 29)) + 0.00001, 0, 1);
+    float noise03 = clamp(noise(coords + vec2(31, 11)) + 0.00001, 0, 1);
+
+    float u0 = 2.0 * PI * noise00;
+    float v0 = sqrt(-2.0 * log(noise01));
+    float u1 = 2.0 * PI * noise02;
+    float v1 = sqrt(-2.0 * log(noise03));
+
+    vec4 rnd = vec4(v0 * cos(u0), v0 * sin(u0), v1 * cos(u1), v1 * sin(u1));
+
+    return rnd;
+}
+
 void main()
 {
-    vec2 fragCoord = gl_GlobalInvocationID.xy;
+    vec2 x = vec2(gl_GlobalInvocationID.xy);
 
-    imageStore(u_H0k, ivec2(fragCoord), vec4(1, 0, 0, 1));
-    imageStore(u_H0minusk, ivec2(fragCoord), vec4(0, 1, 0, 1));
+    vec2 k = vec2(2.0 * PI * x.x/L, 2.0 * PI * x.y/L);
+
+    float L_ = (windspeed * windspeed) / g;
+    float mag = length(k);
+    if(mag < 0.0001) mag = 0.0001;
+    float magSq = mag * mag;
+
+    float h0k = clamp(sqrt((A/(magSq*magSq)) * pow(dot(normalize(k), normalize(w)), 4.0)
+    * exp(-(1.0/(magSq * L_ * L_))) * exp(-magSq*pow(L/2000.0,2))) / sqrt(2.0), 0, 1000000);
+
+    float h0minusk = clamp(sqrt((A/(magSq*magSq)) * pow(dot(normalize(-k), normalize(w)), 4.0)
+    * exp(-(1.0/(magSq * L_ * L_))) * exp(-magSq*pow(L/2000.0,2))) / sqrt(2.0), 0, 1000000);
+
+    vec4 gauss_random = gaussRND();
+
+    imageStore(u_H0k, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.xy * h0k, 0, 1));
+    imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0minusk, 0, 1));
+
+    // vec2 fragCoord = gl_GlobalInvocationID.xy;
+    // vec2 st = fragCoord / vec2(imageSize(u_H0k));
+
+    // float v = noise(fragCoord);
+
+    // imageStore(u_H0k, ivec2(fragCoord), vec4(v, v, v, 1));
+    // imageStore(u_H0minusk, ivec2(fragCoord), vec4(st.x, 0, st.y, 1));
 }

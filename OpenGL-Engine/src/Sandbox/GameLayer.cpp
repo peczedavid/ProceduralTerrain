@@ -89,6 +89,8 @@ GameLayer::GameLayer()
 	m_H0minusk = new Texture2D(FFTResoltion, FFTResoltion, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_H0ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/h0.comp");
 
+	GenerateH0Textures();
+
 	m_UI = new GameLayerImGui(this);
 }
 
@@ -286,7 +288,7 @@ void GameLayer::GenerateH0Textures()
 {
 	m_H0k->BindImage(0);
 	m_H0minusk->BindImage(1);
-	m_H0ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 16), ceil(planeSize / 16), 1));
+	m_H0ComputeShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
 }
 
 /*
