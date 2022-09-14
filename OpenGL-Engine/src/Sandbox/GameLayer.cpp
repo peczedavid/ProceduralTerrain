@@ -85,8 +85,8 @@ GameLayer::GameLayer()
 
 	GenerateTerrain();
 
-	m_H0k = new Texture2D(FFTResoltion, FFTResoltion, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	m_H0minusk = new Texture2D(FFTResoltion, FFTResoltion, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_H0k = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_H0minusk = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_H0ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/h0.comp");
 
 	GenerateH0Textures();
