@@ -10,17 +10,18 @@
 #include <iostream>
 #include <random>
 #include "Rendering/Renderer.h"
-#include <Windows.h>
-#include <dxgi1_4.h>
 #include <stb_image_write.h>
 #include <stb_image.h>
 #include <ctime>
 #include <sstream>
+#include "Sandbox/GameLayerImGui.h"
 
 constexpr uint32_t planeSize = 1024u;
 constexpr uint32_t planeDivision = 25u;
 constexpr uint32_t waterPlaneSize = 1000u;
 constexpr uint32_t waterPlaneDivision = 100u;
+
+constexpr uint32_t FFTResoltion = 256u;
 
 GameLayer::GameLayer()
 {
@@ -82,13 +83,20 @@ GameLayer::GameLayer()
 		for (int x = -1; x <= 1; x++)
 			m_HeightMaps.push_back(new Texture2D(planeSize, planeSize, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F));
 
-	this->GenerateTerrain();
+	GenerateTerrain();
+
+	m_H0k = new Texture2D(FFTResoltion, FFTResoltion, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_H0minusk = new Texture2D(FFTResoltion, FFTResoltion, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_H0ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/h0.comp");
+
+	m_UI = new GameLayerImGui(this);
 }
 
 void GameLayer::OnUpdate(float dt)
 {
 	RenderStart();
 
+	UpdateFPS(dt);
 	static float t = 0.0f; t += dt;
 	float fov = 45.0f, nearPlane = 0.1f, farPlane = 3000.0f;
 
@@ -175,162 +183,18 @@ void GameLayer::GenerateHeightMap()
 }
 #endif
 
-void DrawImage(uint32_t textureId);
-
 void GameLayer::OnImGuiRender(float dt)
 {
-	if (ImGui::Begin("Controls"))
-	{
-		ImGui::Text("WASD - Move");
-		ImGui::Text("Mouse - Look around");
-		ImGui::Text("Space - Move up");
-		ImGui::Text("C - Move down");
-		ImGui::Text("Shift - Fast");
-		ImGui::Text("Ctrl - Slow");
-		ImGui::Text("F2 - Screenshot");
-		ImGui::Text("F3 - Debug info");
-		ImGui::Text("F - Wireframe");
-		ImGui::Text("Tab - Cursor");
-		ImGui::Text("Esc - Close");
-	}
-	ImGui::End();
-
-	if (ImGui::Begin("Noise props"))
-	{
-		ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f);
-		ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
-		ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
-		ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 0.3f);
-		ImGui::SliderFloat2("NoiseOffset", &m_NoiseOffset[0], 0.0f, 10.0f);
-	}
-	ImGui::End();
-
-	if (ImGui::Begin("Landscape"))
-	{
-		if (ImGui::Button("Generate")) this->GenerateTerrain();
-		ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
-		ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
-		ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
-		ImGui::Checkbox("Normals", &m_TerrainNormals);
-	}
-	ImGui::End();
-
-	if (ImGui::Begin("Water"))
-	{
-		ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 100.0f);
-		ImGui::Checkbox("Normals", &m_WaterNormals);
-		ImGui::SliderFloat("A - Steepness", &m_WaveA[2], 0.0f, 1.0f);
-		ImGui::SliderFloat("A - Wavelength", &m_WaveA[3], 10.0f, 75.0f);
-		ImGui::SliderFloat2("A - Direction", &m_WaveA[0], -1.0f, 1.0f);
-		ImGui::SliderFloat("B - Steepness", &m_WaveB[2], 0.0f, 1.0f);
-		ImGui::SliderFloat("B - Wavelength", &m_WaveB[3], 10.0f, 75.0f);
-		ImGui::SliderFloat2("B - Direction", &m_WaveB[0], -1.0f, 1.0f);
-		ImGui::SliderFloat("C - Steepness", &m_WaveC[2], 0.0f, 1.0f);
-		ImGui::SliderFloat("C - Wavelength", &m_WaveC[3], 10.0f, 75.0f);
-		ImGui::SliderFloat2("C - Direction", &m_WaveC[0], -1.0f, 1.0f);
-	}
-	ImGui::End();
-
-	if (ImGui::Begin("Viewport"))
-	{
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		float my_tex_w = viewportPanelSize.x;
-		float my_tex_h = viewportPanelSize.y;
-		if (m_ViewportSize.x != viewportPanelSize.x || m_ViewportSize.y != viewportPanelSize.y)
-		{
-			m_FrameBuffer->Resize(my_tex_w, my_tex_h);
-			m_Camera->Resize(my_tex_w, my_tex_h);
-			m_ViewportSize.x = viewportPanelSize.x;
-			m_ViewportSize.y = viewportPanelSize.y;
-		}
-		else
-		{
-			ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
-			ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
-			ImGui::Image((ImTextureID)m_FrameBuffer->GetTextureId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
-		}
-	}
-	ImGui::End();
-
-	if (ImGui::Begin("Textures"))
-	{
-		for (int i = 2; i >= 0; i--)
-		{
-			for (int j = 0; j < 3; j++)
-			{
-				DrawImage(m_HeightMaps[i * 3 + j]->GetId());
-				if (j < 2)
-					ImGui::SameLine();
-			}
-		}
-	}
-	ImGui::End();
-
-	if (ImGui::Begin("Waves"))
-	{
-		constexpr int size = 500;
-		static float values[size] = { };
-		for (int i = 0; i < size; i++)
-			values[i] = sinf(i / 10.0f);
-		ImGui::PlotLines("Sin", values, size, 0, 0, -1.0f, 1.0f, ImVec2(0.0, 80.0f));
-	}
-	ImGui::End();
-
-	static uint32_t FPS = 0u;
-	static float lastFPSUpdate = 0.0f;
-	static float sumDt = 0.0f;
-	static uint32_t numFrames = 0u;
-	lastFPSUpdate += dt;
-	sumDt += dt;
-	numFrames++;
-	if (lastFPSUpdate >= 0.5f) {
-		lastFPSUpdate = 0.0f;
-		FPS = (float)(numFrames) / sumDt;
-		numFrames = 0u;
-		sumDt = 0.0f;
-	}
-	if (Renderer::debugView)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
-		ImGui::SetNextWindowBgAlpha(0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		ImGui::Begin("Debug overaly", &Renderer::debugView, window_flags);
-		ImGui::Text("Viewport size: %.0fx%.0f", m_ViewportSize.x, m_ViewportSize.y);
-		const glm::vec3 cameraPos = m_Camera->GetPosition();
-		ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.y);
-		const glm::vec3 cameraOri = m_Camera->GetOrientation();
-		ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.y);
-		ImGui::Text("%d FPS", FPS);
-		ImGui::End();
-		ImGui::PopStyleVar();
-	}
-
-	static bool firstRun = true;
-	static IDXGIFactory4* pFactory{};
-	static IDXGIAdapter3* adapter{};
-	static DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo{};
-	if (firstRun)
-	{
-		CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)&pFactory);
-		pFactory->EnumAdapters(0, reinterpret_cast<IDXGIAdapter**>(&adapter));
-		firstRun = false;
-	}
-	if (ImGui::Begin("Vendor info"))
-	{
-		adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
-		const size_t usedVRAM = videoMemoryInfo.CurrentUsage / 1024 / 1024;
-		const size_t maxVRAM = videoMemoryInfo.Budget / 1024 / 1024;
-		ImGui::Text("Vendor: %s", glGetString(GL_VENDOR));
-		ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
-		ImGui::Text("Version: %s", glGetString(GL_VERSION));
-		int versionMajor, versionMinor;
-		glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
-		glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-		ImGui::Text("OpenGL %d.%d", versionMajor, versionMinor);
-		ImGui::Text("VRAM: %d/%d MB", usedVRAM, maxVRAM);
-	}
-	ImGui::End();
+	m_UI->ContolsPanel();
+	m_UI->NoisePanel();
+	m_UI->LandscapePanel();
+	m_UI->WaterPanel();
+	m_UI->ViewportPanel();
+	m_UI->TexturesPanel();
+	m_UI->WavesPanel();
+	m_UI->VendorInfoPanel();
+	m_UI->FFTPanel();
+	if (Renderer::debugView) m_UI->DebugOverlayPanel();
 }
 
 void GameLayer::OnScreenshot()
@@ -397,43 +261,32 @@ void GameLayer::GenerateTerrain()
 			int index = (z + 1) * 3 + (x + 1);
 			m_ComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * (int)planeSize, z * (int)planeSize));
 			m_HeightMaps[index]->BindImage();
-			m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 8), ceil(planeSize / 4), 1));
+			m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 16), ceil(planeSize / 16), 1));
 		}
 	}
 }
 
-void DrawImage(uint32_t textureId)
+void GameLayer::UpdateFPS(float dt)
 {
-	ImGuiIO& io = ImGui::GetIO();
-	ImTextureID my_tex_id = (ImTextureID)textureId;
-	float my_tex_w = 200.0f;
-	float my_tex_h = 200.0f;
-	{
-		ImVec2 pos = ImGui::GetCursorScreenPos();
-		ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
-		ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
-		ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::BeginTooltip();
-			float region_sz = 32.0f;
-			float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
-			float region_y = io.MousePos.y - pos.y;
-			region_y = my_tex_h - region_y;
-			region_y = region_y - region_sz * 0.5f;
-			float zoom = 7.0f;
-			if (region_x < 0.0f) { region_x = 0.0f; }
-			else if (region_x > my_tex_w - region_sz) { region_x = my_tex_w - region_sz; }
-			if (region_y < 0.0f) { region_y = 0.0f; }
-			else if (region_y > my_tex_h - region_sz) { region_y = my_tex_h - region_sz; }
-			ImGui::Text("Min: (%.2f, %.2f)", region_x, region_y);
-			ImGui::Text("Max: (%.2f, %.2f)", region_x + region_sz, region_y + region_sz);
-			ImVec2 uv0 = ImVec2((region_x) / my_tex_w, (region_y + region_sz) / my_tex_h);
-			ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y) / my_tex_h);
-			ImGui::Image(my_tex_id, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
-			ImGui::EndTooltip();
-		}
+	static float lastFPSUpdate = 0.0f;
+	static float sumDt = 0.0f;
+	static uint32_t numFrames = 0u;
+	lastFPSUpdate += dt;
+	sumDt += dt;
+	numFrames++;
+	if (lastFPSUpdate >= 0.5f) {
+		lastFPSUpdate = 0.0f;
+		m_FPS = (float)(numFrames) / sumDt;
+		numFrames = 0u;
+		sumDt = 0.0f;
 	}
+}
+
+void GameLayer::GenerateH0Textures()
+{
+	m_H0k->BindImage(0);
+	m_H0minusk->BindImage(1);
+	m_H0ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 16), ceil(planeSize / 16), 1));
 }
 
 /*

@@ -1,0 +1,12 @@
+#version 460 core
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+layout(rgba32f, binding = 0) uniform image2D u_H0k;
+layout(rgba32f, binding = 1) uniform image2D u_H0minusk;
+
+void main()
+{
+    vec2 fragCoord = gl_GlobalInvocationID.xy;
+
+    imageStore(u_H0k, ivec2(fragCoord), vec4(1, 0, 0, 1));
+    imageStore(u_H0minusk, ivec2(fragCoord), vec4(0, 1, 0, 1));
+}

@@ -12,7 +12,7 @@ public:
 
 	//void TexUnit(Shader* shader, const char* uniform, uint32_t slot);
 	void Bind(uint32_t slot = 0u);
-	void BindImage();
+	void BindImage(uint32_t slot = 0u);
 private:
 	uint32_t m_Id;
 	uint32_t m_Width, m_Height, m_ColorChannels;

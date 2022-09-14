@@ -19,8 +19,6 @@ std::string ReadComputeSource(const char* fileName) {
 
 ComputeShader::ComputeShader(const char* computePath)
 {
-	//m_Texture = new Texture2D(1024, 1024, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-
 	std::string computeStr = ReadComputeSource(computePath);
 
 	const char* computeSrc = computeStr.c_str();
