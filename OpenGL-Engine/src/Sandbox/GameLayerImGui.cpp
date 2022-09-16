@@ -2,23 +2,26 @@
 #include <imgui.h>
 #include <Windows.h>
 #include <dxgi1_4.h>
+#include "Rendering/Renderer.h"
+#include "Core/Application.h"
 
 GameLayerImGui::GameLayerImGui(GameLayer* gameLayer)
 	: m_GameLayer(gameLayer)
 {
 }
 
-void GameLayerImGui::WavesPanel()
+void GameLayerImGui::FPSGraphPanel()
 {
-	if (ImGui::Begin("Waves"))
-	{
-		constexpr int size = 500;
-		static float values[size] = { };
-		for (int i = 0; i < size; i++)
-			values[i] = sinf(i / 10.0f);
-		ImGui::PlotLines("Sin", values, size, 0, 0, -1.0f, 1.0f, ImVec2(0.0, 80.0f));
-	}
-	ImGui::End();
+	//if (ImGui::Begin("FPS graph"))
+	//{
+	//	/*constexpr int size = 500;
+	//	static float values[size] = { };
+	//	for (int i = 0; i < size; i++)
+	//		values[i] = sinf(i / 10.0f);
+	//	ImGui::PlotLines("Sin", values, size, 0, 0, -1.0f, 1.0f, ImVec2(0.0, 80.0f));*/
+	//	
+	//}
+	//ImGui::End();
 }
 
 void GameLayerImGui::ViewportPanel()
@@ -141,16 +144,18 @@ void GameLayerImGui::VendorInfoPanel()
 void GameLayerImGui::DebugOverlayPanel()
 {
 	ImGuiIO& io = ImGui::GetIO();
-	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
-	ImGui::SetNextWindowBgAlpha(0.0f);
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+	ImGui::SetNextWindowBgAlpha(0.3f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::Begin("Debug overaly", (bool*)1, window_flags);
 	ImGui::Text("Viewport size: %.0fx%.0f", m_GameLayer->m_ViewportSize.x, m_GameLayer->m_ViewportSize.y);
 	const glm::vec3 cameraPos = m_GameLayer->m_Camera->GetPosition();
-	ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.y);
+	ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.z);
 	const glm::vec3 cameraOri = m_GameLayer->m_Camera->GetOrientation();
-	ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.y);
-	ImGui::Text("%d FPS", m_GameLayer->m_FPS);
+	ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.z);
+	ImGui::Text("%d FPS (max: %.0f)", m_GameLayer->m_FPS, Renderer::maxFPS);
+	ImGui::Text("%.4f ms", 1.0f / m_GameLayer->m_FPS);
+	ImGui::PlotLines("FPS", &Renderer::fpsPool[0], Renderer::fpsPoolSize, 0, 0, 0, Renderer::maxFPS, ImVec2(175, 45));
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
@@ -180,6 +185,18 @@ void GameLayerImGui::FFTPanel()
 		DrawImage(m_GameLayer->m_H0k->GetId());
 		ImGui::SameLine();
 		DrawImage(m_GameLayer->m_H0minusk->GetId());
+	}
+	ImGui::End();
+}
+
+void GameLayerImGui::GraphicsSettingsPanel()
+{
+	if (ImGui::Begin("Graphics settings"))
+	{
+		auto window = Application::Get().GetWindow();
+		bool vSync = window->IsVSync();
+		ImGui::Checkbox("VSync", &vSync);
+		window->SetVSync(vSync);
 	}
 	ImGui::End();
 }

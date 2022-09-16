@@ -1,6 +1,7 @@
 // TODO: - offset terrain height relative to amplitude so it starts at 0
 //		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
-//		 - axis, fix length
+//		 - make renderer into static class
+//		 - make FPSPool into own class/struct
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
@@ -99,6 +100,7 @@ void GameLayer::OnUpdate(float dt)
 	RenderStart();
 
 	UpdateFPS(dt);
+
 	static float t = 0.0f; t += dt;
 	float fov = 45.0f, nearPlane = 0.1f, farPlane = 3000.0f;
 
@@ -193,9 +195,10 @@ void GameLayer::OnImGuiRender(float dt)
 	m_UI->WaterPanel();
 	m_UI->ViewportPanel();
 	m_UI->TexturesPanel();
-	m_UI->WavesPanel();
+	m_UI->FPSGraphPanel();
 	m_UI->VendorInfoPanel();
 	m_UI->FFTPanel();
+	m_UI->GraphicsSettingsPanel();
 	if (Renderer::debugView) m_UI->DebugOverlayPanel();
 }
 
@@ -276,11 +279,22 @@ void GameLayer::UpdateFPS(float dt)
 	lastFPSUpdate += dt;
 	sumDt += dt;
 	numFrames++;
+
+	static float lastFPSSampleUpdate = 0.0f;
+	lastFPSSampleUpdate += dt;
+	if (lastFPSSampleUpdate >= 0.016f)
+	{
+		Renderer::AddFPSSample(static_cast<float>(m_FPS));
+		lastFPSSampleUpdate = 0;
+	}
+
 	if (lastFPSUpdate >= 0.5f) {
 		lastFPSUpdate = 0.0f;
 		m_FPS = (float)(numFrames) / sumDt;
 		numFrames = 0u;
 		sumDt = 0.0f;
+		auto result = std::max_element(Renderer::fpsPool.begin(), Renderer::fpsPool.end());
+		Renderer::maxFPS = Renderer::fpsPool.at(std::distance(Renderer::fpsPool.begin(), result));
 	}
 }
 
@@ -290,37 +304,3 @@ void GameLayer::GenerateH0Textures()
 	m_H0minusk->BindImage(1);
 	m_H0ComputeShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
 }
-
-/*
-std::vector<int>& FFT(std::vector<int>& P)
-{
-	const size_t n = P.size();
-	if (n == 1)
-		return P;
-
-	float w = powf(E, (2.0f * PI) / n);
-	std::vector<int> Pe, Po;
-	for (size_t i = 0; i < n; i++)
-	{
-		if (i % 2 == 0)
-			Pe.push_back(P[i]);
-		else
-			Po.push_back(P[i]);
-	}
-	std::vector<int> ye, yo;
-	ye = FFT(Pe);
-	yo = FFT(Po);
-
-	std::vector<int> y;
-	for (size_t i = 0; i < n; i++)
-		y.push_back(0);
-
-	for (size_t j = 0; j < (n / 2); j++)
-	{
-		y[j] = ye[j] + powf(w, j) * yo[j];
-		y[j + n / 2] = ye[j] - powf(w, j) * yo[j];
-	}
-
-	return y;
-}
-*/

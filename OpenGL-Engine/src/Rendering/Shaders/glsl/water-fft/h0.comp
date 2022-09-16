@@ -23,10 +23,10 @@ vec4 gaussRND()
 {
     vec2 coords = vec2(gl_GlobalInvocationID.xy);
 
-    float noise00 = clamp(rand(coords + vec2(11, 17)) + 0.00001, 0, 1);
-    float noise01 = clamp(rand(coords + vec2(3, 7)) + 0.00001, 0, 1);
-    float noise02 = clamp(rand(coords + vec2(19, 29)) + 0.00001, 0, 1);
-    float noise03 = clamp(rand(coords + vec2(31, 11)) + 0.00001, 0, 1);
+    float noise00 = clamp(rand(coords + vec2(11, 17)), 0.00001, 1.0);
+    float noise01 = clamp(rand(coords + vec2(3, 7)), 0.00001, 1.0);
+    float noise02 = clamp(rand(coords + vec2(19, 2)), 0.00001, 1.0);
+    float noise03 = clamp(rand(coords + vec2(31, 11)), 0.00001, 1.0);
 
     float u0 = 2.0 * PI * noise00;
     float v0 = sqrt(-2.0 * log(noise01));
@@ -49,11 +49,15 @@ void main()
     if(mag < 0.0001) mag = 0.0001;
     float magSq = mag * mag;
 
-    float h0k = clamp(sqrt((A/(magSq*magSq)) * pow(dot(normalize(k), normalize(w)), 4.0)
-    * exp(-(1.0/(magSq * L_ * L_))) * exp(-magSq*pow(L/2000.0,2))) / sqrt(2.0), 0, 1000000);
+    float h0k = clamp(sqrt((A/(magSq*magSq))
+    * pow(dot(normalize(k), normalize(w)), 4.0)
+    * exp(-(1.0/(magSq * L_ * L_)))
+    * exp(-magSq*pow(L/2000.0, 2.0)))/sqrt(2.0), 0.0, 10.0);
 
-    float h0minusk = clamp(sqrt((A/(magSq*magSq)) * pow(dot(normalize(-k), normalize(w)), 4.0)
-    * exp(-(1.0/(magSq * L_ * L_))) * exp(-magSq*pow(L/2000.0,2))) / sqrt(2.0), 0, 1000000);
+    float h0minusk = clamp(sqrt((A/(magSq*magSq))
+    * pow(dot(normalize(-k), normalize(w)), 4.0)
+    * exp(-(1.0/(magSq * L_ * L_)))
+    * exp(-magSq * pow(L/2000.0, 2.0))) / sqrt(2.0), 0.0, 10.0);
 
     vec4 gauss_random = gaussRND();
 
