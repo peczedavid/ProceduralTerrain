@@ -155,7 +155,7 @@ void GameLayerImGui::DebugOverlayPanel()
 	ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.z);
 	ImGui::Text("%d FPS (max: %.0f)", m_GameLayer->m_FPS, Renderer::maxFPS);
 	ImGui::Text("%.4f ms", 1.0f / m_GameLayer->m_FPS);
-	ImGui::PlotLines("FPS", &Renderer::fpsPool[0], Renderer::fpsPoolSize, 0, 0, 0, Renderer::maxFPS, ImVec2(175, 45));
+	ImGui::PlotLines("FPS", &Renderer::fpsPool[0], Renderer::fpsPoolSize, 0, 0, 0, Renderer::maxFPS, ImVec2(175, 40));
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
@@ -185,6 +185,19 @@ void GameLayerImGui::FFTPanel()
 		DrawImage(m_GameLayer->m_H0k->GetId());
 		ImGui::SameLine();
 		DrawImage(m_GameLayer->m_H0minusk->GetId());
+		m_GameLayer->m_HtDy->BindImage(0);
+		m_GameLayer->m_HtDx->BindImage(1);
+		m_GameLayer->m_HtDz->BindImage(2);
+		m_GameLayer->m_H0k->BindImage(3);
+		m_GameLayer->m_H0minusk->BindImage(4);
+		m_GameLayer->m_HktComputeShader->Use();
+		m_GameLayer->m_HktComputeShader->SetUniform("u_Time", m_GameLayer->m_Time);
+		m_GameLayer->m_HktComputeShader->Dispatch(glm::uvec3(ceil(m_GameLayer->FFTResoltion / 16), ceil(m_GameLayer->FFTResoltion / 16), 1));
+		DrawImage(m_GameLayer->m_HtDy->GetId());
+		ImGui::SameLine();
+		DrawImage(m_GameLayer->m_HtDx->GetId());
+		ImGui::SameLine();
+		DrawImage(m_GameLayer->m_HtDz->GetId());
 	}
 	ImGui::End();
 }

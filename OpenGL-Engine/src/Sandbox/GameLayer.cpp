@@ -3,6 +3,8 @@
 //		 - make renderer into static class
 //		 - make FPSPool into own class/struct
 
+//		 - put shaders into assets
+
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
 #include <glad/glad.h>
@@ -21,8 +23,6 @@ constexpr uint32_t planeSize = 1024u;
 constexpr uint32_t planeDivision = 25u;
 constexpr uint32_t waterPlaneSize = 1000u;
 constexpr uint32_t waterPlaneDivision = 100u;
-
-constexpr uint32_t FFTResoltion = 256u;
 
 GameLayer::GameLayer()
 {
@@ -88,7 +88,11 @@ GameLayer::GameLayer()
 
 	m_H0k = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_H0minusk = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_HtDy = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_HtDx = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_HtDz = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_H0ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/h0.comp");
+	m_HktComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/hkt.comp");
 
 	GenerateH0Textures();
 
@@ -101,7 +105,7 @@ void GameLayer::OnUpdate(float dt)
 
 	UpdateFPS(dt);
 
-	static float t = 0.0f; t += dt;
+	m_Time += dt;
 	float fov = 45.0f, nearPlane = 0.1f, farPlane = 3000.0f;
 
 	m_Camera->UpdateMatrix(fov, nearPlane, farPlane);

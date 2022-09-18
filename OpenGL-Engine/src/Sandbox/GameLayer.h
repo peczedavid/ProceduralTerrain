@@ -64,7 +64,10 @@ private:
 
 	Texture2D* m_H0k;
 	Texture2D* m_H0minusk;
+	Texture2D* m_HtDy, * m_HtDx, * m_HtDz;
 	ComputeShader* m_H0ComputeShader;
+	ComputeShader* m_HktComputeShader;
+	const uint32_t FFTResoltion = 256u;
 
 	FrameBuffer* m_FrameBuffer;
 	BasicShader* m_PostProcessShader;
@@ -74,4 +77,5 @@ private:
 	GameLayerImGui* m_UI;
 
 	uint32_t m_FPS = 0u;
+	float m_Time = 0.0f;
 };

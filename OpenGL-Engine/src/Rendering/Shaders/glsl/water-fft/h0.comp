@@ -23,10 +23,15 @@ vec4 gaussRND()
 {
     vec2 coords = vec2(gl_GlobalInvocationID.xy);
 
-    float noise00 = clamp(rand(coords + vec2(11, 17)), 0.00001, 1.0);
-    float noise01 = clamp(rand(coords + vec2(3, 7)), 0.00001, 1.0);
-    float noise02 = clamp(rand(coords + vec2(19, 2)), 0.00001, 1.0);
-    float noise03 = clamp(rand(coords + vec2(31, 11)), 0.00001, 1.0);
+    float noise00 = clamp(rand(coords + vec2(23.11, 31.17)), 0.00001, 1.0);
+    float noise01 = clamp(rand(coords + vec2(64.3, 32.7)), 0.00001, 1.0);
+    float noise02 = clamp(rand(coords + vec2(22.19, 63.2)), 0.00001, 1.0);
+    float noise03 = clamp(rand(coords + vec2(11.31, 5.11)), 0.00001, 1.0);
+
+//    float noise00 = clamp(rand(coords + vec2(11, 17)), 0.00001, 1.0);
+//    float noise01 = clamp(rand(coords + vec2(3, 7)), 0.00001, 1.0);
+//    float noise02 = clamp(rand(coords + vec2(19, 2)), 0.00001, 1.0);
+//    float noise03 = clamp(rand(coords + vec2(31, 11)), 0.00001, 1.0);
 
     float u0 = 2.0 * PI * noise00;
     float v0 = sqrt(-2.0 * log(noise01));
@@ -64,5 +69,6 @@ void main()
     // red = real
     // green = im
     imageStore(u_H0k, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.xy * h0k, 0, 1));
-    imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0minusk, 0, 1));
+//    imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0minusk, 0, 1));
+    imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0k, 0, 1));
 }
