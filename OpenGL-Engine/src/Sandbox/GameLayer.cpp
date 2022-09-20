@@ -1,9 +1,17 @@
 // TODO: - offset terrain height relative to amplitude so it starts at 0
 //		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
+// 
 //		 - make renderer into static class
 //		 - make FPSPool into own class/struct
-
 //		 - put shaders into assets
+//
+//		 - profiling (maybe benchmark scene)
+//		 - scene system (switching between scenes)
+//		 - shader library, hot reload shaders
+//		 - trackball camera controls
+//
+//       - object loading
+//		 - grass and tree rendering
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
