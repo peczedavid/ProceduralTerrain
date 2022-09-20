@@ -30,6 +30,7 @@ private:
 	void GenerateTerrain();
 	void UpdateFPS(float dt);
 	void GenerateFFTTextures();
+	void FFTLoop();
 private:
 	Plane* m_GroundPlane;
 	int m_TessLevel = 1;
@@ -69,6 +70,11 @@ private:
 	ComputeShader* m_HktComputeShader;
 	Texture2D* m_TwiddleTexture;
 	ComputeShader* m_TwiddleShader;
+	Texture2D* m_PingPong0, * m_PingPong1;
+	ComputeShader* m_ButterflyShader;
+	Texture2D* m_Displacement;
+	ComputeShader* m_CopyShader;
+	ComputeShader* m_InversionShader;
 	const uint32_t FFTResoltion = 256u;
 
 	FrameBuffer* m_FrameBuffer;

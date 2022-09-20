@@ -54,7 +54,7 @@ void Texture2D::Bind(uint32_t slot)
 	glBindTexture(GL_TEXTURE_2D, m_Id);
 }
 
-void Texture2D::BindImage(uint32_t slot)
+void Texture2D::BindImage(uint32_t slot, GLenum access)
 {
-	glBindImageTexture(slot, m_Id, 0, GL_FALSE, 0, GL_WRITE_ONLY, m_InternalFormat);
+	glBindImageTexture(slot, m_Id, 0, GL_FALSE, 0, access, m_InternalFormat);
 }

@@ -95,10 +95,17 @@ GameLayer::GameLayer()
 	m_HktComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/hkt.comp");
 	m_TwiddleTexture = new Texture2D(8, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_TwiddleShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/twiddle.comp");
+	m_PingPong0 = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_PingPong1 = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_Displacement = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_ButterflyShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/butterfly.comp");
+	m_CopyShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/copy.comp");
+	m_InversionShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/inversion.comp");
 
 	GenerateFFTTextures();
 
 	m_UI = new GameLayerImGui(this);
+
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -163,6 +170,8 @@ void GameLayer::OnUpdate(float dt)
 
 	if (Renderer::debugView)
 		m_Axis->Render(m_Camera);
+
+	FFTLoop();
 
 	RenderEnd();
 }
@@ -314,4 +323,54 @@ void GameLayer::GenerateFFTTextures()
 	m_TwiddleShader->Use();
 	m_TwiddleTexture->BindImage(0);
 	m_TwiddleShader->Dispatch(glm::uvec3(8, ceil(FFTResoltion / 16), 1));
+}
+
+void GameLayer::FFTLoop()
+{
+	m_HktComputeShader->Use();
+	m_HtDy->BindImage(0);
+	m_HtDx->BindImage(1);
+	m_HtDz->BindImage(2);
+	m_H0k->BindImage(3);
+	m_H0minusk->BindImage(4);
+	m_HktComputeShader->SetUniform("u_Time", m_Time);
+	m_HktComputeShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+
+	m_CopyShader->Use();
+	m_HtDy->BindImage(0);
+	m_PingPong0->BindImage(1);
+	m_CopyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+	m_ButterflyShader->Use();
+	m_TwiddleTexture->BindImage(0);
+	m_PingPong0->BindImage(1);
+	m_PingPong1->BindImage(2);
+
+	int pingpong = 0;
+
+	m_ButterflyShader->SetUniform("u_Direction", 0);
+	for (int i = 0; i < log2(FFTResoltion); i++)
+	{
+		m_ButterflyShader->SetUniform("u_Stage", i);
+		m_ButterflyShader->SetUniform("u_PingPong", pingpong);
+		m_ButterflyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+		pingpong++;
+		pingpong = pingpong % 2;
+	}
+
+	m_ButterflyShader->SetUniform("u_Direction", 1);
+	for (int i = 0; i < log2(FFTResoltion); i++)
+	{
+		m_ButterflyShader->SetUniform("u_Stage", i);
+		m_ButterflyShader->SetUniform("u_PingPong", pingpong);
+		m_ButterflyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+		pingpong++;
+		pingpong = pingpong % 2;
+	}
+
+	m_InversionShader->Use();
+	m_Displacement->BindImage(0);
+	m_PingPong0->BindImage(1);
+	m_PingPong1->BindImage(2);
+	m_InversionShader->SetUniform("u_PingPong", pingpong);
+	m_InversionShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
 }

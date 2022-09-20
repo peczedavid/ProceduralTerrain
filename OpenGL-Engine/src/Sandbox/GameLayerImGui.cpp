@@ -187,19 +187,18 @@ void GameLayerImGui::FFTPanel()
 		DrawImage(m_GameLayer->m_H0minusk->GetId());
 		ImGui::SameLine();
 		DrawImage(m_GameLayer->m_TwiddleTexture->GetId());
-		m_GameLayer->m_HtDy->BindImage(0);
-		m_GameLayer->m_HtDx->BindImage(1);
-		m_GameLayer->m_HtDz->BindImage(2);
-		m_GameLayer->m_H0k->BindImage(3);
-		m_GameLayer->m_H0minusk->BindImage(4);
-		m_GameLayer->m_HktComputeShader->Use();
-		m_GameLayer->m_HktComputeShader->SetUniform("u_Time", m_GameLayer->m_Time);
-		m_GameLayer->m_HktComputeShader->Dispatch(glm::uvec3(ceil(m_GameLayer->FFTResoltion / 16), ceil(m_GameLayer->FFTResoltion / 16), 1));
+		
 		DrawImage(m_GameLayer->m_HtDy->GetId());
 		ImGui::SameLine();
 		DrawImage(m_GameLayer->m_HtDx->GetId());
 		ImGui::SameLine();
 		DrawImage(m_GameLayer->m_HtDz->GetId());
+
+		DrawImage(m_GameLayer->m_PingPong0->GetId());
+		ImGui::SameLine();
+		DrawImage(m_GameLayer->m_PingPong1->GetId());
+		ImGui::SameLine();
+		DrawImage(m_GameLayer->m_Displacement->GetId());
 	}
 	ImGui::End();
 }

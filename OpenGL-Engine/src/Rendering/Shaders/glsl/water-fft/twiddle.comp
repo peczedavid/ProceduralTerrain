@@ -16,7 +16,7 @@ struct complex
 
 void main()
 {
-	const int j[] = {2};
+	const int j[] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
 
 	vec2 x = gl_GlobalInvocationID.xy;
 	float k = mod(x.y * (float(N) / pow(2, x.x + 1)), N);
