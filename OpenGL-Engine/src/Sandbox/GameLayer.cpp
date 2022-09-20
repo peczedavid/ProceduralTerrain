@@ -93,8 +93,10 @@ GameLayer::GameLayer()
 	m_HtDz = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_H0ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/h0.comp");
 	m_HktComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/hkt.comp");
+	m_TwiddleTexture = new Texture2D(8, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_TwiddleShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/twiddle.comp");
 
-	GenerateH0Textures();
+	GenerateFFTTextures();
 
 	m_UI = new GameLayerImGui(this);
 }
@@ -302,9 +304,14 @@ void GameLayer::UpdateFPS(float dt)
 	}
 }
 
-void GameLayer::GenerateH0Textures()
+void GameLayer::GenerateFFTTextures()
 {
+	m_H0ComputeShader->Use();
 	m_H0k->BindImage(0);
 	m_H0minusk->BindImage(1);
 	m_H0ComputeShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+
+	m_TwiddleShader->Use();
+	m_TwiddleTexture->BindImage(0);
+	m_TwiddleShader->Dispatch(glm::uvec3(8, ceil(FFTResoltion / 16), 1));
 }

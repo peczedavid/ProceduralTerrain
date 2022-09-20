@@ -3,7 +3,7 @@
 
 Application* CreateApplication();
 
-constexpr int gpu = 0;
+constexpr int gpu = 1;
 
 extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = static_cast<DWORD>(gpu);

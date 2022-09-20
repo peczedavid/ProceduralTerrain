@@ -180,11 +180,13 @@ void GameLayerImGui::FFTPanel()
 {
 	if (ImGui::Begin("FFT textures"))
 	{
-		if (ImGui::Button("Generate"))
-			m_GameLayer->GenerateH0Textures();
+		//if (ImGui::Button("Generate"))
+		//	m_GameLayer->GenerateFFTTextures();
 		DrawImage(m_GameLayer->m_H0k->GetId());
 		ImGui::SameLine();
 		DrawImage(m_GameLayer->m_H0minusk->GetId());
+		ImGui::SameLine();
+		DrawImage(m_GameLayer->m_TwiddleTexture->GetId());
 		m_GameLayer->m_HtDy->BindImage(0);
 		m_GameLayer->m_HtDx->BindImage(1);
 		m_GameLayer->m_HtDz->BindImage(2);
