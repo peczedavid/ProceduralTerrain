@@ -4,16 +4,17 @@
 //		 - make renderer into static class			DONE
 //		 - make FPSPool into own class/struct		DONE
 //		 - put shaders into assets					DONE
-//       - dist post build command
+//       - dist post build command					DONE
 //		   (copy assets and imgui.ini)
-// 
+//
+//		 - uniforms in map
+// 		 - shader library, hot reload shaders
 //		 - profiling (maybe benchmark scene)
 //		 - scene system (switching between scenes)
-//		 - shader library, hot reload shaders
-//		 - trackball camera controls
 //
 //       - object loading
 //		 - grass and tree rendering
+//		 - trackball camera controls
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
