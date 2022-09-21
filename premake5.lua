@@ -6,6 +6,7 @@ workspace "OpenGLWorkspace"
     {
         "Debug",
         "Release",
+        "Dist"
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -83,3 +84,13 @@ project "OpenGL-Engine"
     filter "configurations:Release"
         runtime "Release"
         optimize "on" 
+    
+    filter "configurations:Dist"
+        runtime "Release"
+        optimize "on"
+    
+    --TODO: CLEAN, REBUILD COMMANDS
+    postbuildcommands {
+        "{COPY} imgui.ini %{cfg.targetdir}",
+        "{COPY} assets %{cfg.targetdir}/assets"
+    }

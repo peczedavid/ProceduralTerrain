@@ -10,7 +10,7 @@ Application::Application(const WindowProps& props)
 	m_Window->SetCursor(m_Cursor);
 	s_Instance = this;
 
-	Renderer::SetOpenGLConfig();
+	Renderer::Initialize();
 	
 	m_LayerStack = new LayerStack();
 

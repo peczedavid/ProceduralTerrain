@@ -1,6 +1,32 @@
 // TODO: - offset terrain height relative to amplitude so it starts at 0
 //		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
-//		 - axis, fix length
+// 
+//		 - make renderer into static class			DONE
+//		 - make FPSPool into own class/struct		DONE
+//		 - put shaders into assets					DONE
+//       - dist post build command					DONE
+//		   (copy assets and imgui.ini)
+//
+//		 - uniforms in map							DONE
+//		 - hot reaload shaders
+//			- parse for sampler2D	
+// 		 - shader type annotaion at the beginning
+//		   so we can make generalized compile fn
+//		   (some kind of preprocessor)
+// 		 - shader library
+//		 - precompiled header
+//		 - Core.h macros for logging, assert,...
+//		 - logging
+//		 - reference
+// 
+//		 - scene system (switching between scenes)
+//		 - profiling (maybe benchmark scene)
+//
+//       - object loading
+//		 - grass and tree rendering
+//		 - trackball camera controls
+
+// COMPUTE SHADER HOT RELOAD TESTING, then tess shader hot reload impl, then testing
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
@@ -10,12 +36,11 @@
 #include <iostream>
 #include <random>
 #include "Rendering/Renderer.h"
-#include <Windows.h>
-#include <dxgi1_4.h>
 #include <stb_image_write.h>
 #include <stb_image.h>
 #include <ctime>
 #include <sstream>
+#include "Sandbox/GameLayerImGui.h"
 
 constexpr uint32_t planeSize = 1024u;
 constexpr uint32_t planeDivision = 25u;
@@ -24,13 +49,11 @@ constexpr uint32_t waterPlaneDivision = 100u;
 
 GameLayer::GameLayer()
 {
-	m_Shader = new BasicShader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
-	m_Shader->TexUnit("u_Texture", 0);
 	m_TerrainShader = new TessellationShader(
-		"src/Rendering/Shaders/glsl/terrain/terrain.vert",
-		"src/Rendering/Shaders/glsl/terrain/terrain.tesc",
-		"src/Rendering/Shaders/glsl/terrain/terrain.tese",
-		"src/Rendering/Shaders/glsl/terrain/terrain.frag");
+		"assets/GLSL/terrain/terrain.vert",
+		"assets/GLSL/terrain/terrain.tesc",
+		"assets/GLSL/terrain/terrain.tese",
+		"assets/GLSL/terrain/terrain.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	m_TerrainShader->TexUnit("u_NoiseTexture", 0);
 	m_TerrainShader->TexUnit("u_GroundTexture", 1);
@@ -38,10 +61,10 @@ GameLayer::GameLayer()
 	m_TerrainShader->TexUnit("u_SnowTexture", 3);
 
 	m_WaterShader = new TessellationShader(
-		"src/Rendering/Shaders/glsl/water/water.vert",
-		"src/Rendering/Shaders/glsl/water/water.tesc",
-		"src/Rendering/Shaders/glsl/water/water.tese",
-		"src/Rendering/Shaders/glsl/water/water.frag");
+		"assets/GLSL/water/water.vert",
+		"assets/GLSL/water/water.tesc",
+		"assets/GLSL/water/water.tese",
+		"assets/GLSL/water/water.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	m_WaterShader->TexUnit("u_WaterTexture", 0);
 
@@ -51,7 +74,7 @@ GameLayer::GameLayer()
 	m_Camera = new Camera(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
 
-	BasicShader* skyboxShader = new BasicShader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
+	BasicShader* skyboxShader = new BasicShader("assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
 
 	m_Axis = new Axis();
@@ -64,32 +87,54 @@ GameLayer::GameLayer()
 
 	m_FrameBuffer = new FrameBuffer(1, 1);
 	m_PostProcessShader = new BasicShader(
-		"src/Rendering/Shaders/glsl/postprocess.vert",
-		"src/Rendering/Shaders/glsl/postprocess.frag"
+		"assets/GLSL/postprocess.vert",
+		"assets/GLSL/postprocess.frag"
 	);
 	m_PostProcessShader->TexUnit("u_ScreenTexture", 0);
 	FrameBuffer::Default();
 
-	m_ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/noise.comp");
-	m_ComputeShader->Use();
-	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
-	m_ComputeShader->SetUniform("u_Gain", m_Gain);
-	m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
-	m_ComputeShader->SetUniform("u_Scale", m_Scale);
-	m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+	m_TerrainComputeShader = new ComputeShader("assets/GLSL/noise.comp");
+	m_TerrainComputeShader->Use();
+	m_TerrainComputeShader->SetUniform("u_Amplitude", m_Amplitude);
+	m_TerrainComputeShader->SetUniform("u_Gain", m_Gain);
+	m_TerrainComputeShader->SetUniform("u_Frequency", m_Frequency);
+	m_TerrainComputeShader->SetUniform("u_Scale", m_Scale);
+	m_TerrainComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
 
 	for (int z = -1; z <= 1; z++)
 		for (int x = -1; x <= 1; x++)
 			m_HeightMaps.push_back(new Texture2D(planeSize, planeSize, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F));
 
-	this->GenerateTerrain();
+	GenerateTerrain();
+
+	m_H0k = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_H0minusk = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_HtDy = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_HtDx = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_HtDz = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_H0ComputeShader = new ComputeShader("assets/GLSL/water-fft/h0.comp");
+	m_HktComputeShader = new ComputeShader("assets/GLSL/water-fft/hkt.comp");
+	m_TwiddleTexture = new Texture2D(8, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_TwiddleShader = new ComputeShader("assets/GLSL/water-fft/twiddle.comp");
+	m_PingPong0 = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_PingPong1 = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_Displacement = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
+	m_ButterflyShader = new ComputeShader("assets/GLSL/water-fft/butterfly.comp");
+	m_CopyShader = new ComputeShader("assets/GLSL/water-fft/copy.comp");
+	m_InversionShader = new ComputeShader("assets/GLSL/water-fft/inversion.comp");
+
+	GenerateFFTTextures();
+
+	m_UI = new GameLayerImGui(this);
 }
 
 void GameLayer::OnUpdate(float dt)
 {
 	RenderStart();
 
-	static float t = 0.0f; t += dt;
+	UpdateFPS(dt);
+
+	m_Time += dt;
 	float fov = 45.0f, nearPlane = 0.1f, farPlane = 3000.0f;
 
 	m_Camera->UpdateMatrix(fov, nearPlane, farPlane);
@@ -98,8 +143,6 @@ void GameLayer::OnUpdate(float dt)
 
 	m_TerrainShader->Use();
 	m_TerrainShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
-	m_Shader->Use();
-	m_Shader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 
 	m_Skybox->Render(m_Camera);
 
@@ -143,170 +186,27 @@ void GameLayer::OnUpdate(float dt)
 	m_WaterPlane->Render();
 #endif
 
-	if (Renderer::debugView)
+	if (Renderer::DebugView)
 		m_Axis->Render(m_Camera);
+
+	FFTLoop();
 
 	RenderEnd();
 }
 
-#if 0 OLD_HEIGHTMAP_GENERATION_CODE
-void GameLayer::GenerateHeightMap()
-{
-#pragma warning ( push )
-#pragma warning ( disable: 6386)
-	unsigned char* bytes = new unsigned char[m_HeightMap->GetWidth() * m_HeightMap->GetHeight() * 4];
-	for (uint32_t y = 0; y < m_HeightMap->GetHeight(); y++)
-	{
-		for (uint32_t x = 0; x < m_HeightMap->GetWidth(); x++)
-		{
-			uint32_t i = y * m_HeightMap->GetWidth() + x;
-			const double noise = perlin.octave2D_01(x * frequency, y * frequency, octaves);
-			const uint32_t height = (uint32_t)(std::clamp(noise, 0.01, 0.99) * 255);
-
-			bytes[4 * i + 0] = height;
-			bytes[4 * i + 1] = height;
-			bytes[4 * i + 2] = height;
-			bytes[4 * i + 3] = 255;
-		}
-	}
-	m_HeightMap->LoadData(bytes, GL_RGBA, GL_RGBA);
-	delete[] bytes;
-#pragma warning (pop)
-}
-#endif
-
-void DrawImage(uint32_t textureId);
-
 void GameLayer::OnImGuiRender(float dt)
 {
-	ImGui::Begin("Controls");
-	ImGui::Text("WASD - Move");
-	ImGui::Text("Mouse - Look around");
-	ImGui::Text("Space - Move up");
-	ImGui::Text("C - Move down");
-	ImGui::Text("Shift - Fast");
-	ImGui::Text("Ctrl - Slow");
-	ImGui::Text("F2 - Screenshot");
-	ImGui::Text("F3 - Debug info");
-	ImGui::Text("F - Wireframe");
-	ImGui::Text("Tab - Cursor");
-	ImGui::Text("Esc - Close");
-	ImGui::End();
-
-	ImGui::Begin("Noise props");
-	ImGui::SliderFloat("Amlitude", &m_Amplitude, 0.01f, 1.0f);
-	ImGui::SliderFloat("Frequency", &m_Frequency, 0.01f, 5.0f);
-	ImGui::SliderFloat("Gain", &m_Gain, 0.01f, 0.5f);
-	ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 0.3f);
-	ImGui::SliderFloat2("NoiseOffset", &m_NoiseOffset[0], 0.0f, 10.0f);
-	ImGui::End();
-
-	ImGui::Begin("Landscape");
-	if (ImGui::Button("Generate")) this->GenerateTerrain();
-	ImGui::SliderFloat("MaxHeight", &m_MaxHeight, 0.0f, 1000.f);
-	ImGui::SliderFloat("FogGradient", &m_FogGradient, 0.0f, 5.f);
-	ImGui::SliderFloat("FogDensity", &m_FogDensity, 0.0f, 0.01f);
-	ImGui::Checkbox("Normals", &m_TerrainNormals);
-	ImGui::End();
-
-	ImGui::Begin("Water");
-	ImGui::SliderFloat("Level", &m_WaterLevel, -50.0f, 100.0f);
-	ImGui::Checkbox("Normals", &m_WaterNormals);
-	ImGui::SliderFloat("A - Steepness", &m_WaveA[2], 0.0f, 1.0f);
-	ImGui::SliderFloat("A - Wavelength", &m_WaveA[3], 10.0f, 75.0f);
-	ImGui::SliderFloat2("A - Direction", &m_WaveA[0], -1.0f, 1.0f);
-	ImGui::SliderFloat("B - Steepness", &m_WaveB[2], 0.0f, 1.0f);
-	ImGui::SliderFloat("B - Wavelength", &m_WaveB[3], 10.0f, 75.0f);
-	ImGui::SliderFloat2("B - Direction", &m_WaveB[0], -1.0f, 1.0f);
-	ImGui::SliderFloat("C - Steepness", &m_WaveC[2], 0.0f, 1.0f);
-	ImGui::SliderFloat("C - Wavelength", &m_WaveC[3], 10.0f, 75.0f);
-	ImGui::SliderFloat2("C - Direction", &m_WaveC[0], -1.0f, 1.0f);
-	ImGui::End();
-
-	ImGui::Begin("Viewport");
-	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	float my_tex_w = viewportPanelSize.x;
-	float my_tex_h = viewportPanelSize.y;
-	if (m_ViewportSize.x != viewportPanelSize.x || m_ViewportSize.y != viewportPanelSize.y)
-	{
-		m_FrameBuffer->Resize(my_tex_w, my_tex_h);
-		m_Camera->Resize(my_tex_w, my_tex_h);
-		m_ViewportSize.x = viewportPanelSize.x;
-		m_ViewportSize.y = viewportPanelSize.y;
-	}
-	else
-	{
-		ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
-		ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
-		ImGui::Image((ImTextureID)m_FrameBuffer->GetTextureId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
-	}
-	ImGui::End();
-
-	ImGui::Begin("Textures");
-	for (int i = 2; i >= 0; i--)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			DrawImage(m_HeightMaps[i * 3 + j]->GetId());
-			if (j < 2)
-				ImGui::SameLine();
-		}
-	}
-	ImGui::End();
-
-	static uint32_t FPS = 0u;
-	static float lastFPSUpdate = 0.0f;
-	static float sumDt = 0.0f;
-	static uint32_t numFrames = 0u;
-	lastFPSUpdate += dt;
-	sumDt += dt;
-	numFrames++;
-	if (lastFPSUpdate >= 0.5f) {
-		lastFPSUpdate = 0.0f;
-		FPS = (float)(numFrames) / sumDt;
-		numFrames = 0u;
-		sumDt = 0.0f;
-	}
-	if (Renderer::debugView)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
-		ImGui::SetNextWindowBgAlpha(0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		ImGui::Begin("Debug overaly", &Renderer::debugView, window_flags);
-		ImGui::Text("Viewport size: %.0fx%.0f", m_ViewportSize.x, m_ViewportSize.y);
-		const glm::vec3 cameraPos = m_Camera->GetPosition();
-		ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.y);
-		const glm::vec3 cameraOri = m_Camera->GetOrientation();
-		ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.y);
-		ImGui::Text("%d FPS", FPS);
-		ImGui::End();
-		ImGui::PopStyleVar();
-	}
-
-	ImGui::Begin("Vendor info");
-	static bool firstRun = true;
-	static IDXGIFactory4* pFactory{};
-	static IDXGIAdapter3* adapter{};
-	static DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo{};
-	if (firstRun)
-	{
-		CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)&pFactory);
-		pFactory->EnumAdapters(0, reinterpret_cast<IDXGIAdapter**>(&adapter));
-		firstRun = false;
-	}
-	adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
-	const size_t usedVRAM = videoMemoryInfo.CurrentUsage / 1024 / 1024;
-	const size_t maxVRAM = videoMemoryInfo.Budget / 1024 / 1024;
-	ImGui::Text("Vendor: %s", glGetString(GL_VENDOR));
-	ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
-	ImGui::Text("Version: %s", glGetString(GL_VERSION));
-	int versionMajor, versionMinor;
-	glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
-	glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-	ImGui::Text("OpenGL %d.%d", versionMajor, versionMinor);
-	ImGui::Text("VRAM: %d/%d MB", usedVRAM, maxVRAM);
-	ImGui::End();
+	m_UI->ContolsPanel();
+	m_UI->NoisePanel();
+	m_UI->LandscapePanel();
+	m_UI->WaterPanel();
+	m_UI->ViewportPanel();
+	m_UI->TexturesPanel();
+	m_UI->VendorInfoPanel();
+	m_UI->FFTPanel();
+	m_UI->GraphicsSettingsPanel();
+	m_UI->ShadersPanel();
+	if (Renderer::DebugView) m_UI->DebugOverlayPanel();
 }
 
 void GameLayer::OnScreenshot()
@@ -359,55 +259,111 @@ void GameLayer::RenderEnd()
 
 void GameLayer::GenerateTerrain()
 {
-	m_ComputeShader->Use();
-	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
-	m_ComputeShader->SetUniform("u_Gain", m_Gain);
-	m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
-	m_ComputeShader->SetUniform("u_Scale", m_Scale);
-	m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+	m_TerrainComputeShader->Use();
+	m_TerrainComputeShader->SetUniform("u_Amplitude", m_Amplitude);
+	m_TerrainComputeShader->SetUniform("u_Gain", m_Gain);
+	m_TerrainComputeShader->SetUniform("u_Frequency", m_Frequency);
+	m_TerrainComputeShader->SetUniform("u_Scale", m_Scale);
+	m_TerrainComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
 
 	for (int z = -1; z <= 1; z++)
 	{
 		for (int x = -1; x <= 1; x++)
 		{
 			int index = (z + 1) * 3 + (x + 1);
-			m_ComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * (int)planeSize, z * (int)planeSize));
+			m_TerrainComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * (int)planeSize, z * (int)planeSize));
 			m_HeightMaps[index]->BindImage();
-			m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 8), ceil(planeSize / 4), 1));
+			m_TerrainComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 16), ceil(planeSize / 16), 1));
 		}
 	}
 }
 
-void DrawImage(uint32_t textureId)
+void GameLayer::UpdateFPS(float dt)
 {
-	ImGuiIO& io = ImGui::GetIO();
-	ImTextureID my_tex_id = (ImTextureID)textureId;
-	float my_tex_w = 200.0f;
-	float my_tex_h = 200.0f;
+	static float lastFPSUpdate = 0.0f;
+	static float sumDt = 0.0f;
+	static uint32_t numFrames = 0u;
+	lastFPSUpdate += dt;
+	sumDt += dt;
+	numFrames++;
+
+	static float lastFPSSampleUpdate = 0.0f;
+	lastFPSSampleUpdate += dt;
+	if (lastFPSSampleUpdate >= 0.016f)
 	{
-		ImVec2 pos = ImGui::GetCursorScreenPos();
-		ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
-		ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
-		ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::BeginTooltip();
-			float region_sz = 32.0f;
-			float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
-			float region_y = io.MousePos.y - pos.y;
-			region_y = my_tex_h - region_y;
-			region_y = region_y - region_sz * 0.5f;
-			float zoom = 7.0f;
-			if (region_x < 0.0f) { region_x = 0.0f; }
-			else if (region_x > my_tex_w - region_sz) { region_x = my_tex_w - region_sz; }
-			if (region_y < 0.0f) { region_y = 0.0f; }
-			else if (region_y > my_tex_h - region_sz) { region_y = my_tex_h - region_sz; }
-			ImGui::Text("Min: (%.2f, %.2f)", region_x, region_y);
-			ImGui::Text("Max: (%.2f, %.2f)", region_x + region_sz, region_y + region_sz);
-			ImVec2 uv0 = ImVec2((region_x) / my_tex_w, (region_y + region_sz) / my_tex_h);
-			ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y) / my_tex_h);
-			ImGui::Image(my_tex_id, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
-			ImGui::EndTooltip();
-}
+		Renderer::FPSPool.AddFPSSample(static_cast<float>(m_FPS));
+		lastFPSSampleUpdate = 0;
 	}
+
+	if (lastFPSUpdate >= 0.5f) {
+		lastFPSUpdate = 0.0f;
+		m_FPS = (float)(numFrames) / sumDt;
+		numFrames = 0u;
+		sumDt = 0.0f;
+		auto& samples = Renderer::FPSPool.GetSamples();
+		auto result = std::max_element(samples.begin(), samples.end());
+		Renderer::FPSPool.SetMax(samples.at(std::distance(samples.begin(), result)));
+	}
+}
+
+void GameLayer::GenerateFFTTextures()
+{
+	m_H0ComputeShader->Use();
+	m_H0k->BindImage(0);
+	m_H0minusk->BindImage(1);
+	m_H0ComputeShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+
+	m_TwiddleShader->Use();
+	m_TwiddleTexture->BindImage(0);
+	m_TwiddleShader->Dispatch(glm::uvec3(8, ceil(FFTResoltion / 16), 1));
+}
+
+void GameLayer::FFTLoop()
+{
+	m_HktComputeShader->Use();
+	m_HtDy->BindImage(0);
+	m_HtDx->BindImage(1);
+	m_HtDz->BindImage(2);
+	m_H0k->BindImage(3);
+	m_H0minusk->BindImage(4);
+	m_HktComputeShader->SetUniform("u_Time", m_Time);
+	m_HktComputeShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+
+	m_CopyShader->Use();
+	m_HtDy->BindImage(0);
+	m_PingPong0->BindImage(1);
+	m_CopyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+	m_ButterflyShader->Use();
+	m_TwiddleTexture->BindImage(0);
+	m_PingPong0->BindImage(1);
+	m_PingPong1->BindImage(2);
+
+	int pingpong = 0;
+
+	m_ButterflyShader->SetUniform("u_Direction", 0);
+	for (int i = 0; i < log2(FFTResoltion); i++)
+	{
+		m_ButterflyShader->SetUniform("u_Stage", i);
+		m_ButterflyShader->SetUniform("u_PingPong", pingpong);
+		m_ButterflyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+		pingpong++;
+		pingpong = pingpong % 2;
+	}
+
+	m_ButterflyShader->SetUniform("u_Direction", 1);
+	for (int i = 0; i < log2(FFTResoltion); i++)
+	{
+		m_ButterflyShader->SetUniform("u_Stage", i);
+		m_ButterflyShader->SetUniform("u_PingPong", pingpong);
+		m_ButterflyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
+		pingpong++;
+		pingpong = pingpong % 2;
+	}
+
+	m_InversionShader->Use();
+	m_Displacement->BindImage(0);
+	m_PingPong0->BindImage(1);
+	m_PingPong1->BindImage(2);
+	m_InversionShader->SetUniform("u_PingPong", pingpong);
+	m_InversionShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
 }

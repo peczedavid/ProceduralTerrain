@@ -37,7 +37,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
 	{
-		Renderer::debugView = !Renderer::debugView;
+		Renderer::DebugView = !Renderer::DebugView;
 	}
 }
 
@@ -75,7 +75,7 @@ Window::Window(const WindowProps& props)
 	glfwMakeContextCurrent(m_Window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-	m_VSync = false;
+	m_VSync = true;
 	glfwSwapInterval(m_VSync ? 1 : 0);
 
 	glfwSetErrorCallback(error_callback);

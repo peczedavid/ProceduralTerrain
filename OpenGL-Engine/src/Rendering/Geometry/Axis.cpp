@@ -5,7 +5,7 @@
 Axis::Axis()
 	: m_Model(glm::mat4(1.0f))
 {
-	m_Shader = new BasicShader("src/Rendering/Shaders/glsl/axis/axis.vert", "src/Rendering/Shaders/glsl/axis/axis.frag");
+	m_Shader = new BasicShader("assets/GLSL/axis/axis.vert", "assets/GLSL/axis/axis.frag");
 
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);
