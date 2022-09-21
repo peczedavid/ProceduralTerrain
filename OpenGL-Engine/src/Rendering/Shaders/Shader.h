@@ -29,6 +29,8 @@ public:
     virtual void SetUniform(const std::string& name, const glm::vec3& value) const;
     virtual void SetUniform(const std::string& name, const glm::vec4& value) const;
     virtual void SetUniform(const std::string& name, const glm::mat4& value) const;
+
+    virtual void Compile() {};
 protected:
     mutable std::unordered_map<std::string, GLint> m_UniformCache;
     uint32_t m_ProgramId;

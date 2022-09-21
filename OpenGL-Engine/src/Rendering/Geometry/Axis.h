@@ -11,8 +11,8 @@ public:
 	~Axis();
 
 	void Render(Camera* camera);
-private:
 	BasicShader* m_Shader;
+private:
 	uint32_t m_Vao, m_Vbo;
 	glm::mat4 m_Model;
 };

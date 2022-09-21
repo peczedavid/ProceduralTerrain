@@ -2,12 +2,29 @@
 #include <vector>
 
 BasicShader::BasicShader(const char* vertexPath, const char* fragmentPath, const char* outputName)
+	: m_VertexPath(vertexPath), m_FragmentPath(fragmentPath)
 {
-	std::string vertexStr = ReadSource(vertexPath);
-	std::string fragmentStr = ReadSource(fragmentPath);
+	Compile();
+}
 
-	const char* vertexSrc = vertexStr.c_str();
-	const char* fragmentSrc = fragmentStr.c_str();
+BasicShader::~BasicShader()
+{
+	if (m_ProgramId > 0)
+		glDeleteProgram(m_ProgramId);
+}
+
+void BasicShader::Compile()
+{
+	if (m_ProgramId > 0)
+		glDeleteProgram(m_ProgramId);
+
+	m_VertexSrc = ReadSource(m_VertexPath.c_str());
+	m_FragmentSrc = ReadSource(m_FragmentPath.c_str());
+
+	const char* vertexSrc = m_VertexSrc.c_str();
+	const char* fragmentSrc = m_FragmentSrc.c_str();
+
+	m_ProgramId = glCreateProgram();
 
 	uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSrc, NULL);
@@ -46,19 +63,13 @@ BasicShader::BasicShader(const char* vertexPath, const char* fragmentPath, const
 		glDeleteShader(fragmentShader);
 	}
 
-	m_ProgramId = glCreateProgram();
 	glAttachShader(m_ProgramId, vertexShader);
 	glAttachShader(m_ProgramId, fragmentShader);
 	glLinkProgram(m_ProgramId);
-	glBindFragDataLocation(m_ProgramId, 0, outputName);
+
+	glBindFragDataLocation(m_ProgramId, 0, "outColor");
 	glUseProgram(m_ProgramId);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-}
-
-BasicShader::~BasicShader()
-{
-	if (m_ProgramId > 0)
-		glDeleteProgram(m_ProgramId);
 }

@@ -39,8 +39,6 @@ constexpr uint32_t waterPlaneDivision = 100u;
 
 GameLayer::GameLayer()
 {
-	m_Shader = new BasicShader("assets/GLSL/default.vert", "assets/GLSL/default.frag");
-	m_Shader->TexUnit("u_Texture", 0);
 	m_TerrainShader = new TessellationShader(
 		"assets/GLSL/terrain/terrain.vert",
 		"assets/GLSL/terrain/terrain.tesc",
@@ -118,7 +116,6 @@ GameLayer::GameLayer()
 	GenerateFFTTextures();
 
 	m_UI = new GameLayerImGui(this);
-
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -136,8 +133,6 @@ void GameLayer::OnUpdate(float dt)
 
 	m_TerrainShader->Use();
 	m_TerrainShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
-	m_Shader->Use();
-	m_Shader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
 
 	m_Skybox->Render(m_Camera);
 
@@ -189,32 +184,6 @@ void GameLayer::OnUpdate(float dt)
 	RenderEnd();
 }
 
-#if 0 OLD_HEIGHTMAP_GENERATION_CODE
-void GameLayer::GenerateHeightMap()
-{
-#pragma warning ( push )
-#pragma warning ( disable: 6386)
-	unsigned char* bytes = new unsigned char[m_HeightMap->GetWidth() * m_HeightMap->GetHeight() * 4];
-	for (uint32_t y = 0; y < m_HeightMap->GetHeight(); y++)
-	{
-		for (uint32_t x = 0; x < m_HeightMap->GetWidth(); x++)
-		{
-			uint32_t i = y * m_HeightMap->GetWidth() + x;
-			const double noise = perlin.octave2D_01(x * frequency, y * frequency, octaves);
-			const uint32_t height = (uint32_t)(std::clamp(noise, 0.01, 0.99) * 255);
-
-			bytes[4 * i + 0] = height;
-			bytes[4 * i + 1] = height;
-			bytes[4 * i + 2] = height;
-			bytes[4 * i + 3] = 255;
-		}
-	}
-	m_HeightMap->LoadData(bytes, GL_RGBA, GL_RGBA);
-	delete[] bytes;
-#pragma warning (pop)
-}
-#endif
-
 void GameLayer::OnImGuiRender(float dt)
 {
 	m_UI->ContolsPanel();
@@ -223,10 +192,10 @@ void GameLayer::OnImGuiRender(float dt)
 	m_UI->WaterPanel();
 	m_UI->ViewportPanel();
 	m_UI->TexturesPanel();
-	m_UI->FPSGraphPanel();
 	m_UI->VendorInfoPanel();
 	m_UI->FFTPanel();
 	m_UI->GraphicsSettingsPanel();
+	m_UI->ShadersPanel();
 	if (Renderer::DebugView) m_UI->DebugOverlayPanel();
 }
 

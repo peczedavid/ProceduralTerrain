@@ -10,20 +10,6 @@ GameLayerImGui::GameLayerImGui(GameLayer* gameLayer)
 {
 }
 
-void GameLayerImGui::FPSGraphPanel()
-{
-	//if (ImGui::Begin("FPS graph"))
-	//{
-	//	/*constexpr int size = 500;
-	//	static float values[size] = { };
-	//	for (int i = 0; i < size; i++)
-	//		values[i] = sinf(i / 10.0f);
-	//	ImGui::PlotLines("Sin", values, size, 0, 0, -1.0f, 1.0f, ImVec2(0.0, 80.0f));*/
-	//	
-	//}
-	//ImGui::End();
-}
-
 void GameLayerImGui::ViewportPanel()
 {
 	if (ImGui::Begin("Viewport"))
@@ -212,6 +198,27 @@ void GameLayerImGui::GraphicsSettingsPanel()
 		bool vSync = window->IsVSync();
 		ImGui::Checkbox("VSync", &vSync);
 		window->SetVSync(vSync);
+	}
+	ImGui::End();
+}
+
+void DrawShader(const char* name, Shader* shader, int id)
+{
+	ImGui::Text(name);
+	ImGui::SameLine();
+	ImGui::PushID(id);
+	if (ImGui::Button("Reload"))
+		shader->Compile();
+	ImGui::PopID();
+}
+
+void GameLayerImGui::ShadersPanel()
+{
+	if (ImGui::Begin("Shaders"))
+	{
+		int id = 0;
+		DrawShader("Axis", m_GameLayer->m_Axis->m_Shader, id++);
+		DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader, id++);
 	}
 	ImGui::End();
 }

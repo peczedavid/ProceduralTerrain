@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Layers/Layer.h"
-#include "Rendering/Shaders/BasicShader.h"
 #include "Rendering/Texture2D.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Geometry/Skybox.h"
@@ -39,7 +38,6 @@ private:
 	ComputeShader* m_ComputeShader;
 	std::vector<Texture2D*> m_HeightMaps;
 
-	BasicShader* m_Shader;
 	TessellationShader* m_TerrainShader;
 	TessellationShader* m_WaterShader;
 	Texture2D* m_GroundTexture, * m_RockTexture;
