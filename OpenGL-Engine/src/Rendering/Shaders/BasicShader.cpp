@@ -1,23 +1,5 @@
 #include "Rendering/Shaders/BasicShader.h"
-#include <fstream>
 #include <vector>
-#include <iostream>
-
-std::string ReadSource(const char* fileName) {
-	std::ifstream in(fileName, std::ios::binary);
-	if (in)
-	{
-		std::string contents;
-		in.seekg(0, std::ios::end);
-		contents.resize(in.tellg());
-		in.seekg(0, std::ios::beg);
-		in.read(&contents[0], contents.size());
-		in.close();
-		return(contents);
-	}
-	std::cout << "Error reading: " + std::string(fileName) << std::endl;
-	throw(errno);
-}
 
 BasicShader::BasicShader(const char* vertexPath, const char* fragmentPath, const char* outputName)
 {

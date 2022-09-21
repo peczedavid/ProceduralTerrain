@@ -1,30 +1,14 @@
 #include "Rendering/Shaders/TessellationShader.h"
-#include<fstream>
 #include <vector>
-
-std::string ReadFile(const char* fileName) {
-	std::ifstream in(fileName, std::ios::binary);
-	if (in)
-	{
-		std::string contents;
-		in.seekg(0, std::ios::end);
-		contents.resize(in.tellg());
-		in.seekg(0, std::ios::beg);
-		in.read(&contents[0], contents.size());
-		in.close();
-		return(contents);
-	}
-	throw(errno);
-}
 
 TessellationShader::TessellationShader(const char* vertexPath,
 	const char* tessControlPath, const char* tessEvalPath,
 	const char* fragmentPath, const char* outputName)
 {
-	std::string vertexStr = ReadFile(vertexPath);
-	std::string tessControlStr = ReadFile(tessControlPath);
-	std::string tessEvalStr = ReadFile(tessEvalPath);
-	std::string fragmentStr = ReadFile(fragmentPath);
+	std::string vertexStr = ReadSource(vertexPath);
+	std::string tessControlStr = ReadSource(tessControlPath);
+	std::string tessEvalStr = ReadSource(tessEvalPath);
+	std::string fragmentStr = ReadSource(fragmentPath);
 
 	const char* vertexSrc = vertexStr.c_str();
 	const char* tessControlSrc = tessControlStr.c_str();

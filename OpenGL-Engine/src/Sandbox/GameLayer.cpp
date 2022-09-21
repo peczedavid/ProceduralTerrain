@@ -7,8 +7,10 @@
 //       - dist post build command					DONE
 //		   (copy assets and imgui.ini)
 //
-//		 - uniforms in map
+//		 - uniforms in map							DONE
 // 		 - shader library, hot reload shaders
+// 		 - shader type annotaion at the beginning
+//		   so we can make generalized compile fn
 //		 - profiling (maybe benchmark scene)
 //		 - scene system (switching between scenes)
 //

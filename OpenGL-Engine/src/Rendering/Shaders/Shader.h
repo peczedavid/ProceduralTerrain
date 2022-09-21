@@ -7,6 +7,8 @@
 #include <glm/mat4x4.hpp>
 #include <unordered_map>
 
+std::string ReadSource(const char* fileName);
+
 class Shader
 {
 public:

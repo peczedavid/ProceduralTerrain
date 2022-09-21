@@ -1,25 +1,9 @@
 #include "Rendering/Shaders/ComputeShader.h"
-#include <fstream>
 #include <vector>
-
-std::string ReadComputeSource(const char* fileName) {
-	std::ifstream in(fileName, std::ios::binary);
-	if (in)
-	{
-		std::string contents;
-		in.seekg(0, std::ios::end);
-		contents.resize(in.tellg());
-		in.seekg(0, std::ios::beg);
-		in.read(&contents[0], contents.size());
-		in.close();
-		return(contents);
-	}
-	throw(errno);
-}
 
 ComputeShader::ComputeShader(const char* computePath)
 {
-	std::string computeStr = ReadComputeSource(computePath);
+	std::string computeStr = ReadSource(computePath);
 
 	const char* computeSrc = computeStr.c_str();
 
