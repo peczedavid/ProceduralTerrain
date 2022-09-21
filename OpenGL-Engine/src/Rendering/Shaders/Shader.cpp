@@ -88,6 +88,25 @@ void Shader::SetUniform(const std::string& name, const glm::mat4& value) const
 		printf("Uniform %s not found in shader!\n", name.c_str());
 }
 
+void Shader::CheckCompile(GLuint shader)
+{
+	GLint isCompiled = 0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+	if (isCompiled == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		std::vector<GLchar> errorLog(maxLength);
+		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+
+		for (uint32_t i = 0; i < maxLength; i++)
+			printf("%c", errorLog[i]);
+
+		glDeleteShader(shader);
+	}
+}
+
 GLint Shader::getUniformLocation(const std::string& name) const
 {
 	if (m_UniformCache.find(name) != m_UniformCache.end())

@@ -25,26 +25,10 @@ void ComputeShader::Compile()
 
 	m_ProgramId = glCreateProgram();
 
-	uint32_t computeShader = glCreateShader(GL_COMPUTE_SHADER);
+	GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
 	glShaderSource(computeShader, 1, &computeSrc, NULL);
 	glCompileShader(computeShader);
-
-	GLint isCompiled = 0;
-	glGetShaderiv(computeShader, GL_COMPILE_STATUS, &isCompiled);
-	if (isCompiled == GL_FALSE)
-	{
-		GLint maxLength = 0;
-		glGetShaderiv(computeShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-		std::vector<GLchar> errorLog(maxLength);
-		glGetShaderInfoLog(computeShader, maxLength, &maxLength, &errorLog[0]);
-
-		for (uint32_t i = 0; i < maxLength; i++)
-			printf("%c", errorLog[i]);
-
-		glDeleteShader(computeShader);
-		return;
-	}
+	CheckCompile(computeShader);
 
 	glAttachShader(m_ProgramId, computeShader);
 	glLinkProgram(m_ProgramId);

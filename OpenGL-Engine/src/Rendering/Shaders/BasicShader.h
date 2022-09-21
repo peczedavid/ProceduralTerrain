@@ -12,4 +12,5 @@ public:
 private:
     std::string m_VertexPath, m_VertexSrc;
     std::string m_FragmentPath, m_FragmentSrc;
+    std::string m_OutputName;
 };

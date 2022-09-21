@@ -35,51 +35,25 @@ void TessellationShader::Compile()
 	
 	m_ProgramId = glCreateProgram();
 
-	uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSrc, NULL);
 	glCompileShader(vertexShader);
+	CheckCompile(vertexShader);
 
-	uint32_t tessControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+	GLuint tessControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
 	glShaderSource(tessControlShader, 1, &tessControlSrc, NULL);
 	glCompileShader(tessControlShader);
-	GLint tessControlCompiled = 0;
-	glGetShaderiv(tessControlShader, GL_COMPILE_STATUS, &tessControlCompiled);
-	if (tessControlCompiled == GL_FALSE)
-	{
-		GLint maxLength = 0;
-		glGetShaderiv(tessControlShader, GL_INFO_LOG_LENGTH, &maxLength);
+	CheckCompile(tessControlShader);
 
-		std::vector<GLchar> errorLog(maxLength);
-		glGetShaderInfoLog(tessControlShader, maxLength, &maxLength, &errorLog[0]);
-
-		for (uint32_t i = 0; i < maxLength; i++)
-			printf("%c", errorLog[i]);
-
-		glDeleteShader(tessControlShader);
-	}
-
-	uint32_t tessEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+	GLuint tessEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
 	glShaderSource(tessEvalShader, 1, &tessEvalSrc, NULL);
 	glCompileShader(tessEvalShader);
-	GLint tessEvalShaderCompiled = 0;
-	glGetShaderiv(tessEvalShader, GL_COMPILE_STATUS, &tessEvalShaderCompiled);
-	if (tessEvalShaderCompiled == GL_FALSE)
-	{
-		GLint maxLength = 0;
-		glGetShaderiv(tessEvalShader, GL_INFO_LOG_LENGTH, &maxLength);
+	CheckCompile(tessEvalShader);
 
-		std::vector<GLchar> errorLog(maxLength);
-		glGetShaderInfoLog(tessEvalShader, maxLength, &maxLength, &errorLog[0]);
-
-		for (uint32_t i = 0; i < maxLength; i++)
-			printf("%c", errorLog[i]);
-
-		glDeleteShader(tessEvalShader);
-	}
-
-	uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSrc, NULL);
 	glCompileShader(fragmentShader);
+	CheckCompile(fragmentShader);
 
 	glAttachShader(m_ProgramId, vertexShader);
 	glAttachShader(m_ProgramId, tessControlShader);
@@ -112,8 +86,7 @@ void TessellationShader::Compile()
 		return;
 	}
 
-	const char* outputName = m_OutputName.c_str();
-	glBindFragDataLocation(m_ProgramId, 0, outputName);
+	glBindFragDataLocation(m_ProgramId, 0, m_OutputName.c_str());
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(tessControlShader);

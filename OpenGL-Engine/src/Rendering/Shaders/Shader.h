@@ -32,9 +32,11 @@ public:
 
     virtual void Compile() {};
 protected:
+    void CheckCompile(GLuint shader);
+    // TODO: Check linked function
+protected:
     mutable std::unordered_map<std::string, GLint> m_UniformCache;
     uint32_t m_ProgramId = 0;
-    // TODO: Check compiled function
 private:
     GLint getUniformLocation(const std::string& name) const;
 };
