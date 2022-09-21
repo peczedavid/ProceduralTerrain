@@ -72,4 +72,6 @@ void BasicShader::Compile()
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	m_UniformCache.clear();
 }

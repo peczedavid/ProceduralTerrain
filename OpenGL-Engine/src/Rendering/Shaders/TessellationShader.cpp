@@ -82,9 +82,9 @@ void TessellationShader::Compile()
 	glCompileShader(fragmentShader);
 
 	glAttachShader(m_ProgramId, vertexShader);
-	glAttachShader(m_ProgramId, fragmentShader);
 	glAttachShader(m_ProgramId, tessControlShader);
 	glAttachShader(m_ProgramId, tessEvalShader);
+	glAttachShader(m_ProgramId, fragmentShader);
 	glLinkProgram(m_ProgramId);
 	GLint isLinked = 0;
 	glGetProgramiv(m_ProgramId, GL_LINK_STATUS, (int*)&isLinked);
@@ -119,4 +119,6 @@ void TessellationShader::Compile()
 	glDeleteShader(tessControlShader);
 	glDeleteShader(tessEvalShader);
 	glDeleteShader(fragmentShader);
+
+	m_UniformCache.clear();
 }

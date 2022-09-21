@@ -50,6 +50,8 @@ void ComputeShader::Compile()
 	glLinkProgram(m_ProgramId);
 
 	glDeleteShader(computeShader);
+
+	m_UniformCache.clear();
 }
 
 void ComputeShader::Dispatch(const glm::uvec3& dimensions, GLenum barrier) const
