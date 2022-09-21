@@ -167,8 +167,6 @@ void GameLayerImGui::FFTPanel()
 {
 	if (ImGui::Begin("FFT textures"))
 	{
-		//if (ImGui::Button("Generate"))
-		//	m_GameLayer->GenerateFFTTextures();
 		DrawImage(m_GameLayer->m_H0k->GetId());
 		ImGui::SameLine();
 		DrawImage(m_GameLayer->m_H0minusk->GetId());
@@ -202,11 +200,13 @@ void GameLayerImGui::GraphicsSettingsPanel()
 	ImGui::End();
 }
 
-void DrawShader(const char* name, Shader* shader, int id)
+int id = 0;
+
+void DrawShader(const char* name, Shader* shader)
 {
 	ImGui::Text(name);
 	ImGui::SameLine();
-	ImGui::PushID(id);
+	ImGui::PushID(id++);
 	if (ImGui::Button("Reload"))
 		shader->Compile();
 	ImGui::PopID();
@@ -216,9 +216,11 @@ void GameLayerImGui::ShadersPanel()
 {
 	if (ImGui::Begin("Shaders"))
 	{
-		int id = 0;
-		DrawShader("Axis", m_GameLayer->m_Axis->m_Shader, id++);
-		DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader, id++);
+		id = 0;
+		DrawShader("Axis", m_GameLayer->m_Axis->m_Shader);
+		DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader);
+		DrawShader("Terrain compute", m_GameLayer->m_TerrainComputeShader);
+		DrawShader("Terrain tess", m_GameLayer->m_TerrainShader);
 	}
 	ImGui::End();
 }

@@ -22,7 +22,6 @@ public:
 
 	void OnScreenshot() override;
 private:
-	void GenerateHeightMap();
 	void RenderStart();
 	void RenderEnd();
 
@@ -35,7 +34,7 @@ private:
 	int m_TessLevel = 1;
 	float m_MaxHeight = 87.0f;
 
-	ComputeShader* m_ComputeShader;
+	ComputeShader* m_TerrainComputeShader;
 	std::vector<Texture2D*> m_HeightMaps;
 
 	TessellationShader* m_TerrainShader;

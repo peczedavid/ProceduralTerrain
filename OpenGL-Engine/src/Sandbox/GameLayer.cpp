@@ -13,9 +13,13 @@
 //		   so we can make generalized compile fn
 //		   (some kind of preprocessor)
 // 		 - shader library
+//		 - precompiled header
+//		 - Core.h macros for logging, assert,...
+//		 - logging
+//		 - reference
 // 
-//		 - profiling (maybe benchmark scene)
 //		 - scene system (switching between scenes)
+//		 - profiling (maybe benchmark scene)
 //
 //       - object loading
 //		 - grass and tree rendering
@@ -88,13 +92,13 @@ GameLayer::GameLayer()
 	m_PostProcessShader->TexUnit("u_ScreenTexture", 0);
 	FrameBuffer::Default();
 
-	m_ComputeShader = new ComputeShader("assets/GLSL/noise.comp");
-	m_ComputeShader->Use();
-	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
-	m_ComputeShader->SetUniform("u_Gain", m_Gain);
-	m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
-	m_ComputeShader->SetUniform("u_Scale", m_Scale);
-	m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+	m_TerrainComputeShader = new ComputeShader("assets/GLSL/noise.comp");
+	m_TerrainComputeShader->Use();
+	m_TerrainComputeShader->SetUniform("u_Amplitude", m_Amplitude);
+	m_TerrainComputeShader->SetUniform("u_Gain", m_Gain);
+	m_TerrainComputeShader->SetUniform("u_Frequency", m_Frequency);
+	m_TerrainComputeShader->SetUniform("u_Scale", m_Scale);
+	m_TerrainComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
 
 	for (int z = -1; z <= 1; z++)
 		for (int x = -1; x <= 1; x++)
@@ -254,21 +258,21 @@ void GameLayer::RenderEnd()
 
 void GameLayer::GenerateTerrain()
 {
-	m_ComputeShader->Use();
-	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
-	m_ComputeShader->SetUniform("u_Gain", m_Gain);
-	m_ComputeShader->SetUniform("u_Frequency", m_Frequency);
-	m_ComputeShader->SetUniform("u_Scale", m_Scale);
-	m_ComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
+	m_TerrainComputeShader->Use();
+	m_TerrainComputeShader->SetUniform("u_Amplitude", m_Amplitude);
+	m_TerrainComputeShader->SetUniform("u_Gain", m_Gain);
+	m_TerrainComputeShader->SetUniform("u_Frequency", m_Frequency);
+	m_TerrainComputeShader->SetUniform("u_Scale", m_Scale);
+	m_TerrainComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
 
 	for (int z = -1; z <= 1; z++)
 	{
 		for (int x = -1; x <= 1; x++)
 		{
 			int index = (z + 1) * 3 + (x + 1);
-			m_ComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * (int)planeSize, z * (int)planeSize));
+			m_TerrainComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * (int)planeSize, z * (int)planeSize));
 			m_HeightMaps[index]->BindImage();
-			m_ComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 16), ceil(planeSize / 16), 1));
+			m_TerrainComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 16), ceil(planeSize / 16), 1));
 		}
 	}
 }

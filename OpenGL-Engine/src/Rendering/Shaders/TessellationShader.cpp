@@ -4,16 +4,36 @@
 TessellationShader::TessellationShader(const char* vertexPath,
 	const char* tessControlPath, const char* tessEvalPath,
 	const char* fragmentPath, const char* outputName)
+	: m_VertexPath(vertexPath), m_TessControlPath(tessControlPath),
+	  m_TessEvalPath(tessEvalPath), m_FragmentPath(fragmentPath),
+	  m_OutputName(outputName)
 {
-	std::string vertexStr = ReadSource(vertexPath);
-	std::string tessControlStr = ReadSource(tessControlPath);
-	std::string tessEvalStr = ReadSource(tessEvalPath);
-	std::string fragmentStr = ReadSource(fragmentPath);
+	Compile();
+	glUseProgram(m_ProgramId);
+}
 
-	const char* vertexSrc = vertexStr.c_str();
-	const char* tessControlSrc = tessControlStr.c_str();
-	const char* tessEvalSrc = tessEvalStr.c_str();
-	const char* fragmentSrc = fragmentStr.c_str();
+TessellationShader::~TessellationShader()
+{
+	if (m_ProgramId > 0)
+		glDeleteProgram(m_ProgramId);
+}
+
+void TessellationShader::Compile()
+{
+	if (m_ProgramId > 0)
+		glDeleteProgram(m_ProgramId);
+
+	m_VertexSrc = ReadSource(m_VertexPath.c_str());
+	m_TessControlSrc = ReadSource(m_TessControlPath.c_str());
+	m_TessEvalSrc = ReadSource(m_TessEvalPath.c_str());
+	m_FragmentSrc = ReadSource(m_FragmentPath.c_str());
+
+	const char* vertexSrc = m_VertexSrc.c_str();
+	const char* tessControlSrc = m_TessControlSrc.c_str();
+	const char* tessEvalSrc = m_TessEvalSrc.c_str();
+	const char* fragmentSrc = m_FragmentSrc.c_str();
+	
+	m_ProgramId = glCreateProgram();
 
 	uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSrc, NULL);
@@ -61,7 +81,6 @@ TessellationShader::TessellationShader(const char* vertexPath,
 	glShaderSource(fragmentShader, 1, &fragmentSrc, NULL);
 	glCompileShader(fragmentShader);
 
-	m_ProgramId = glCreateProgram();
 	glAttachShader(m_ProgramId, vertexShader);
 	glAttachShader(m_ProgramId, fragmentShader);
 	glAttachShader(m_ProgramId, tessControlShader);
@@ -87,22 +106,17 @@ TessellationShader::TessellationShader(const char* vertexPath,
 		glDeleteShader(fragmentShader);
 
 		// Use the infoLog as you see fit.
-			for (uint32_t i = 0; i < maxLength; i++)
-				printf("%c", infoLog[i]);
+		for (uint32_t i = 0; i < maxLength; i++)
+			printf("%c", infoLog[i]);
 		// In this simple program, we'll just leave
 		return;
 	}
+
+	const char* outputName = m_OutputName.c_str();
 	glBindFragDataLocation(m_ProgramId, 0, outputName);
-	glUseProgram(m_ProgramId);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(tessControlShader);
 	glDeleteShader(tessEvalShader);
 	glDeleteShader(fragmentShader);
-}
-
-TessellationShader::~TessellationShader()
-{
-	if (m_ProgramId > 0)
-		glDeleteProgram(m_ProgramId);
 }

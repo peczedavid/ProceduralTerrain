@@ -59,7 +59,7 @@ vec3 NoiseDeriv(in vec2 v) {
      2.0 * du * vec2(k1 + k4 * u.y, k2 + k4 * u.x));
 }
 
-#define OCTAVES 16
+#define OCTAVES 8
 vec3 FractBrownNoiseDeriv(in vec2 x) {
   float a = 0.0;
   float b = u_Amplitude;
