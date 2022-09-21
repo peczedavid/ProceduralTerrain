@@ -8,11 +8,8 @@
 //		   (copy assets and imgui.ini)
 //
 //		 - uniforms in map							DONE
-//		 - hot reaload shaders
-//			- parse for sampler2D	
-// 		 - shader type annotaion at the beginning
-//		   so we can make generalized compile fn
-//		   (some kind of preprocessor)
+//		 - hot reaload shaders						DONE
+// 		 - single shader class
 // 		 - shader library
 //		 - precompiled header
 //		 - Core.h macros for logging, assert,...
