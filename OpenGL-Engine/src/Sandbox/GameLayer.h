@@ -4,7 +4,7 @@
 #include "Rendering/Shaders/BasicShader.h"
 #include "Rendering/Texture2D.h"
 #include "Rendering/Camera.h"
-#include "Rendering/Skybox.h"
+#include "Rendering/Geometry/Skybox.h"
 #include "Rendering/Shaders/TessellationShader.h"
 #include "Rendering/Geometry/Plane.h"
 #include "Rendering/Geometry/Axis.h"

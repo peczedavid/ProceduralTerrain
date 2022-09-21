@@ -1,4 +1,4 @@
-#include "Rendering/Skybox.h"
+#include "Rendering/Geometry/Skybox.h"
 #include <glad/glad.h>
 #include <string>
 #include <stb_image.h>

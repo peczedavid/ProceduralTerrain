@@ -1,10 +1,12 @@
 // TODO: - offset terrain height relative to amplitude so it starts at 0
 //		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
 // 
-//		 - make renderer into static class
-//		 - make FPSPool into own class/struct
-//		 - put shaders into assets
-//
+//		 - make renderer into static class			DONE
+//		 - make FPSPool into own class/struct		DONE
+//		 - put shaders into assets					DONE
+//       - dist post build command
+//		   (copy assets and imgui.ini)
+// 
 //		 - profiling (maybe benchmark scene)
 //		 - scene system (switching between scenes)
 //		 - shader library, hot reload shaders
@@ -34,13 +36,13 @@ constexpr uint32_t waterPlaneDivision = 100u;
 
 GameLayer::GameLayer()
 {
-	m_Shader = new BasicShader("src/Rendering/Shaders/glsl/default.vert", "src/Rendering/Shaders/glsl/default.frag");
+	m_Shader = new BasicShader("assets/GLSL/default.vert", "assets/GLSL/default.frag");
 	m_Shader->TexUnit("u_Texture", 0);
 	m_TerrainShader = new TessellationShader(
-		"src/Rendering/Shaders/glsl/terrain/terrain.vert",
-		"src/Rendering/Shaders/glsl/terrain/terrain.tesc",
-		"src/Rendering/Shaders/glsl/terrain/terrain.tese",
-		"src/Rendering/Shaders/glsl/terrain/terrain.frag");
+		"assets/GLSL/terrain/terrain.vert",
+		"assets/GLSL/terrain/terrain.tesc",
+		"assets/GLSL/terrain/terrain.tese",
+		"assets/GLSL/terrain/terrain.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	m_TerrainShader->TexUnit("u_NoiseTexture", 0);
 	m_TerrainShader->TexUnit("u_GroundTexture", 1);
@@ -48,10 +50,10 @@ GameLayer::GameLayer()
 	m_TerrainShader->TexUnit("u_SnowTexture", 3);
 
 	m_WaterShader = new TessellationShader(
-		"src/Rendering/Shaders/glsl/water/water.vert",
-		"src/Rendering/Shaders/glsl/water/water.tesc",
-		"src/Rendering/Shaders/glsl/water/water.tese",
-		"src/Rendering/Shaders/glsl/water/water.frag");
+		"assets/GLSL/water/water.vert",
+		"assets/GLSL/water/water.tesc",
+		"assets/GLSL/water/water.tese",
+		"assets/GLSL/water/water.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	m_WaterShader->TexUnit("u_WaterTexture", 0);
 
@@ -61,7 +63,7 @@ GameLayer::GameLayer()
 	m_Camera = new Camera(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
 
-	BasicShader* skyboxShader = new BasicShader("src/Rendering/Shaders/glsl/skybox.vert", "src/Rendering/Shaders/glsl/skybox.frag");
+	BasicShader* skyboxShader = new BasicShader("assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag");
 	m_Skybox = new Skybox(skyboxShader);
 
 	m_Axis = new Axis();
@@ -74,13 +76,13 @@ GameLayer::GameLayer()
 
 	m_FrameBuffer = new FrameBuffer(1, 1);
 	m_PostProcessShader = new BasicShader(
-		"src/Rendering/Shaders/glsl/postprocess.vert",
-		"src/Rendering/Shaders/glsl/postprocess.frag"
+		"assets/GLSL/postprocess.vert",
+		"assets/GLSL/postprocess.frag"
 	);
 	m_PostProcessShader->TexUnit("u_ScreenTexture", 0);
 	FrameBuffer::Default();
 
-	m_ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/noise.comp");
+	m_ComputeShader = new ComputeShader("assets/GLSL/noise.comp");
 	m_ComputeShader->Use();
 	m_ComputeShader->SetUniform("u_Amplitude", m_Amplitude);
 	m_ComputeShader->SetUniform("u_Gain", m_Gain);
@@ -99,16 +101,16 @@ GameLayer::GameLayer()
 	m_HtDy = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_HtDx = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_HtDz = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	m_H0ComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/h0.comp");
-	m_HktComputeShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/hkt.comp");
+	m_H0ComputeShader = new ComputeShader("assets/GLSL/water-fft/h0.comp");
+	m_HktComputeShader = new ComputeShader("assets/GLSL/water-fft/hkt.comp");
 	m_TwiddleTexture = new Texture2D(8, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	m_TwiddleShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/twiddle.comp");
+	m_TwiddleShader = new ComputeShader("assets/GLSL/water-fft/twiddle.comp");
 	m_PingPong0 = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_PingPong1 = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_Displacement = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	m_ButterflyShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/butterfly.comp");
-	m_CopyShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/copy.comp");
-	m_InversionShader = new ComputeShader("src/Rendering/Shaders/glsl/water-fft/inversion.comp");
+	m_ButterflyShader = new ComputeShader("assets/GLSL/water-fft/butterfly.comp");
+	m_CopyShader = new ComputeShader("assets/GLSL/water-fft/copy.comp");
+	m_InversionShader = new ComputeShader("assets/GLSL/water-fft/inversion.comp");
 
 	GenerateFFTTextures();
 
@@ -176,7 +178,7 @@ void GameLayer::OnUpdate(float dt)
 	m_WaterPlane->Render();
 #endif
 
-	if (Renderer::debugView)
+	if (Renderer::DebugView)
 		m_Axis->Render(m_Camera);
 
 	FFTLoop();
@@ -222,7 +224,7 @@ void GameLayer::OnImGuiRender(float dt)
 	m_UI->VendorInfoPanel();
 	m_UI->FFTPanel();
 	m_UI->GraphicsSettingsPanel();
-	if (Renderer::debugView) m_UI->DebugOverlayPanel();
+	if (Renderer::DebugView) m_UI->DebugOverlayPanel();
 }
 
 void GameLayer::OnScreenshot()
@@ -307,7 +309,7 @@ void GameLayer::UpdateFPS(float dt)
 	lastFPSSampleUpdate += dt;
 	if (lastFPSSampleUpdate >= 0.016f)
 	{
-		Renderer::AddFPSSample(static_cast<float>(m_FPS));
+		Renderer::FPSPool.AddFPSSample(static_cast<float>(m_FPS));
 		lastFPSSampleUpdate = 0;
 	}
 
@@ -316,8 +318,9 @@ void GameLayer::UpdateFPS(float dt)
 		m_FPS = (float)(numFrames) / sumDt;
 		numFrames = 0u;
 		sumDt = 0.0f;
-		auto result = std::max_element(Renderer::fpsPool.begin(), Renderer::fpsPool.end());
-		Renderer::maxFPS = Renderer::fpsPool.at(std::distance(Renderer::fpsPool.begin(), result));
+		auto& samples = Renderer::FPSPool.GetSamples();
+		auto result = std::max_element(samples.begin(), samples.end());
+		Renderer::FPSPool.SetMax(samples.at(std::distance(samples.begin(), result)));
 	}
 }
 

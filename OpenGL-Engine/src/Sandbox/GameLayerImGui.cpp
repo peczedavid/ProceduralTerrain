@@ -153,9 +153,10 @@ void GameLayerImGui::DebugOverlayPanel()
 	ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.z);
 	const glm::vec3 cameraOri = m_GameLayer->m_Camera->GetOrientation();
 	ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.z);
-	ImGui::Text("%d FPS (max: %.0f)", m_GameLayer->m_FPS, Renderer::maxFPS);
+	ImGui::Text("%d FPS (max: %.0f)", m_GameLayer->m_FPS, Renderer::FPSPool.GetMax());
 	ImGui::Text("%.4f ms", 1.0f / m_GameLayer->m_FPS);
-	ImGui::PlotLines("FPS", &Renderer::fpsPool[0], Renderer::fpsPoolSize, 0, 0, 0, Renderer::maxFPS, ImVec2(175, 40));
+	const auto& samples = Renderer::FPSPool.GetSamples();
+	ImGui::PlotLines("FPS", &samples[0], samples.size(), 0, 0, 0, Renderer::FPSPool.GetMax(), ImVec2(175, 40));
 	ImGui::End();
 	ImGui::PopStyleVar();
 }

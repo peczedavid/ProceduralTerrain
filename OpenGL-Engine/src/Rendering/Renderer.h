@@ -2,25 +2,19 @@
 #include <glad/glad.h>
 #include <cinttypes>
 #include <vector>
+#include "Rendering/FPSPool.h"
 
-namespace Renderer
+class Renderer
 {
-	void Initialize();
+public:
+	static void Initialize();
+	static void TogglePolygonMode();
+	static void SetOpenGLConfig();
 
-	extern bool debugView;
-
-	extern bool wireframe;
-
-	void TogglePolygonMode();
-
-	void SetOpenGLConfig();
-
-	extern const size_t fpsPoolSize;
-	extern size_t poolIndex;
-	extern std::vector<float> fpsPool;
-	extern float maxFPS;
-
-	void InitPool();
-
-	void AddFPSSample(float FPS);
+	static const bool IsWireFrame();
+public:
+	static FPSPool FPSPool;
+	static bool DebugView;
+private:
+	static bool WireFrame;
 };

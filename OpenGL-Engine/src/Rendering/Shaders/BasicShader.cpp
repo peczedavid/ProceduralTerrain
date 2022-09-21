@@ -1,6 +1,7 @@
 #include "Rendering/Shaders/BasicShader.h"
-#include<fstream>
+#include <fstream>
 #include <vector>
+#include <iostream>
 
 std::string ReadSource(const char* fileName) {
 	std::ifstream in(fileName, std::ios::binary);
@@ -14,6 +15,7 @@ std::string ReadSource(const char* fileName) {
 		in.close();
 		return(contents);
 	}
+	std::cout << "Error reading: " + std::string(fileName) << std::endl;
 	throw(errno);
 }
 

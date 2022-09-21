@@ -37,7 +37,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
 	{
-		Renderer::debugView = !Renderer::debugView;
+		Renderer::DebugView = !Renderer::DebugView;
 	}
 }
 
