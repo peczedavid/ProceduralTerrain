@@ -15,6 +15,8 @@ public:
     virtual uint32_t GetProgramId() { return m_ProgramId; }
     virtual const uint32_t GetProgramId() const { return m_ProgramId; }
 
+    virtual void Dispatch(const glm::uvec3& dimensions, GLenum barrier = GL_ALL_BARRIER_BITS) const {}
+
     virtual void TexUnit(const std::string& name, uint32_t slot) const;
 
     virtual void SetUniform(const std::string& name, int value) const;

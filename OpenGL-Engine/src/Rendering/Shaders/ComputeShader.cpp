@@ -58,7 +58,7 @@ ComputeShader::~ComputeShader()
 		glDeleteProgram(m_ProgramId);
 }
 
-void ComputeShader::Dispatch(const glm::uvec3& dimensions, GLenum barrier)
+void ComputeShader::Dispatch(const glm::uvec3& dimensions, GLenum barrier) const
 {
 	glUseProgram(m_ProgramId);
 	glDispatchCompute(dimensions.x, dimensions.y, dimensions.z);
