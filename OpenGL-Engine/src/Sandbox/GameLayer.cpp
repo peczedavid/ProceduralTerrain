@@ -8,15 +8,20 @@
 //		   (copy assets and imgui.ini)
 //
 //		 - uniforms in map							DONE
-// 		 - shader library, hot reload shaders
+//		 - hot reaload shaders					
 // 		 - shader type annotaion at the beginning
 //		   so we can make generalized compile fn
+//		   (some kind of preprocessor)
+// 		 - shader library
+// 
 //		 - profiling (maybe benchmark scene)
 //		 - scene system (switching between scenes)
 //
 //       - object loading
 //		 - grass and tree rendering
 //		 - trackball camera controls
+
+// COMPUTE SHADER HOT RELOAD TESTING, then tess shader hot reload impl, then testing
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"

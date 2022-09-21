@@ -10,8 +10,6 @@ public:
 
     void Compile() override;
 private:
-    std::string m_VertexPath;
-    std::string m_VertexSrc;
-    std::string m_FragmentPath;
-    std::string m_FragmentSrc;
+    std::string m_VertexPath, m_VertexSrc;
+    std::string m_FragmentPath, m_FragmentSrc;
 };

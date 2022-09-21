@@ -5,6 +5,7 @@ BasicShader::BasicShader(const char* vertexPath, const char* fragmentPath, const
 	: m_VertexPath(vertexPath), m_FragmentPath(fragmentPath)
 {
 	Compile();
+	glUseProgram(m_ProgramId);
 }
 
 BasicShader::~BasicShader()
@@ -68,7 +69,6 @@ void BasicShader::Compile()
 	glLinkProgram(m_ProgramId);
 
 	glBindFragDataLocation(m_ProgramId, 0, "outColor");
-	glUseProgram(m_ProgramId);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);

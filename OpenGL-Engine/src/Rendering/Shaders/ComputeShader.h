@@ -11,5 +11,8 @@ public:
     ComputeShader(const char* computePath);
     ~ComputeShader();
 
+    void Compile() override;
     void Dispatch(const glm::uvec3& dimensions, GLenum barrier = GL_ALL_BARRIER_BITS) const override;
+private:
+    std::string m_ComputePath, m_ComputeSrc;
 };

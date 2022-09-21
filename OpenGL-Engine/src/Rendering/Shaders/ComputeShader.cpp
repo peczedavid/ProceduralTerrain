@@ -2,10 +2,28 @@
 #include <vector>
 
 ComputeShader::ComputeShader(const char* computePath)
+	: m_ComputePath(computePath)
 {
-	std::string computeStr = ReadSource(computePath);
+	Compile();
+	glUseProgram(m_ProgramId);
+}
 
-	const char* computeSrc = computeStr.c_str();
+ComputeShader::~ComputeShader()
+{
+	if (m_ProgramId > 0)
+		glDeleteProgram(m_ProgramId);
+}
+
+void ComputeShader::Compile()
+{
+	if (m_ProgramId > 0)
+		glDeleteProgram(m_ProgramId);
+
+	m_ComputeSrc = ReadSource(m_ComputePath.c_str());
+
+	const char* computeSrc = m_ComputeSrc.c_str();
+
+	m_ProgramId = glCreateProgram();
 
 	uint32_t computeShader = glCreateShader(GL_COMPUTE_SHADER);
 	glShaderSource(computeShader, 1, &computeSrc, NULL);
@@ -28,18 +46,10 @@ ComputeShader::ComputeShader(const char* computePath)
 		return;
 	}
 
-	m_ProgramId = glCreateProgram();
 	glAttachShader(m_ProgramId, computeShader);
 	glLinkProgram(m_ProgramId);
-	glUseProgram(m_ProgramId);
 
 	glDeleteShader(computeShader);
-}
-
-ComputeShader::~ComputeShader()
-{
-	if (m_ProgramId > 0)
-		glDeleteProgram(m_ProgramId);
 }
 
 void ComputeShader::Dispatch(const glm::uvec3& dimensions, GLenum barrier) const
