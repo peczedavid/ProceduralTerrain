@@ -26,7 +26,9 @@
 //		 - grass and tree rendering
 //		 - trackball camera controls
 
-// COMPUTE SHADER HOT RELOAD TESTING, then tess shader hot reload impl, then testing
+// Create single shader class, vector of shader src-s, { type, src }
+// Compile based on type and src
+// Parse for samplers, if has any, activate with tex-unit
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
