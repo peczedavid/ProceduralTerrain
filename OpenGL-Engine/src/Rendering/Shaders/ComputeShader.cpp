@@ -28,7 +28,7 @@ void ComputeShader::Compile()
 	GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
 	glShaderSource(computeShader, 1, &computeSrc, NULL);
 	glCompileShader(computeShader);
-	CheckCompile(computeShader);
+	CheckCompiled(computeShader);
 
 	glAttachShader(m_ProgramId, computeShader);
 	glLinkProgram(m_ProgramId);

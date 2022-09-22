@@ -1,5 +1,5 @@
 #pragma once
-#include "Rendering/Shaders/Shader.h"
+#include "Rendering/Shaders/ShaderBase.h"
 
 class Texture2D
 {

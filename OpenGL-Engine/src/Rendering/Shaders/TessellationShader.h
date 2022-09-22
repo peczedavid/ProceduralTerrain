@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Rendering/Shaders/Shader.h"
+#include "Rendering/Shaders/ShaderBase.h"
 
-class TessellationShader : public Shader
+class TessellationShader : public ShaderBase
 {
 public:
     TessellationShader(const char* vertexPath,

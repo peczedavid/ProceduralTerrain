@@ -10,6 +10,7 @@
 #include "Rendering/FrameBuffer.h"
 #include "Rendering/Geometry/FullscreenQuad.h"
 #include "Rendering/Shaders/ComputeShader.h"
+#include "Rendering/Shaders/BasicShader.h"
 
 class GameLayer : public Layer
 {

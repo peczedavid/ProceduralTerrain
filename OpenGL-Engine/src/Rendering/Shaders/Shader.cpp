@@ -2,7 +2,8 @@
 #include <fstream>
 #include <iostream>
 
-std::string ReadSource(const char* fileName) {
+std::string ReadFile(const char* fileName)
+{
 	std::ifstream in(fileName, std::ios::binary);
 	if (in)
 	{
@@ -18,12 +19,57 @@ std::string ReadSource(const char* fileName) {
 	throw(errno);
 }
 
+Shader::Shader(const std::vector<std::string>& shaderFiles, const std::string& outputName)
+	: m_OutputName(outputName)
+{
+	Compile(shaderFiles);
+	glUseProgram(m_ProgramId);
+}
+
+Shader::~Shader()
+{
+	if (m_ProgramId > 0)
+		glDeleteProgram(m_ProgramId);
+}
+
+void Shader::Compile(const std::vector<std::string>& shaderFiles)
+{
+	m_UniformCache.clear();
+	m_ProgramId = glCreateProgram();
+
+	m_ShaderInfos.resize(shaderFiles.size());
+	for (int i = 0; i < m_ShaderInfos.size(); i++)
+	{
+		auto& shaderInfo = m_ShaderInfos[i];
+		shaderInfo.Path = shaderFiles[i];
+		shaderInfo.Source = ReadFile(shaderInfo.Path.c_str());
+		shaderInfo.Type = GetType(shaderInfo.Path);
+
+		const char* src = shaderInfo.Source.c_str();
+
+		GLuint shader = glCreateShader(GetType(shaderInfo.Path));
+		glShaderSource(shader, 1, &src, NULL);
+		glCompileShader(shader);
+		CheckCompiled(shader);
+		glAttachShader(m_ProgramId, shader);
+		glDeleteShader(shader);
+	}
+
+	glLinkProgram(m_ProgramId);
+}
+
+void Shader::Dispatch(const glm::uvec3& dimensions, GLenum barrier) const
+{
+	glUseProgram(m_ProgramId);
+	glDispatchCompute(dimensions.x, dimensions.y, dimensions.z);
+	glMemoryBarrier(barrier);
+}
+
 void Shader::TexUnit(const std::string& name, uint32_t slot) const
 {
 	uint32_t textureUnit = getUniformLocation(name);
 	glUniform1i(textureUnit, slot);
 }
-
 
 void Shader::SetUniform(const std::string& name, int value) const
 {
@@ -88,7 +134,11 @@ void Shader::SetUniform(const std::string& name, const glm::mat4& value) const
 		printf("Uniform %s not found in shader!\n", name.c_str());
 }
 
-void Shader::CheckCompile(GLuint shader)
+void Shader::ReCompile()
+{
+}
+
+void Shader::CheckCompiled(GLuint shader)
 {
 	GLint isCompiled = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
@@ -115,4 +165,19 @@ GLint Shader::getUniformLocation(const std::string& name) const
 	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
 	m_UniformCache[name] = location;
 	return location;
+}
+
+GLenum Shader::GetType(const std::string& path)
+{
+	const size_t lastSlashIdx = path.find_last_of('/');
+	const std::string fileName = path.substr(lastSlashIdx + 1, path.length() - lastSlashIdx + 1);
+	const size_t dotLocation = fileName.find_last_of('.');
+	const std::string extension = fileName.substr(dotLocation + 1, fileName.length() - dotLocation + 1);
+	if (extension == "vert") return GL_VERTEX_SHADER;
+	else if (extension == "frag") return GL_FRAGMENT_SHADER;
+	else if (extension == "tesc") return GL_TESS_CONTROL_SHADER;
+	else if (extension == "tese") return GL_TESS_EVALUATION_SHADER;
+	else if (extension == "comp") return GL_COMPUTE_SHADER;
+	else if (extension == "geom") return GL_GEOMETRY_SHADER;
+	return 0;
 }

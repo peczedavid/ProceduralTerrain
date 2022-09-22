@@ -1,17 +1,17 @@
 #pragma once
 
 #include <stdint.h>
-#include "Rendering/Shaders/Shader.h"
+#include "Rendering/Shaders/ShaderBase.h"
 #include "Rendering/Camera.h"
 
 class Skybox
 {
 public:
-	Skybox(Shader* shader);
+	Skybox(ShaderBase* shader);
 	~Skybox();
 
 	void Render(Camera* camera);
-	Shader* m_Shader;
+	ShaderBase* m_Shader;
 private:
 	uint32_t m_Vao, m_Vbo, m_Ebo;
 	uint32_t m_TextureId;

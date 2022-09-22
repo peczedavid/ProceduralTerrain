@@ -30,15 +30,16 @@ void BasicShader::Compile()
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSrc, NULL);
 	glCompileShader(vertexShader);
-	CheckCompile(vertexShader);
+	CheckCompiled(vertexShader);
 
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSrc, NULL);
 	glCompileShader(fragmentShader);
-	CheckCompile(fragmentShader);
+	CheckCompiled(fragmentShader);
 
 	glAttachShader(m_ProgramId, vertexShader);
 	glAttachShader(m_ProgramId, fragmentShader);
+	
 	glLinkProgram(m_ProgramId);
 
 	glBindFragDataLocation(m_ProgramId, 0, m_OutputName.c_str());

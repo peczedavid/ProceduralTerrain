@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Rendering/Texture2D.h"
-#include "Rendering/Shaders/Shader.h"
+#include "Rendering/Shaders/ShaderBase.h"
 #include <glad/glad.h>
 #include <glm/vec3.hpp>
 
-class ComputeShader : public Shader
+class ComputeShader : public ShaderBase
 {
 public:
     ComputeShader(const char* computePath);

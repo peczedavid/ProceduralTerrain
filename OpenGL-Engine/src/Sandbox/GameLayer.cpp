@@ -22,7 +22,8 @@
 //       - object loading
 //		 - grass and tree rendering
 //		 - trackball camera controls
-
+//		 - uniform buffer objects eg: camera uniform
+// 
 // Create single shader class, vector of shader src-s, { type, src }
 // Compile based on type and src
 // Parse for samplers, if has any, activate with tex-unit

@@ -38,22 +38,22 @@ void TessellationShader::Compile()
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSrc, NULL);
 	glCompileShader(vertexShader);
-	CheckCompile(vertexShader);
+	CheckCompiled(vertexShader);
 
 	GLuint tessControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
 	glShaderSource(tessControlShader, 1, &tessControlSrc, NULL);
 	glCompileShader(tessControlShader);
-	CheckCompile(tessControlShader);
+	CheckCompiled(tessControlShader);
 
 	GLuint tessEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
 	glShaderSource(tessEvalShader, 1, &tessEvalSrc, NULL);
 	glCompileShader(tessEvalShader);
-	CheckCompile(tessEvalShader);
+	CheckCompiled(tessEvalShader);
 
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSrc, NULL);
 	glCompileShader(fragmentShader);
-	CheckCompile(fragmentShader);
+	CheckCompiled(fragmentShader);
 
 	glAttachShader(m_ProgramId, vertexShader);
 	glAttachShader(m_ProgramId, tessControlShader);
