@@ -1,7 +1,6 @@
 #pragma once
 #include <glad/glad.h>
 
-//#include "Rendering/Shaders/BasicShader.h"
 #include "Rendering/Shaders/Shader.h"
 #include "Rendering/Camera.h"
 

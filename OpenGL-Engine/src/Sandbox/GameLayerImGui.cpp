@@ -202,13 +202,13 @@ void GameLayerImGui::GraphicsSettingsPanel()
 
 int id = 0;
 
-void DrawShader(const char* name, ShaderBase* shader)
+void DrawShader(const char* name, Shader* shader)
 {
 	ImGui::Text(name);
 	ImGui::SameLine();
 	ImGui::PushID(id++);
 	if (ImGui::Button("Reload"))
-		shader->Compile();
+		shader->ReCompile();
 	ImGui::PopID();
 }
 
@@ -218,12 +218,12 @@ void GameLayerImGui::ShadersPanel()
 	{
 		id = 0;
 		//DrawShader("Axis", m_GameLayer->m_Axis->m_Shader);
-		DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader);
-		DrawShader("Terrain compute", m_GameLayer->m_TerrainComputeShader);
-		DrawShader("Terrain tess", m_GameLayer->m_TerrainShader);
-		m_GameLayer->m_TerrainShader->Use();
-		m_GameLayer->m_TerrainShader->TexUnit("u_GroundTexture", 1);
-		m_GameLayer->m_TerrainShader->TexUnit("u_RockTexture", 2);
+		//DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader);
+		//DrawShader("Terrain compute", m_GameLayer->m_TerrainComputeShader);
+		//DrawShader("Terrain tess", m_GameLayer->m_TerrainShader);
+		//m_GameLayer->m_TerrainShader->Use();
+		//m_GameLayer->m_TerrainShader->TexUnit("u_GroundTexture", 1);
+		//m_GameLayer->m_TerrainShader->TexUnit("u_RockTexture", 2);
 	}
 	ImGui::End();
 }

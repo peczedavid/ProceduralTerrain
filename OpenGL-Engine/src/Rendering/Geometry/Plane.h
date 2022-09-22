@@ -1,8 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glad/glad.h>
 #include <vector>
-#include "Rendering/Shaders/TessellationShader.h"
 
 class Plane
 {

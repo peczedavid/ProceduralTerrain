@@ -4,7 +4,7 @@
 #include <stb_image.h>
 #include <glm/gtx/transform.hpp>
 
-Skybox::Skybox(ShaderBase* shader)
+Skybox::Skybox(Shader* shader)
 	: m_Shader(shader)
 {
 	float vertices[27] =

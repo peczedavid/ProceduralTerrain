@@ -49,22 +49,24 @@ constexpr uint32_t waterPlaneDivision = 100u;
 
 GameLayer::GameLayer()
 {
-	m_TerrainShader = new TessellationShader(
+	m_TerrainShader = new Shader({
 		"assets/GLSL/terrain/terrain.vert",
 		"assets/GLSL/terrain/terrain.tesc",
 		"assets/GLSL/terrain/terrain.tese",
-		"assets/GLSL/terrain/terrain.frag");
+		"assets/GLSL/terrain/terrain.frag"
+		});
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	m_TerrainShader->TexUnit("u_NoiseTexture", 0);
 	m_TerrainShader->TexUnit("u_GroundTexture", 1);
 	m_TerrainShader->TexUnit("u_RockTexture", 2);
 	m_TerrainShader->TexUnit("u_SnowTexture", 3);
 
-	m_WaterShader = new TessellationShader(
+	m_WaterShader = new Shader({
 		"assets/GLSL/water/water.vert",
 		"assets/GLSL/water/water.tesc",
 		"assets/GLSL/water/water.tese",
-		"assets/GLSL/water/water.frag");
+		"assets/GLSL/water/water.frag"
+		});
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	m_WaterShader->TexUnit("u_WaterTexture", 0);
 
@@ -74,7 +76,7 @@ GameLayer::GameLayer()
 	m_Camera = new Camera(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
 
-	BasicShader* skyboxShader = new BasicShader("assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag");
+	Shader* skyboxShader = new Shader({ "assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag" });
 	m_Skybox = new Skybox(skyboxShader);
 
 	m_Axis = new Axis();
@@ -86,14 +88,14 @@ GameLayer::GameLayer()
 	m_WaterTexture = new Texture2D("assets/Textures/water-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 
 	m_FrameBuffer = new FrameBuffer(1, 1);
-	m_PostProcessShader = new BasicShader(
+	m_PostProcessShader = new Shader({
 		"assets/GLSL/postprocess.vert",
 		"assets/GLSL/postprocess.frag"
-	);
+		});
 	m_PostProcessShader->TexUnit("u_ScreenTexture", 0);
 	FrameBuffer::Default();
 
-	m_TerrainComputeShader = new ComputeShader("assets/GLSL/noise.comp");
+	m_TerrainComputeShader = new Shader({ "assets/GLSL/noise.comp" });
 	m_TerrainComputeShader->Use();
 	m_TerrainComputeShader->SetUniform("u_Amplitude", m_Amplitude);
 	m_TerrainComputeShader->SetUniform("u_Gain", m_Gain);
@@ -112,16 +114,16 @@ GameLayer::GameLayer()
 	m_HtDy = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_HtDx = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_HtDz = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	m_H0ComputeShader = new ComputeShader("assets/GLSL/water-fft/h0.comp");
-	m_HktComputeShader = new ComputeShader("assets/GLSL/water-fft/hkt.comp");
+	m_H0ComputeShader = new Shader({ "assets/GLSL/water-fft/h0.comp" });
+	m_HktComputeShader = new Shader({ "assets/GLSL/water-fft/hkt.comp" });
 	m_TwiddleTexture = new Texture2D(8, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	m_TwiddleShader = new ComputeShader("assets/GLSL/water-fft/twiddle.comp");
+	m_TwiddleShader = new Shader({ "assets/GLSL/water-fft/twiddle.comp" });
 	m_PingPong0 = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_PingPong1 = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
 	m_Displacement = new Texture2D(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	m_ButterflyShader = new ComputeShader("assets/GLSL/water-fft/butterfly.comp");
-	m_CopyShader = new ComputeShader("assets/GLSL/water-fft/copy.comp");
-	m_InversionShader = new ComputeShader("assets/GLSL/water-fft/inversion.comp");
+	m_ButterflyShader = new Shader({ "assets/GLSL/water-fft/butterfly.comp" });
+	m_CopyShader = new Shader({ "assets/GLSL/water-fft/copy.comp" });
+	m_InversionShader = new Shader({ "assets/GLSL/water-fft/inversion.comp" });
 
 	GenerateFFTTextures();
 

@@ -4,13 +4,10 @@
 #include "Rendering/Texture2D.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Geometry/Skybox.h"
-#include "Rendering/Shaders/TessellationShader.h"
 #include "Rendering/Geometry/Plane.h"
 #include "Rendering/Geometry/Axis.h"
 #include "Rendering/FrameBuffer.h"
 #include "Rendering/Geometry/FullscreenQuad.h"
-#include "Rendering/Shaders/ComputeShader.h"
-#include "Rendering/Shaders/BasicShader.h"
 
 class GameLayer : public Layer
 {
@@ -35,11 +32,11 @@ private:
 	int m_TessLevel = 1;
 	float m_MaxHeight = 87.0f;
 
-	ComputeShader* m_TerrainComputeShader;
+	Shader* m_TerrainComputeShader;
 	std::vector<Texture2D*> m_HeightMaps;
 
-	TessellationShader* m_TerrainShader;
-	TessellationShader* m_WaterShader;
+	Shader* m_TerrainShader;
+	Shader* m_WaterShader;
 	Texture2D* m_GroundTexture, * m_RockTexture;
 	Texture2D* m_WaterTexture;
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
@@ -64,19 +61,19 @@ private:
 	Texture2D* m_H0k;
 	Texture2D* m_H0minusk;
 	Texture2D* m_HtDy, * m_HtDx, * m_HtDz;
-	ComputeShader* m_H0ComputeShader;
-	ComputeShader* m_HktComputeShader;
+	Shader* m_H0ComputeShader;
+	Shader* m_HktComputeShader;
 	Texture2D* m_TwiddleTexture;
-	ComputeShader* m_TwiddleShader;
+	Shader* m_TwiddleShader;
 	Texture2D* m_PingPong0, * m_PingPong1;
-	ComputeShader* m_ButterflyShader;
+	Shader* m_ButterflyShader;
 	Texture2D* m_Displacement;
-	ComputeShader* m_CopyShader;
-	ComputeShader* m_InversionShader;
+	Shader* m_CopyShader;
+	Shader* m_InversionShader;
 	const uint32_t FFTResoltion = 256u;
 
 	FrameBuffer* m_FrameBuffer;
-	BasicShader* m_PostProcessShader;
+	Shader* m_PostProcessShader;
 	FullscreenQuad* m_FullscreenQuad;
 	glm::vec2 m_ViewportSize = glm::vec2(1, 1);
 

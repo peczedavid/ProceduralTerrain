@@ -1,5 +1,7 @@
 #pragma once
-#include "Rendering/Shaders/ShaderBase.h"
+
+#include <glad/glad.h>
+#include <cinttypes>
 
 class Texture2D
 {
