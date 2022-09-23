@@ -17,8 +17,6 @@ public:
     void Use() const { glUseProgram(m_ProgramId); }
     void Dispatch(const glm::uvec3& dimensions, GLenum barrier = GL_ALL_BARRIER_BITS) const;
 
-    void TexUnit(const std::string& name, uint32_t slot) const;
-
     void SetUniform(const std::string& name, int value) const;
     void SetUniform(const std::string& name, uint32_t value) const;
     void SetUniform(const std::string& name, float value) const;
@@ -35,8 +33,9 @@ public:
 private:
     struct TextureUnit
     {
-        uint32_t Slot;
         std::string Name;
+        uint32_t Slot;
+        GLenum Type{};
     };
 
     // Per pipeline element
@@ -44,17 +43,21 @@ private:
     {
         std::string Path;
         std::string Source;
-        GLenum Type;
-        std::vector<TextureUnit> TextureUnits;
+        GLenum Type{};
     };
 private:
     void Compile(const std::vector<std::string>& shaderFiles);
-    void CheckCompiled(GLuint shader);
+    void ActivateTexUnits();
+    void CheckCompiled(GLuint shader) const;
     // TODO: Check linked function
     GLint getUniformLocation(const std::string& name) const;
-    GLenum GetType(const std::string& path);
+    GLenum GetShaderType(const std::string& path) const;
+    GLenum GetSamplerType(const std::string& typeStr) const;
+    void TexUnit(const std::string& name, uint32_t slot) const;
+    void ParseTexUnits(ShaderInfo& shaderInfo);
 private:
     mutable std::unordered_map<std::string, GLint> m_UniformCache;
+    std::vector<TextureUnit> m_TextureUnits;
     uint32_t m_ProgramId = 0;
     std::string m_OutputName;
     std::vector<ShaderInfo> m_ShaderInfos;

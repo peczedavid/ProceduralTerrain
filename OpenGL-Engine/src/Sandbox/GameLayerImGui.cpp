@@ -217,13 +217,10 @@ void GameLayerImGui::ShadersPanel()
 	if (ImGui::Begin("Shaders"))
 	{
 		id = 0;
-		//DrawShader("Axis", m_GameLayer->m_Axis->m_Shader);
-		//DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader);
-		//DrawShader("Terrain compute", m_GameLayer->m_TerrainComputeShader);
-		//DrawShader("Terrain tess", m_GameLayer->m_TerrainShader);
-		//m_GameLayer->m_TerrainShader->Use();
-		//m_GameLayer->m_TerrainShader->TexUnit("u_GroundTexture", 1);
-		//m_GameLayer->m_TerrainShader->TexUnit("u_RockTexture", 2);
+		DrawShader("Axis", m_GameLayer->m_Axis->m_Shader);
+		DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader);
+		DrawShader("Terrain compute", m_GameLayer->m_TerrainComputeShader);
+		DrawShader("Terrain tess", m_GameLayer->m_TerrainShader);
 	}
 	ImGui::End();
 }

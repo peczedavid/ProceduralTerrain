@@ -9,12 +9,13 @@
 //
 //		 - uniforms in map							DONE
 //		 - hot reaload shaders						DONE
-// 		 - single shader class
+// 		 - single shader class						DONE
 // 		 - shader library
 //		 - precompiled header
 //		 - Core.h macros for logging, assert,...
 //		 - logging
 //		 - reference
+//		 - uniform buffer objects eg: camera uniform
 // 
 //		 - scene system (switching between scenes)
 //		 - profiling (maybe benchmark scene)
@@ -22,7 +23,6 @@
 //       - object loading
 //		 - grass and tree rendering
 //		 - trackball camera controls
-//		 - uniform buffer objects eg: camera uniform
 // 
 // Create single shader class, vector of shader src-s, { type, src }
 // Compile based on type and src
@@ -56,10 +56,6 @@ GameLayer::GameLayer()
 		"assets/GLSL/terrain/terrain.frag"
 		});
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
-	m_TerrainShader->TexUnit("u_NoiseTexture", 0);
-	m_TerrainShader->TexUnit("u_GroundTexture", 1);
-	m_TerrainShader->TexUnit("u_RockTexture", 2);
-	m_TerrainShader->TexUnit("u_SnowTexture", 3);
 
 	m_WaterShader = new Shader({
 		"assets/GLSL/water/water.vert",
@@ -68,7 +64,6 @@ GameLayer::GameLayer()
 		"assets/GLSL/water/water.frag"
 		});
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
-	m_WaterShader->TexUnit("u_WaterTexture", 0);
 
 	m_GroundPlane = new Plane(planeSize, planeDivision);
 	m_WaterPlane = new Plane(waterPlaneSize, waterPlaneDivision);
@@ -92,7 +87,6 @@ GameLayer::GameLayer()
 		"assets/GLSL/postprocess.vert",
 		"assets/GLSL/postprocess.frag"
 		});
-	m_PostProcessShader->TexUnit("u_ScreenTexture", 0);
 	FrameBuffer::Default();
 
 	m_TerrainComputeShader = new Shader({ "assets/GLSL/noise.comp" });

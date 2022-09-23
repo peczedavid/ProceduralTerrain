@@ -111,8 +111,6 @@ Skybox::Skybox(Shader* shader)
 		}
 	}
 	m_Shader->Use();
-	uint32_t textureUnit = glGetUniformLocation(m_Shader->GetProgramId(), "u_Skybox");
-	glUniform1i(textureUnit, 0);
 }
 
 Skybox::~Skybox()
