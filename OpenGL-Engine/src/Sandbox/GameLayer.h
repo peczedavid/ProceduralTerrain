@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Core.h"
 #include "Core/Layers/Layer.h"
 #include "Rendering/Texture2D.h"
 #include "Rendering/Camera.h"
@@ -28,19 +29,19 @@ private:
 	void GenerateFFTTextures();
 	void FFTLoop();
 private:
-	Plane* m_GroundPlane;
+	Ref<Plane> m_GroundPlane;
 	int m_TessLevel = 1;
 	float m_MaxHeight = 87.0f;
 
 	Shader* m_TerrainComputeShader;
 	std::vector<Texture2D*> m_HeightMaps;
 
-	Shader* m_TerrainShader;
-	Shader* m_WaterShader;
-	Texture2D* m_GroundTexture, * m_RockTexture;
-	Texture2D* m_WaterTexture;
+	Ref<Shader> m_TerrainShader;
+	Ref<Shader> m_WaterShader;
+	Ref<Texture2D> m_GroundTexture, m_RockTexture;
+	Ref<Texture2D> m_WaterTexture;
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
-	Camera* m_Camera;
+	Ref<Camera> m_Camera;
 	Skybox* m_Skybox;
 	Axis* m_Axis;
 

@@ -49,26 +49,24 @@ constexpr uint32_t waterPlaneDivision = 100u;
 
 GameLayer::GameLayer()
 {
-	m_TerrainShader = new Shader({
+	m_TerrainShader = CreateShaderRef(
 		"assets/GLSL/terrain/terrain.vert",
 		"assets/GLSL/terrain/terrain.tesc",
 		"assets/GLSL/terrain/terrain.tese",
-		"assets/GLSL/terrain/terrain.frag"
-		});
+		"assets/GLSL/terrain/terrain.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	m_WaterShader = new Shader({
+	m_WaterShader = CreateShaderRef(
 		"assets/GLSL/water/water.vert",
 		"assets/GLSL/water/water.tesc",
 		"assets/GLSL/water/water.tese",
-		"assets/GLSL/water/water.frag"
-		});
+		"assets/GLSL/water/water.frag");
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	m_GroundPlane = new Plane(planeSize, planeDivision);
+	m_GroundPlane = CreateRef<Plane>(planeSize, planeDivision);
 	m_WaterPlane = new Plane(waterPlaneSize, waterPlaneDivision);
 
-	m_Camera = new Camera(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
+	m_Camera = CreateRef<Camera>(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
 
 	Shader* skyboxShader = new Shader({ "assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag" });
@@ -78,9 +76,9 @@ GameLayer::GameLayer()
 
 	m_FullscreenQuad = new FullscreenQuad();
 
-	m_GroundTexture = new Texture2D("assets/Textures/ground-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-	m_RockTexture = new Texture2D("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-	m_WaterTexture = new Texture2D("assets/Textures/water-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_GroundTexture = CreateRef<Texture2D>("assets/Textures/ground-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_RockTexture = CreateRef<Texture2D>("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_WaterTexture = CreateRef<Texture2D>("assets/Textures/water-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 
 	m_FrameBuffer = new FrameBuffer(1, 1);
 	m_PostProcessShader = new Shader({

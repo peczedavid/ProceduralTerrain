@@ -117,7 +117,7 @@ Skybox::~Skybox()
 {
 }
 
-void Skybox::Render(Camera* camera)
+void Skybox::Render(Ref<Camera> camera)
 {
 	// The skybox is on the edge
 	glDepthFunc(GL_LEQUAL);

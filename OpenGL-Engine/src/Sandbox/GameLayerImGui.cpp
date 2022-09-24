@@ -217,10 +217,10 @@ void GameLayerImGui::ShadersPanel()
 	if (ImGui::Begin("Shaders"))
 	{
 		id = 0;
-		DrawShader("Axis", m_GameLayer->m_Axis->m_Shader);
+		//DrawShader("Axis", m_GameLayer->m_Axis->m_Shader);
 		DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader);
 		DrawShader("Terrain compute", m_GameLayer->m_TerrainComputeShader);
-		DrawShader("Terrain tess", m_GameLayer->m_TerrainShader);
+		//DrawShader("Terrain tess", m_GameLayer->m_TerrainShader);
 	}
 	ImGui::End();
 }

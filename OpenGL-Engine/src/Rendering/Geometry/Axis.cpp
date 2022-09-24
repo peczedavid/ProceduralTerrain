@@ -5,7 +5,7 @@
 Axis::Axis()
 	: m_Model(glm::mat4(1.0f))
 {
-	m_Shader = new Shader({ "assets/GLSL/axis/axis.vert", "assets/GLSL/axis/axis.frag" });
+	m_Shader = CreateShaderRef("assets/GLSL/axis/axis.vert", "assets/GLSL/axis/axis.frag");
 
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);
@@ -39,7 +39,7 @@ Axis::~Axis()
 {
 }
 
-void Axis::Render(Camera* camera)
+void Axis::Render(Ref<Camera> camera)
 {
 	m_Shader->Use();
 	glm::vec3 orientation = camera->GetOrientation();

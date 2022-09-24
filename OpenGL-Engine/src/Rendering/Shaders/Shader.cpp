@@ -14,7 +14,7 @@ std::string ReadFile(const char* fileName)
 		in.seekg(0, std::ios::beg);
 		in.read(&contents[0], contents.size());
 		in.close();
-		return(contents);
+		return contents;
 	}
 	std::cout << "Error reading: " + std::string(fileName) << std::endl;
 	throw(errno);
