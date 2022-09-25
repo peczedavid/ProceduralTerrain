@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Core/Window.h"
 #include "Core/Layers/LayerStack.h"
 #include "Rendering/ImGui/ImGuiLayer.h"
@@ -7,6 +8,7 @@ class Application
 {
 public:
 	Application(const WindowProps& props = WindowProps());
+	Application(const Application& application) = delete;
 	virtual ~Application();
 
 	void Run();

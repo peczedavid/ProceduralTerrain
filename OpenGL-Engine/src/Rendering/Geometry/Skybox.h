@@ -8,11 +8,11 @@
 class Skybox
 {
 public:
-	Skybox(Shader* shader);
+	Skybox(Ref<Shader> shader);
 	~Skybox();
 
 	void Render(Ref<Camera> camera);
-	Shader* m_Shader;
+	Ref<Shader> m_Shader;
 private:
 	uint32_t m_Vao, m_Vbo, m_Ebo;
 	uint32_t m_TextureId;

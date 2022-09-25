@@ -18,4 +18,4 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 	return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
-#define CreateShaderRef(...) CreateRef<Shader>(std::vector<std::string>{##__VA_ARGS__});
+#define CreateShaderRef(...) CreateRef<Shader>(std::vector<std::string>{##__VA_ARGS__})

@@ -7,6 +7,7 @@
 #include <glm/mat4x4.hpp>
 #include <unordered_map>
 #include <vector>
+#include "Core/Core.h"
 
 class Shader
 {
@@ -61,4 +62,24 @@ private:
     uint32_t m_ProgramId = 0;
     std::string m_OutputName;
     std::vector<ShaderInfo> m_ShaderInfos;
+};
+
+class ShaderLibrary
+{
+public:
+    ShaderLibrary() = default;
+    ShaderLibrary(const ShaderLibrary&) = delete;
+    ShaderLibrary operator=(const ShaderLibrary&) = delete;
+    ~ShaderLibrary() = default;
+    
+    void Add(const std::string name, const Ref<Shader> shader);
+    const Ref<Shader> Get(const std::string& name);
+
+    std::unordered_map<std::string, Ref<Shader>>::iterator begin() { return m_Shaders.begin(); }
+    std::unordered_map<std::string, Ref<Shader>>::iterator end() { return m_Shaders.end(); }
+
+    std::unordered_map<std::string, Ref<Shader>>::const_iterator begin() const { return m_Shaders.begin(); }
+    std::unordered_map<std::string, Ref<Shader>>::const_iterator end()	const { return m_Shaders.end(); }
+private:
+    std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 };

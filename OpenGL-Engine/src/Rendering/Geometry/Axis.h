@@ -9,7 +9,7 @@
 class Axis
 {
 public:
-	Axis();
+	Axis(Ref<Shader> m_Shader);
 	~Axis();
 
 	void Render(Ref<Camera> camera);

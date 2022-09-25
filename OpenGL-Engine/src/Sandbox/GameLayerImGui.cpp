@@ -202,7 +202,7 @@ void GameLayerImGui::GraphicsSettingsPanel()
 
 int id = 0;
 
-void DrawShader(const char* name, Shader* shader)
+void DrawShader(const char* name, Ref<Shader> shader)
 {
 	ImGui::Text(name);
 	ImGui::SameLine();
@@ -217,10 +217,10 @@ void GameLayerImGui::ShadersPanel()
 	if (ImGui::Begin("Shaders"))
 	{
 		id = 0;
-		//DrawShader("Axis", m_GameLayer->m_Axis->m_Shader);
-		DrawShader("Skybox", m_GameLayer->m_Skybox->m_Shader);
-		DrawShader("Terrain compute", m_GameLayer->m_TerrainComputeShader);
-		//DrawShader("Terrain tess", m_GameLayer->m_TerrainShader);
+		for (auto& shader : m_GameLayer->m_ShaderLibrary)
+		{
+			DrawShader(shader.first.c_str(), shader.second);
+		}
 	}
 	ImGui::End();
 }

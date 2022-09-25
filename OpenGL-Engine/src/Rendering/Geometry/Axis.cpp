@@ -2,11 +2,9 @@
 
 #include <glm/gtx/transform.hpp>
 
-Axis::Axis()
-	: m_Model(glm::mat4(1.0f))
+Axis::Axis(Ref<Shader> shader)
+	: m_Model(glm::mat4(1.0f)), m_Shader(shader)
 {
-	m_Shader = CreateShaderRef("assets/GLSL/axis/axis.vert", "assets/GLSL/axis/axis.frag");
-
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);
 

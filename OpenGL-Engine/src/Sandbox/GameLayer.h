@@ -29,21 +29,20 @@ private:
 	void GenerateFFTTextures();
 	void FFTLoop();
 private:
+	ShaderLibrary m_ShaderLibrary;
+
 	Ref<Plane> m_GroundPlane;
 	int m_TessLevel = 1;
 	float m_MaxHeight = 87.0f;
 
-	Shader* m_TerrainComputeShader;
-	std::vector<Texture2D*> m_HeightMaps;
+	std::vector<Ref<Texture2D>> m_HeightMaps;
 
-	Ref<Shader> m_TerrainShader;
-	Ref<Shader> m_WaterShader;
 	Ref<Texture2D> m_GroundTexture, m_RockTexture;
 	Ref<Texture2D> m_WaterTexture;
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
 	Ref<Camera> m_Camera;
-	Skybox* m_Skybox;
-	Axis* m_Axis;
+	Ref<Skybox> m_Skybox;
+	Ref<Axis> m_Axis;
 
 	float m_Gain = 0.245f, m_Lacunarity = 1.184f, m_Amplitude = 0.385f, m_Frequency = 2.776f;
 	float m_Scale = 0.100f;
@@ -51,7 +50,7 @@ private:
 	float m_FogGradient = 2.5f;
 	glm::vec2 m_NoiseOffset = glm::vec2(0.0f, 0.0f);
 
-	Plane* m_WaterPlane;
+	Ref<Plane> m_WaterPlane;
 	float m_WaterLevel = -15.0f;
 	glm::vec4 m_WaveA = glm::vec4(1.0f, 1.0f, 0.125f, 60.0f);
 	glm::vec4 m_WaveB = glm::vec4(1.0f, 0.6f, 0.125f, 31.0f);
@@ -59,26 +58,19 @@ private:
 	bool m_TerrainNormals = false;
 	bool m_WaterNormals = false;
 
-	Texture2D* m_H0k;
-	Texture2D* m_H0minusk;
-	Texture2D* m_HtDy, * m_HtDx, * m_HtDz;
-	Shader* m_H0ComputeShader;
-	Shader* m_HktComputeShader;
-	Texture2D* m_TwiddleTexture;
-	Shader* m_TwiddleShader;
-	Texture2D* m_PingPong0, * m_PingPong1;
-	Shader* m_ButterflyShader;
-	Texture2D* m_Displacement;
-	Shader* m_CopyShader;
-	Shader* m_InversionShader;
+	Ref<Texture2D> m_H0k;
+	Ref<Texture2D> m_H0minusk;
+	Ref<Texture2D> m_HtDy, m_HtDx, m_HtDz;
+	Ref<Texture2D> m_TwiddleTexture;
+	Ref<Texture2D> m_PingPong0, m_PingPong1;
+	Ref<Texture2D> m_Displacement;
 	const uint32_t FFTResoltion = 256u;
 
-	FrameBuffer* m_FrameBuffer;
-	Shader* m_PostProcessShader;
-	FullscreenQuad* m_FullscreenQuad;
+	Ref<FrameBuffer> m_FrameBuffer;
+	Ref<FullscreenQuad> m_FullscreenQuad;
 	glm::vec2 m_ViewportSize = glm::vec2(1, 1);
 
-	GameLayerImGui* m_UI;
+	Scope<GameLayerImGui> m_UI;
 
 	uint32_t m_FPS = 0u;
 	float m_Time = 0.0f;

@@ -264,3 +264,14 @@ void Shader::ParseTexUnits(Shader::ShaderInfo& shaderInfo)
 		}
 	}
 }
+
+void ShaderLibrary::Add(const std::string name, const Ref<Shader> shader)
+{
+	m_Shaders[name] = shader;
+}
+
+const Ref<Shader> ShaderLibrary::Get(const std::string& name)
+{
+	// throw error if doesn't exist
+	return m_Shaders[name];
+}
