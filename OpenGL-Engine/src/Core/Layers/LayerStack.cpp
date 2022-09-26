@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Core//Layers/LayerStack.h"
 
 LayerStack::LayerStack()

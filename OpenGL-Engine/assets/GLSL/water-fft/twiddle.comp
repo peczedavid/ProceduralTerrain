@@ -1,0 +1,48 @@
+#version 450 core
+precision highp float;
+
+#define PI 3.141592653589793238
+
+layout(local_size_x = 1, local_size_y = 16, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform image2D u_Twiddle;
+
+int N = 256;
+
+struct complex
+{
+	float real;
+	float im;
+};
+
+void main()
+{
+	const int j[] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
+
+	vec2 x = gl_GlobalInvocationID.xy;
+	float k = mod(x.y * (float(N) / pow(2, x.x + 1)), N);
+	complex twiddle = complex(cos(2.0 * PI * k / float(N)), sin(2.0 * PI * k / float(N)));
+
+	int butterflyspan = int(pow(2, x.x));
+	int butterflywing;
+
+	if(mod(x.y, pow(2, x.x + 1)) < pow(2, x.x))
+		butterflywing = 1;
+	else
+		butterflywing = 0;
+
+	if(x.x == 0)
+	{
+		if(butterflywing == 1)
+			imageStore(u_Twiddle, ivec2(x), vec4(twiddle.real, twiddle.im, j[int(x.y)], j[int(x.y + 1)]));
+		else
+			imageStore(u_Twiddle, ivec2(x), vec4(twiddle.real, twiddle.im, j[int(x.y - 1)], j[int(x.y)]));
+	}
+	else
+	{
+		if(butterflywing == 1)
+			imageStore(u_Twiddle, ivec2(x), vec4(twiddle.real, twiddle.im, x.y, x.y + butterflyspan));
+		else
+			imageStore(u_Twiddle, ivec2(x), vec4(twiddle.real, twiddle.im, x.y - butterflyspan, x.y));
+	}
+}

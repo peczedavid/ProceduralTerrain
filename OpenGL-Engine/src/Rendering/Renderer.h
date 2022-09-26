@@ -1,13 +1,20 @@
 #pragma once
 #include <glad/glad.h>
+#include <cinttypes>
+#include <vector>
+#include "Rendering/FPSPool.h"
 
-namespace Renderer
+class Renderer
 {
-	extern bool debugView;
+public:
+	static void Initialize();
+	static void TogglePolygonMode();
+	static void SetOpenGLConfig();
 
-	extern bool wireframe;
-
-	void TogglePolygonMode();
-
-	void SetOpenGLConfig();
+	static const bool IsWireFrame();
+public:
+	static FPSPool FPSPool;
+	static bool DebugView;
+private:
+	static bool WireFrame;
 };

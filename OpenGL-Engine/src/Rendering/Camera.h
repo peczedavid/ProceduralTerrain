@@ -6,10 +6,10 @@ class Camera {
 public:
 	Camera(const glm::vec3& position, const glm::vec3& orientation = { 0.0f, 0.0f, -1.0f});
 
-	void UpdateMatrix(float fovDeg, float nearPlane, float farPlane);
-	void Update(float dt);
+	void UpdateMatrix(const float fovDeg, const float nearPlane, const float farPlane);
+	void Update(const float dt);
 
-	void Resize(uint32_t width, uint32_t height);
+	void Resize(const uint32_t width, const uint32_t height);
 private:
 	glm::vec3 m_Position;
 	glm::vec3 m_Orientation;

@@ -1,5 +1,6 @@
+#include "pch.h"
+
 #include "Texture2D.h"
-#include <stb_image.h>
 
 Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum internalFormat, GLenum format, GLenum pixelType)
 	: m_InternalFormat(internalFormat)
@@ -54,7 +55,7 @@ void Texture2D::Bind(uint32_t slot)
 	glBindTexture(GL_TEXTURE_2D, m_Id);
 }
 
-void Texture2D::BindImage()
+void Texture2D::BindImage(uint32_t slot, GLenum access)
 {
-	glBindImageTexture(0, m_Id, 0, GL_FALSE, 0, GL_WRITE_ONLY, m_InternalFormat);
+	glBindImageTexture(slot, m_Id, 0, GL_FALSE, 0, access, m_InternalFormat);
 }

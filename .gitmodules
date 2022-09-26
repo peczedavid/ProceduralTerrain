@@ -8,3 +8,6 @@
 	path = OpenGL-Engine/vendor/imgui
 	url = https://github.com/peczedavid/imgui.git
 	branch = docking
+[submodule "OpenGL-Engine/vendor/spdlog"]
+	path = OpenGL-Engine/vendor/spdlog
+	url = https://github.com/peczedavid/spdlog

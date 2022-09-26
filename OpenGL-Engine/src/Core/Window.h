@@ -48,6 +48,7 @@ public:
 	inline void SetHeight(uint32_t height) { m_Height = height; }
 	inline void SetWidth(uint32_t width) { m_Width = width; }
 
-	inline void SetVSync(bool enabled) { m_VSync = enabled; }
+	
+	inline void SetVSync(bool enabled) { m_VSync = enabled; glfwSwapInterval(m_VSync ? 1 : 0); }
 	inline bool IsVSync() const { return m_VSync; }
 };

@@ -1,18 +1,20 @@
 #pragma once
+
 #include <glad/glad.h>
 
-#include "Rendering/Shaders/BasicShader.h"
+#include "Rendering/Shaders/Shader.h"
 #include "Rendering/Camera.h"
+#include "Core/Core.h"
 
 class Axis
 {
 public:
-	Axis();
+	Axis(Ref<Shader> m_Shader);
 	~Axis();
 
-	void Render(Camera* camera);
+	void Render(Ref<Camera> camera);
+	Ref<Shader> m_Shader;
 private:
-	BasicShader* m_Shader;
 	uint32_t m_Vao, m_Vbo;
 	glm::mat4 m_Model;
 };

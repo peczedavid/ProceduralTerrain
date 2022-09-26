@@ -1,10 +1,12 @@
+#include "pch.h"
+
 #include "Rendering/Geometry/FullscreenQuad.h"
 
 #include <glad/glad.h>
 
 FullscreenQuad::FullscreenQuad()
 {
-	float vertices[] = {
+	constexpr float vertices[] = {
 		 // NDC pos	// UV coords
 		 1.0f, -1.0f,  1.0f, 0.0f,
 		-1.0f, -1.0f,  0.0f, 0.0f,

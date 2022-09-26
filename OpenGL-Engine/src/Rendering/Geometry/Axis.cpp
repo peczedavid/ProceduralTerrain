@@ -1,19 +1,17 @@
+#include "pch.h"
+
 #include "Rendering/Geometry/Axis.h"
 
-#include <glm/gtx/transform.hpp>
-
-Axis::Axis()
-	: m_Model(glm::mat4(1.0f))
+Axis::Axis(Ref<Shader> shader)
+	: m_Model(glm::mat4(1.0f)), m_Shader(shader)
 {
-	m_Shader = new BasicShader("src/Rendering/Shaders/glsl/axis/axis.vert", "src/Rendering/Shaders/glsl/axis/axis.frag");
-
 	glGenVertexArrays(1, &m_Vao);
 	glGenBuffers(1, &m_Vbo);
 
 	glBindVertexArray(m_Vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
-	float vertices[] = {
+	constexpr float vertices[] = {
 		// X - Red
 		0.0f, 0.0f, 0.0f, 0.9f, 0.2f, 0.15f,
 		1.0f, 0.0f, 0.0f, 0.9f, 0.2f, 0.15f,
@@ -39,10 +37,10 @@ Axis::~Axis()
 {
 }
 
-void Axis::Render(Camera* camera)
+void Axis::Render(Ref<Camera> camera)
 {
 	m_Shader->Use();
-	glm::vec3 orientation = camera->GetOrientation();
+	const glm::vec3 orientation = camera->GetOrientation();
 	constexpr float pi2 = glm::pi<float>() / 2.0f;
 	m_Model = glm::mat4(1.0f);
 	m_Model = glm::scale(m_Model, glm::vec3(1.0f, 16.0f / 10.0f, 10.0f / 16.0f) * 0.05f);

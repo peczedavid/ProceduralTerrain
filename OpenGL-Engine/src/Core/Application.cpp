@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Core/Application.h"
 #include "Rendering/Renderer.h"
 
@@ -6,16 +8,22 @@ Application* Application::s_Instance = nullptr;
 Application::Application(const WindowProps& props)
 	: m_Cursor(false)
 {
-	m_Window = new Window(props);
-	m_Window->SetCursor(m_Cursor);
 	s_Instance = this;
+	Log::Initialize();
 
-	Renderer::SetOpenGLConfig();
-	
+	m_Window = new Window(props);
+	TRACE("Created window");
+	m_Window->SetCursor(m_Cursor);
+
+	Renderer::Initialize();
+	TRACE("Initialized renderer");
+
 	m_LayerStack = new LayerStack();
+	TRACE("Created LayerStack");
 
 	m_ImGuiLayer = new ImGuiLayer();
 	this->PushOverlay(m_ImGuiLayer);
+	TRACE("Created ImGuiLayer");
 }
 
 Application::~Application()
@@ -29,8 +37,8 @@ void Application::Run()
 	while (!m_Window->ShouldClose())
 	{
 		static float lastFrameTime = 0.0f;
-		float time = (float)glfwGetTime();
-		float dt = time - lastFrameTime;
+		const float time = (float)glfwGetTime();
+		const float dt = time - lastFrameTime;
 		lastFrameTime = time;
 
 		// Update the layers from bottom to top
@@ -58,13 +66,10 @@ void Application::PushOverlay(Layer* overlay)
 	overlay->OnAttach();
 }
 
-void Application::OnResize(uint32_t width, uint32_t height)
+void Application::OnResize(const uint32_t width, const uint32_t height)
 {
 	m_Window->SetWidth(width);
 	m_Window->SetWidth(height);
-
-	for (Layer* layer : *m_LayerStack)
-		layer->OnResize(width, height);
 }
 
 void Application::OnScreenshot()
