@@ -1,6 +1,6 @@
-#include "Rendering/Geometry/Axis.h"
+#include "pch.h"
 
-#include <glm/gtx/transform.hpp>
+#include "Rendering/Geometry/Axis.h"
 
 Axis::Axis(Ref<Shader> shader)
 	: m_Model(glm::mat4(1.0f)), m_Shader(shader)

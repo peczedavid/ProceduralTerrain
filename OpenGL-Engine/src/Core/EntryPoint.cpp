@@ -1,5 +1,6 @@
+#include "pch.h"
+
 #include "Core/Application.h"
-#include <wtypes.h>
 
 Application* CreateApplication();
 

@@ -69,6 +69,6 @@ void main()
     // red = real
     // green = im
     imageStore(u_H0k, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.xy * h0k, 0, 1));
-    imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0minusk, 0, 1));
-    //imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0k, 0, 1));
+    //imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0minusk, 0, 1));
+    imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0k, 0, 1));
 }

@@ -1,5 +1,6 @@
+#include "pch.h"
+
 #include "Texture2D.h"
-#include <stb_image.h>
 
 Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum internalFormat, GLenum format, GLenum pixelType)
 	: m_InternalFormat(internalFormat)

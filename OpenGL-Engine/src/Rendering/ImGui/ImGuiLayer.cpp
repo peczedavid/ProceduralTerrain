@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Rendering/ImGui/ImGuiLayer.h"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>

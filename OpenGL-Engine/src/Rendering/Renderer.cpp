@@ -1,5 +1,6 @@
+#include "pch.h"
+
 #include "Rendering/Renderer.h"
-#include <algorithm>
 
 bool Renderer::DebugView = false;
 bool Renderer::WireFrame = false;

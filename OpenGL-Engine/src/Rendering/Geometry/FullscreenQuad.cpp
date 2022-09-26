@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Rendering/Geometry/FullscreenQuad.h"
 
 #include <glad/glad.h>

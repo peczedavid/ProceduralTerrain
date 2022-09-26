@@ -1,6 +1,6 @@
+#include "pch.h"
+
 #include "Rendering/Camera.h"
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/vector_angle.hpp>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <Core/Application.h>

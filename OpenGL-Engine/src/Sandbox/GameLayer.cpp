@@ -11,36 +11,33 @@
 //		 - hot reaload shaders						DONE
 // 		 - single shader class						DONE
 // 		 - shader library							DONE
+//		 - reference								DONE
+// 
 //		 - precompiled header
-//		 - Core.h macros for logging, assert,...
 //		 - logging
-//		 - reference
+//		 - Core.h macros for logging, assert,...
 //		 - uniform buffer objects eg: camera uniform
 // 
 //		 - scene system (switching between scenes)
-//		 - profiling (maybe benchmark scene)
-//
 //       - object loading
-//		 - grass and tree rendering
+//		 - tree rendering
+//		 - screenshots in dist mode
+// 
+//		 - profiling (maybe benchmark scene)
 //		 - trackball camera controls
 // 
 // Create single shader class, vector of shader src-s, { type, src }
 // Compile based on type and src
 // Parse for samplers, if has any, activate with tex-unit
+#include "pch.h"
 
 #include "Sandbox/GameLayer.h"
 #include "Core/Application.h"
-#include <glad/glad.h>
-#include <glm/gtx/transform.hpp>
-#include <imgui.h>
-#include <iostream>
-#include <random>
 #include "Rendering/Renderer.h"
-#include <stb_image_write.h>
-#include <stb_image.h>
-#include <ctime>
-#include <sstream>
 #include "Sandbox/GameLayerImGui.h"
+
+#include <imgui.h>
+#include <glad/glad.h>
 
 constexpr uint32_t planeSize = 1024u;
 constexpr uint32_t planeDivision = 25u;

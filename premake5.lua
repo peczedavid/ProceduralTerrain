@@ -37,6 +37,9 @@ project "OpenGL-Engine"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+    pchheader "pch.h"
+    pchsource "%{prj.name}/src/pch.cpp"
+
     files
     {
         "%{prj.name}/src/**.h",
@@ -60,8 +63,7 @@ project "OpenGL-Engine"
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}",
-        "%{IncludeDir.PerlinNoise}"
+        "%{IncludeDir.stb_image}"
     }
 
     links

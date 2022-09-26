@@ -1,7 +1,6 @@
+#include "pch.h"
+
 #include "Rendering/Shaders/Shader.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 std::string ReadFile(const char* fileName)
 {

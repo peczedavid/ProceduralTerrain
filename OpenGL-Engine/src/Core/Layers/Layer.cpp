@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Core/Layers/Layer.h"
 
 Layer::Layer(const std::string& name)

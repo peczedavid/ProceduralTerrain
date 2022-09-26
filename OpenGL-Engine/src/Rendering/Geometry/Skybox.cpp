@@ -1,8 +1,7 @@
+#include "pch.h"
+
 #include "Rendering/Geometry/Skybox.h"
 #include <glad/glad.h>
-#include <string>
-#include <stb_image.h>
-#include <glm/gtx/transform.hpp>
 
 Skybox::Skybox(Ref<Shader> shader)
 	: m_Shader(shader)

@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Rendering/Geometry/Plane.h"
 
 Plane::Plane(uint32_t width, uint32_t div)

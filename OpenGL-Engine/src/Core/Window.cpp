@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Core/Window.h"
 #include "Core/Application.h"
 #include "Rendering/Renderer.h"

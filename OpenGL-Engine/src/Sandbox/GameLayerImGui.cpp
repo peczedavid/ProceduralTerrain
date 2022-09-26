@@ -1,6 +1,7 @@
+#include "pch.h"
+
 #include "Sandbox/GameLayerImGui.h"
 #include <imgui.h>
-#include <Windows.h>
 #include <dxgi1_4.h>
 #include "Rendering/Renderer.h"
 #include "Core/Application.h"

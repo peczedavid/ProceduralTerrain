@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Rendering/FPSPool.h"
 
 FPSPool::FPSPool()

@@ -1,7 +1,9 @@
+#include "pch.h"
+
 #include "Rendering/FrameBuffer.h"
 
 #include <glad/glad.h>
-#include <cstdio>
+
 
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height)
 {

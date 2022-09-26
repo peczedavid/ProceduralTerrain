@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "Core/Application.h"
 #include "Sandbox/GameLayer.h"
 
