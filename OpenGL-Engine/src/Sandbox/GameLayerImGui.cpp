@@ -66,16 +66,18 @@ void GameLayerImGui::WaterPanel()
 	if (ImGui::Begin("Water"))
 	{
 		ImGui::SliderFloat("Level", &m_GameLayer->m_WaterLevel, -50.0f, 100.0f);
+		ImGui::SliderFloat("Steepness dropoff", &m_GameLayer->m_SteepnessDropoff, 0.01f, 5.0f);
+		ImGui::SliderFloat("Wavelength dropoff", &m_GameLayer->m_WavelengthDropoff, 0.01f, 5.0f);
 		ImGui::Checkbox("Normals", &m_GameLayer->m_WaterNormals);
-		ImGui::SliderFloat("A - Steepness", &m_GameLayer->m_WaveA[2], 0.0f, 1.0f);
-		ImGui::SliderFloat("A - Wavelength", &m_GameLayer->m_WaveA[3], 10.0f, 75.0f);
-		ImGui::SliderFloat2("A - Direction", &m_GameLayer->m_WaveA[0], -1.0f, 1.0f);
-		ImGui::SliderFloat("B - Steepness", &m_GameLayer->m_WaveB[2], 0.0f, 1.0f);
-		ImGui::SliderFloat("B - Wavelength", &m_GameLayer->m_WaveB[3], 10.0f, 75.0f);
-		ImGui::SliderFloat2("B - Direction", &m_GameLayer->m_WaveB[0], -1.0f, 1.0f);
-		ImGui::SliderFloat("C - Steepness", &m_GameLayer->m_WaveC[2], 0.0f, 1.0f);
-		ImGui::SliderFloat("C - Wavelength", &m_GameLayer->m_WaveC[3], 10.0f, 75.0f);
-		ImGui::SliderFloat2("C - Direction", &m_GameLayer->m_WaveC[0], -1.0f, 1.0f);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_GameLayer->m_WavesUBO);
+		for (size_t i = 0; i < m_GameLayer->m_WavesCount; i++)
+		{
+			const float steepness = m_GameLayer->m_WavesInitial[i].z * m_GameLayer->m_SteepnessDropoff;
+			const float wavelength = m_GameLayer->m_WavesInitial[i].w * m_GameLayer->m_WavelengthDropoff;
+			m_GameLayer->m_Waves[i] = glm::vec4(m_GameLayer->m_WavesInitial[i].x, m_GameLayer->m_WavesInitial[i].y, steepness, wavelength);
+			glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::vec4), sizeof(glm::vec4), &m_GameLayer->m_Waves[i][0]);
+		}
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 	ImGui::End();
 }

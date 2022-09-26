@@ -10,6 +10,7 @@ Application::Application(const WindowProps& props)
 {
 	s_Instance = this;
 	Log::Initialize();
+	srand(static_cast<uint32_t>(time(0)));
 
 	m_Window = new Window(props);
 	TRACE("Created window");

@@ -35,11 +35,11 @@ private:
 	Ref<Plane> m_GroundPlane;
 	int m_TessLevel = 1;
 	float m_MaxHeight = 87.0f;
+	bool m_TerrainNormals = false;
 
 	std::vector<Ref<Texture2D>> m_HeightMaps;
 
 	Ref<Texture2D> m_GroundTexture, m_RockTexture;
-	Ref<Texture2D> m_WaterTexture;
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
 	Ref<Camera> m_Camera;
 	Ref<Skybox> m_Skybox;
@@ -52,20 +52,14 @@ private:
 	glm::vec2 m_NoiseOffset = glm::vec2(0.0f, 0.0f);
 
 	Ref<Plane> m_WaterPlane;
-	float m_WaterLevel = -15.0f;
-	glm::vec4 m_WaveA = glm::vec4(1.0f, 1.0f, 0.125f, 60.0f);
-	glm::vec4 m_WaveB = glm::vec4(1.0f, 0.6f, 0.125f, 31.0f);
-	glm::vec4 m_WaveC = glm::vec4(1.0f, 1.3f, 0.125f, 18.0f);
-	bool m_TerrainNormals = false;
+	Ref<Texture2D> m_WaterTexture;
+	float m_WaterLevel = 25.0f;
+	std::vector<glm::vec4> m_Waves;
+	std::vector<glm::vec4> m_WavesInitial;
+	GLuint m_WavesUBO;
+	const size_t m_WavesCount = 16;
+	float m_SteepnessDropoff = 1.0f, m_WavelengthDropoff = 1.0f;
 	bool m_WaterNormals = false;
-
-	Ref<Texture2D> m_H0k;
-	Ref<Texture2D> m_H0minusk;
-	Ref<Texture2D> m_HtDy, m_HtDx, m_HtDz;
-	Ref<Texture2D> m_TwiddleTexture;
-	Ref<Texture2D> m_PingPong0, m_PingPong1;
-	Ref<Texture2D> m_Displacement;
-	const uint32_t FFTResoltion = 256u;
 
 	Ref<FrameBuffer> m_FrameBuffer;
 	Ref<FullscreenQuad> m_FullscreenQuad;
@@ -75,4 +69,12 @@ private:
 
 	uint32_t m_FPS = 0u;
 	float m_Time = 0.0f;
+
+	Ref<Texture2D> m_H0k;
+	Ref<Texture2D> m_H0minusk;
+	Ref<Texture2D> m_HtDy, m_HtDx, m_HtDz;
+	Ref<Texture2D> m_TwiddleTexture;
+	Ref<Texture2D> m_PingPong0, m_PingPong1;
+	Ref<Texture2D> m_Displacement;
+	const uint32_t FFTResoltion = 256u;
 };

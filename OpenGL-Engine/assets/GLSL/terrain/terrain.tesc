@@ -15,11 +15,13 @@ out vec2 v_UVsCoord[];
 
 uniform mat4 u_Model;
 
-void main() {
+void main()
+{
   gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
   v_UVsCoord[gl_InvocationID] = v_TexCoords[gl_InvocationID];
 
-  if (gl_InvocationID == 0) {
+  if (gl_InvocationID == 0)
+  {
     const int MIN_TESS_LEVEL = 1;
     const int MAX_TESS_LEVEL = 28;
     const float MIN_DISTANCE = 100;

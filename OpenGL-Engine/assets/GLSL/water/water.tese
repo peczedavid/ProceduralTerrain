@@ -3,6 +3,7 @@ precision highp float;
 
 #define M_PI 3.1415926535897932384626433832795
 #define M_GRAVITY 9.81
+#define WAVES_COUNT 16
 
 layout(quads, fractional_odd_spacing, ccw) in;
 
@@ -12,6 +13,11 @@ layout (std140, binding = 0) uniform CameraBufferObject
 	mat4 Proj;
 	mat4 ViewProj;
 } u_Camera;
+
+layout (std140, binding = 1) uniform WavesBufferObject
+{
+	vec4[WAVES_COUNT] Waves;
+} u_Waves;
 
 uniform mat4 u_Model;
 
@@ -24,10 +30,6 @@ out float v_Visibility;
 uniform float u_Time;
 uniform float u_FogDensity;
 uniform float u_FogGradient;
-
-uniform vec4 u_WaveA;
-uniform vec4 u_WaveB;
-uniform vec4 u_WaveC;
 
 vec3 GerstnerWave(vec4 wave, vec3 pos, inout vec3 tangent, inout vec3 binormal)
 {
@@ -82,9 +84,10 @@ void main() {
 
   vec3 tangent = vec3(1.0, 0.0, 0.0);
   vec3 binormal = vec3(0.0, 0.0, 1.0);
-  pos.xyz += GerstnerWave(u_WaveA, pos.xyz, tangent, binormal);
-  pos.xyz += GerstnerWave(u_WaveB, pos.xyz, tangent, binormal);
-  pos.xyz += GerstnerWave(u_WaveC, pos.xyz, tangent, binormal);
+  for(int i = 0; i < WAVES_COUNT; i++)
+  {
+    pos.xyz += GerstnerWave(u_Waves.Waves[i], pos.xyz, tangent, binormal);
+  }
 
   gl_Position = u_Camera.ViewProj * u_Model * pos;
   v_WorldPos = gl_Position.xyz;
