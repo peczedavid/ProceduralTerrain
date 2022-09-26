@@ -26,7 +26,7 @@ void main()
 		// Ambient lighting
 		outColor.xyz *= clamp(cost, 0.15, 1.0);
 		// Fog
-		outColor.xyz = mix(vec3(0.4, 0.5, 0.6), outColor.xyz, v_Visibility);
+		outColor.rgb = mix(vec3(0.4, 0.5, 0.6), outColor.xyz, v_Visibility);
 	}
 	else
 	{

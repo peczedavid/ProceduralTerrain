@@ -29,10 +29,11 @@ group ""
 
 project "OpenGL-Engine"
     location "OpenGL-Engine"
-    kind "ConsoleApp"
+    kind "WindowedApp"
     language "C++"
     cppdialect "C++17"
     staticruntime "on"
+    entrypoint "WinMainCRTStartup"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -86,10 +87,12 @@ project "OpenGL-Engine"
     filter "configurations:Release"
         runtime "Release"
         optimize "on" 
-    
+
     filter "configurations:Dist"
         runtime "Release"
+        kind "WindowedApp"
         optimize "on"
+        defines { "DIST_BUILD" }
     
     --TODO: CLEAN, REBUILD COMMANDS
     postbuildcommands {

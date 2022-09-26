@@ -20,6 +20,7 @@
 #include <utility>
 #include <ctime>
 #include <random>
+#include <thread>
 
 // Vendors
 #include <glm/glm.hpp>

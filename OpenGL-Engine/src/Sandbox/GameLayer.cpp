@@ -13,10 +13,12 @@
 // 		 - shader library							DONE
 //		 - reference								DONE
 // 
-//		 - precompiled header
+//		 - precompiled header						DONE
 //		 - logging
 //		 - Core.h macros for logging, assert,...
-//		 - uniform buffer objects eg: camera uniform
+//		 - uniform buffer objects eg camera uniform 
+//       - Shader outColor not in constructor ->
+//       - variable length parameters
 // 
 //		 - scene system (switching between scenes)
 //       - object loading
@@ -25,10 +27,6 @@
 // 
 //		 - profiling (maybe benchmark scene)
 //		 - trackball camera controls
-// 
-// Create single shader class, vector of shader src-s, { type, src }
-// Compile based on type and src
-// Parse for samplers, if has any, activate with tex-unit
 #include "pch.h"
 
 #include "Sandbox/GameLayer.h"
