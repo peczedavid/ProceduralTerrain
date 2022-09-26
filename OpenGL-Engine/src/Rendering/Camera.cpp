@@ -10,7 +10,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& orientation)
 {
 }
 
-void Camera::UpdateMatrix(float fovDeg, float nearPlane, float farPlane)
+void Camera::UpdateMatrix(const float fovDeg, const float nearPlane, const float farPlane)
 {
 	m_Proj = glm::mat4(1.0f);
 	m_View = glm::mat4(1.0f);
@@ -25,7 +25,7 @@ void Camera::UpdateMatrix(float fovDeg, float nearPlane, float farPlane)
 	m_CameraMatrix = m_Proj * m_View;
 }
 
-void Camera::Update(float dt)
+void Camera::Update(const float dt)
 {
 	GLFWwindow* glfwWindow = Application::Get().GetWindow()->GetNativeWindow();
 
@@ -88,8 +88,8 @@ void Camera::Update(float dt)
 	double mouseX, mouseY;
 	glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
 
-	float rotX = m_Sensitivity * (float)(mouseY - (m_Height / 2)) / m_Height;
-	float rotY = m_Sensitivity * (float)(mouseX - (m_Width / 2)) / m_Width;
+	const float rotX = m_Sensitivity * (float)(mouseY - (m_Height / 2)) / m_Height;
+	const float rotY = m_Sensitivity * (float)(mouseX - (m_Width / 2)) / m_Width;
 
 	glm::vec3 newOrientation = glm::rotate(m_Orientation, glm::radians(-rotX), glm::normalize(glm::cross(m_Orientation, m_Up)));
 	if (!(glm::angle(newOrientation, m_Up) <= glm::radians(5.f) || glm::angle(newOrientation, -m_Up) < glm::radians(5.f)))
@@ -102,7 +102,7 @@ void Camera::Update(float dt)
 	glfwSetCursorPos(glfwWindow, (m_Width / 2), (m_Height / 2));
 }
 
-void Camera::Resize(uint32_t width, uint32_t height)
+void Camera::Resize(const uint32_t width, const uint32_t height)
 {
 	m_Width = width;
 	m_Height = height;

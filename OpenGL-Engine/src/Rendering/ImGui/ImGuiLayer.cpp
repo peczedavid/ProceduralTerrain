@@ -56,9 +56,9 @@ void ImGuiLayer::Begin()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	static bool opt_fullscreen = true;
-	static bool opt_padding = false;
-	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+	const static bool opt_fullscreen = true;
+	const static bool opt_padding = false;
+	const static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 	// because it would be confusing to have two docking targets within each others.
@@ -95,10 +95,10 @@ void ImGuiLayer::Begin()
 		ImGui::PopStyleVar(2);
 
 	// Submit the DockSpace
-	ImGuiIO& io = ImGui::GetIO();
+	const ImGuiIO& io = ImGui::GetIO();
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 	{
-		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+		const ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 	}
 }
@@ -108,7 +108,7 @@ void ImGuiLayer::End()
 	ImGui::End();
 
 	ImGuiIO& io = ImGui::GetIO();
-	Application& app = Application::Get();
+	const Application& app = Application::Get();
 	io.DisplaySize = ImVec2((float)app.GetWindow()->GetWidth(), (float)app.GetWindow()->GetHeight());
 
 	ImGui::Render();
@@ -248,5 +248,5 @@ void ImGuiLayer::SetBlackTheme()
 void ImGuiLayer::SetStyle()
 {
 	ImGuiStyle& style = ImGui::GetStyle();
-	style.FrameRounding = 5.f;
+	style.FrameRounding = 2.f;
 }

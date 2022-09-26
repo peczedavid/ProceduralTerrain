@@ -1,15 +1,18 @@
-#version 460 core
+#version 450 core
+precision highp float;
+
+#define PI 3.141592653589793238
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
 layout(rgba32f, binding = 0) uniform image2D u_H0k;
 layout(rgba32f, binding = 1) uniform image2D u_H0minusk;
 
-float rand(vec2 co){
+float rand(vec2 co)
+{
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-#define PI 3.141592653589793238
 
 int N = 256;
 int L = 1000;
@@ -27,11 +30,6 @@ vec4 gaussRND()
     float noise01 = clamp(rand(coords + vec2(64.3, 32.7)), 0.00001, 1.0);
     float noise02 = clamp(rand(coords + vec2(22.19, 63.2)), 0.00001, 1.0);
     float noise03 = clamp(rand(coords + vec2(11.31, 5.11)), 0.00001, 1.0);
-
-//    float noise00 = clamp(rand(coords + vec2(11, 17)), 0.00001, 1.0);
-//    float noise01 = clamp(rand(coords + vec2(3, 7)), 0.00001, 1.0);
-//    float noise02 = clamp(rand(coords + vec2(19, 2)), 0.00001, 1.0);
-//    float noise03 = clamp(rand(coords + vec2(31, 11)), 0.00001, 1.0);
 
     float u0 = 2.0 * PI * noise00;
     float v0 = sqrt(-2.0 * log(noise01));
@@ -69,6 +67,6 @@ void main()
     // red = real
     // green = im
     imageStore(u_H0k, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.xy * h0k, 0, 1));
-    //imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0minusk, 0, 1));
-    imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0k, 0, 1));
+    imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0minusk, 0, 1));
+    //imageStore(u_H0minusk, ivec2(gl_GlobalInvocationID.xy), vec4(gauss_random.zw * h0k, 0, 1));
 }

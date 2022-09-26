@@ -1,4 +1,5 @@
-#version 460 core
+#version 450 core
+precision highp float;
 
 layout (location = 0) in vec2 a_Position;
 layout (location = 1) in vec2 a_TexCoord;

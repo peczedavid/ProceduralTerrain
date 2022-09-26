@@ -6,7 +6,7 @@
 Skybox::Skybox(Ref<Shader> shader)
 	: m_Shader(shader)
 {
-	float vertices[27] =
+	constexpr float vertices[27] =
 	{
 		-1.0f, -1.0f,  1.0f, //       7--------6
 		 1.0f, -1.0f,  1.0f, //      /|       /|
@@ -18,7 +18,7 @@ Skybox::Skybox(Ref<Shader> shader)
 		-1.0f,  1.0f, -1.0f  //
 	};
 
-	uint32_t indices[36] =
+	constexpr uint32_t indices[36] =
 	{
 		// Right
 		1, 2, 6,
@@ -59,14 +59,8 @@ Skybox::Skybox(Ref<Shader> shader)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	std::string facesPath[6] =
+	constexpr const char* facesPath[6] =
 	{
-		/*"assets/Textures/Skybox/skybox_px.png",
-		"assets/Textures/Skybox/skybox_nx.png",
-		"assets/Textures/Skybox/skybox_py.png",
-		"assets/Textures/Skybox/skybox_ny.png",
-		"assets/Textures/Skybox/skybox_pz.png",
-		"assets/Textures/Skybox/skybox_nz.png",*/
 		"assets/Textures/Skybox/right.jpg",
 		"assets/Textures/Skybox/left.jpg",
 		"assets/Textures/Skybox/top.jpg",
@@ -86,7 +80,7 @@ Skybox::Skybox(Ref<Shader> shader)
 	for (uint32_t i = 0; i < 6; i++)
 	{
 		int width, height, colorCh;
-		unsigned char* bytes = stbi_load(facesPath[i].c_str(), &width, &height, &colorCh, 0);
+		unsigned char* bytes = stbi_load(facesPath[i], &width, &height, &colorCh, 0);
 		if (bytes)
 		{
 			stbi_set_flip_vertically_on_load(false);
@@ -105,7 +99,7 @@ Skybox::Skybox(Ref<Shader> shader)
 		}
 		else
 		{
-			printf("Failed to load in texture: %s", facesPath[0].c_str());
+			printf("Failed to load in texture: %s", facesPath[0]);
 			stbi_image_free(bytes);
 		}
 	}

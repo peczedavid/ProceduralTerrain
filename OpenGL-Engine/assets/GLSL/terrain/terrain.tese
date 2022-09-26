@@ -1,4 +1,5 @@
 #version 450 core
+precision highp float;
 
 layout (quads, fractional_odd_spacing, ccw) in;
 

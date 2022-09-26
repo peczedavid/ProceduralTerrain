@@ -37,8 +37,8 @@ void Application::Run()
 	while (!m_Window->ShouldClose())
 	{
 		static float lastFrameTime = 0.0f;
-		float time = (float)glfwGetTime();
-		float dt = time - lastFrameTime;
+		const float time = (float)glfwGetTime();
+		const float dt = time - lastFrameTime;
 		lastFrameTime = time;
 
 		// Update the layers from bottom to top
@@ -66,13 +66,10 @@ void Application::PushOverlay(Layer* overlay)
 	overlay->OnAttach();
 }
 
-void Application::OnResize(uint32_t width, uint32_t height)
+void Application::OnResize(const uint32_t width, const uint32_t height)
 {
 	m_Window->SetWidth(width);
 	m_Window->SetWidth(height);
-
-	for (Layer* layer : *m_LayerStack)
-		layer->OnResize(width, height);
 }
 
 void Application::OnScreenshot()

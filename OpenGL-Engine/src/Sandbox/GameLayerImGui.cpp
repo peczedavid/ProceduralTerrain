@@ -15,9 +15,9 @@ void GameLayerImGui::ViewportPanel()
 {
 	if (ImGui::Begin("Viewport"))
 	{
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		float my_tex_w = viewportPanelSize.x;
-		float my_tex_h = viewportPanelSize.y;
+		const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		const float my_tex_w = viewportPanelSize.x;
+		const float my_tex_h = viewportPanelSize.y;
 		if (m_GameLayer->m_ViewportSize.x != viewportPanelSize.x || m_GameLayer->m_ViewportSize.y != viewportPanelSize.y)
 		{
 			m_GameLayer->m_FrameBuffer->Resize(my_tex_w, my_tex_h);
@@ -27,8 +27,8 @@ void GameLayerImGui::ViewportPanel()
 		}
 		else
 		{
-			ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
-			ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
+			const ImVec2 uv_min(0.0f, 1.0f); // Top-left
+			const ImVec2 uv_max(1.0f, 0.0f); // Lower-right
 			ImGui::Image((ImTextureID)m_GameLayer->m_FrameBuffer->GetTextureId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
 		}
 	}
@@ -105,10 +105,21 @@ void GameLayerImGui::VendorInfoPanel()
 	static IDXGIFactory4* pFactory{};
 	static IDXGIAdapter3* adapter{};
 	static DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo{};
+	static GLubyte* vendor{};
+	static GLubyte* renderer{};
+	static GLubyte* version{};
+	static GLint majorVersion{}, minorVersion{};
 	if (firstRun)
 	{
 		CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)&pFactory);
 		pFactory->EnumAdapters(0, reinterpret_cast<IDXGIAdapter**>(&adapter));
+		vendor = (GLubyte*)glGetString(GL_VENDOR);
+		renderer = (GLubyte*)glGetString(GL_RENDERER);
+		version = (GLubyte*)glGetString(GL_VERSION);
+		glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+		glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
+		ASSERT(majorVersion >= 4, "OpenGL 4.5 or higher is supported!");
+		ASSERT(minorVersion >= 5, "OpenGL 4.5 or higher is supported!");
 		firstRun = false;
 	}
 	if (ImGui::Begin("Vendor info"))
@@ -116,13 +127,10 @@ void GameLayerImGui::VendorInfoPanel()
 		adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
 		const size_t usedVRAM = videoMemoryInfo.CurrentUsage / 1024 / 1024;
 		const size_t maxVRAM = videoMemoryInfo.Budget / 1024 / 1024;
-		ImGui::Text("Vendor: %s", glGetString(GL_VENDOR));
-		ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
-		ImGui::Text("Version: %s", glGetString(GL_VERSION));
-		int versionMajor, versionMinor;
-		glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
-		glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-		ImGui::Text("OpenGL %d.%d", versionMajor, versionMinor);
+		ImGui::Text("Vendor: %s", vendor);
+		ImGui::Text("Renderer: %s", renderer);
+		ImGui::Text("Version: %s", version);
+		ImGui::Text("OpenGL %d.%d", majorVersion, minorVersion);
 		ImGui::Text("VRAM: %d/%d MB", usedVRAM, maxVRAM);
 	}
 	ImGui::End();
@@ -130,8 +138,8 @@ void GameLayerImGui::VendorInfoPanel()
 
 void GameLayerImGui::DebugOverlayPanel()
 {
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+	const ImGuiIO& io = ImGui::GetIO();
+	const ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 	ImGui::SetNextWindowBgAlpha(0.3f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::Begin("Debug overaly", (bool*)1, window_flags);
@@ -228,30 +236,30 @@ void GameLayerImGui::ShadersPanel()
 
 void GameLayerImGui::DrawImage(uint32_t textureId, float my_tex_w, float my_tex_h)
 {
-	ImGuiIO& io = ImGui::GetIO();
-	ImTextureID my_tex_id = (ImTextureID)textureId;
+	const ImGuiIO& io = ImGui::GetIO();
+	const ImTextureID my_tex_id = (ImTextureID)textureId;
 	{
-		ImVec2 pos = ImGui::GetCursorScreenPos();
-		ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
-		ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
+		const ImVec2 pos = ImGui::GetCursorScreenPos();
+		const ImVec2 uv_min = ImVec2(0.0f, 1.0f); // Top-left
+		const ImVec2 uv_max = ImVec2(1.0f, 0.0f); // Lower-right
 		ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::BeginTooltip();
-			float region_sz = 32.0f;
+			const float region_sz = 32.0f;
 			float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
-			float region_y = io.MousePos.y - pos.y;
+			float region_y = my_tex_h - (io.MousePos.y - pos.y);
 			region_y = my_tex_h - region_y;
 			region_y = region_y - region_sz * 0.5f;
-			float zoom = 7.0f;
+			const float zoom = 7.0f;
 			if (region_x < 0.0f) { region_x = 0.0f; }
 			else if (region_x > my_tex_w - region_sz) { region_x = my_tex_w - region_sz; }
 			if (region_y < 0.0f) { region_y = 0.0f; }
 			else if (region_y > my_tex_h - region_sz) { region_y = my_tex_h - region_sz; }
 			ImGui::Text("Min: (%.2f, %.2f)", region_x, region_y);
 			ImGui::Text("Max: (%.2f, %.2f)", region_x + region_sz, region_y + region_sz);
-			ImVec2 uv0 = ImVec2((region_x) / my_tex_w, (region_y + region_sz) / my_tex_h);
-			ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y) / my_tex_h);
+			const ImVec2 uv0((region_x) / my_tex_w, (region_y + region_sz) / my_tex_h);
+			const ImVec2 uv1((region_x + region_sz) / my_tex_w, (region_y) / my_tex_h);
 			ImGui::Image(my_tex_id, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1);
 			ImGui::EndTooltip();
 		}

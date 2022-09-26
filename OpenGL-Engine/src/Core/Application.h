@@ -17,8 +17,9 @@ public:
 
 	static inline Application& Get() { return *s_Instance; }
 	inline Window* GetWindow() { return m_Window; }
+	const inline Window* GetWindow() const { return m_Window; }
 public:
-	void OnResize(uint32_t width, uint32_t height);
+	void OnResize(const uint32_t width, const uint32_t height);
 	void OnScreenshot();
 private:
 	LayerStack* m_LayerStack;
@@ -30,7 +31,7 @@ private:
 public:
 	inline bool IsCursor() { return m_Cursor; }
 	inline const bool IsCursor() const { return m_Cursor; }
-	inline void SetCursor(bool cursor) { m_Cursor = cursor; }
+	inline void SetCursor(const bool cursor) { m_Cursor = cursor; }
 };
 
 Application* CreateApplication();

@@ -15,8 +15,7 @@ std::string ReadFile(const char* fileName)
 		in.close();
 		return contents;
 	}
-	std::cout << "Error reading: " + std::string(fileName) << std::endl;
-	throw(errno);
+	ERROR("Error reading shader: {0}", fileName);
 }
 
 Shader::Shader(const std::vector<std::string>& shaderFiles, const std::string& outputName)
@@ -113,13 +112,13 @@ void Shader::Dispatch(const glm::uvec3& dimensions, GLenum barrier) const
 
 void Shader::TexUnit(const std::string& name, uint32_t slot) const
 {
-	uint32_t textureUnit = getUniformLocation(name);
+	const uint32_t textureUnit = getUniformLocation(name);
 	glUniform1i(textureUnit, slot);
 }
 
 void Shader::SetUniform(const std::string& name, int value) const
 {
-	GLint location = getUniformLocation(name);
+	const GLint location = getUniformLocation(name);
 	if (location >= 0)
 		glUniform1i(location, value);
 	else
@@ -128,7 +127,7 @@ void Shader::SetUniform(const std::string& name, int value) const
 
 void Shader::SetUniform(const std::string& name, float value) const
 {
-	GLint location = getUniformLocation(name);
+	const GLint location = getUniformLocation(name);
 	if (location >= 0)
 		glUniform1f(location, value);
 	else
@@ -137,7 +136,7 @@ void Shader::SetUniform(const std::string& name, float value) const
 
 void Shader::SetUniform(const std::string& name, uint32_t value) const
 {
-	GLint location = getUniformLocation(name);
+	const GLint location = getUniformLocation(name);
 	if (location >= 0)
 		glUniform1ui(location, value);
 	else
@@ -146,7 +145,7 @@ void Shader::SetUniform(const std::string& name, uint32_t value) const
 
 void Shader::SetUniform(const std::string& name, const glm::vec2& value) const
 {
-	GLint location = getUniformLocation(name);
+	const GLint location = getUniformLocation(name);
 	if (location >= 0)
 		glUniform2f(location, value.x, value.y);
 	else
@@ -155,7 +154,7 @@ void Shader::SetUniform(const std::string& name, const glm::vec2& value) const
 
 void Shader::SetUniform(const std::string& name, const glm::vec3& value) const
 {
-	GLint location = getUniformLocation(name);
+	const GLint location = getUniformLocation(name);
 	if (location >= 0)
 		glUniform3f(location, value.x, value.y, value.z);
 	else
@@ -164,7 +163,7 @@ void Shader::SetUniform(const std::string& name, const glm::vec3& value) const
 
 void Shader::SetUniform(const std::string& name, const glm::vec4& value) const
 {
-	GLint location = getUniformLocation(name);
+	const GLint location = getUniformLocation(name);
 	if (location >= 0)
 		glUniform4f(location, value.x, value.y, value.z, value.w);
 	else
@@ -173,7 +172,7 @@ void Shader::SetUniform(const std::string& name, const glm::vec4& value) const
 
 void Shader::SetUniform(const std::string& name, const glm::mat4& value) const
 {
-	GLint location = getUniformLocation(name);
+	const GLint location = getUniformLocation(name);
 	if (location >= 0)
 		glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
 	else
@@ -192,8 +191,7 @@ void Shader::CheckCompiled(GLuint shader) const
 		std::vector<GLchar> errorLog(maxLength);
 		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
 
-		for (uint32_t i = 0; i < maxLength; i++)
-			printf("%c", errorLog[i]);
+		ERROR("Failed to compile shader\n{0}", &errorLog[0]);
 
 		glDeleteShader(shader);
 	}
@@ -204,7 +202,7 @@ GLint Shader::getUniformLocation(const std::string& name) const
 	if (m_UniformCache.find(name) != m_UniformCache.end())
 		return m_UniformCache[name];
 
-	GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+	const GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
 	m_UniformCache[name] = location;
 	return location;
 }
@@ -271,6 +269,6 @@ void ShaderLibrary::Add(const std::string name, const Ref<Shader> shader)
 
 const Ref<Shader> ShaderLibrary::Get(const std::string& name)
 {
-	// throw error if doesn't exist
+	// TODO: throw error if doesn't exist
 	return m_Shaders[name];
 }

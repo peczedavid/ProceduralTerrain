@@ -51,7 +51,6 @@ Window::Window(const WindowProps& props)
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_SAMPLES, 4);
 	if(props.Maximized)
 		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 

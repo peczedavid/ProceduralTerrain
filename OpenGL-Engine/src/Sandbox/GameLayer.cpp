@@ -131,14 +131,14 @@ GameLayer::GameLayer()
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_CameraUBO, 0, 3 * sizeof(glm::mat4));
 }
 
-void GameLayer::OnUpdate(float dt)
+void GameLayer::OnUpdate(const float dt)
 {
 	RenderStart();
 
 	UpdateFPS(dt);
 
 	m_Time += dt;
-	float fov = 45.0f, nearPlane = 0.1f, farPlane = 3000.0f;
+	const float fov = 45.0f, const nearPlane = 0.1f, const farPlane = 3000.0f;
 
 	m_Camera->UpdateMatrix(fov, nearPlane, farPlane);
 	if (!Application::Get().IsCursor())
@@ -199,7 +199,7 @@ void GameLayer::OnUpdate(float dt)
 	RenderEnd();
 }
 
-void GameLayer::OnImGuiRender(float dt)
+void GameLayer::OnImGuiRender(const float dt)
 {
 	m_UI->ContolsPanel();
 	m_UI->NoisePanel();
@@ -221,8 +221,8 @@ void GameLayer::OnScreenshot()
 	glPixelStorei(GL_PACK_ALIGNMENT, 1); // OpenGL memory to RAM, 1 byte per color channel
 	glReadPixels(0, 0, m_ViewportSize.x, m_ViewportSize.y, GL_RGB, GL_UNSIGNED_BYTE, data);
 	FrameBuffer::Default();
-	std::time_t t = std::time(0);
-	std::tm* now = std::localtime(&t);
+	const std::time_t t = std::time(0);
+	const std::tm* now = std::localtime(&t);
 	std::ostringstream oss;
 	oss << "screenshots/"
 		<< (now->tm_year + 1900) << '-'
@@ -277,7 +277,7 @@ void GameLayer::GenerateTerrain()
 	{
 		for (int x = -1; x <= 1; x++)
 		{
-			int index = (z + 1) * 3 + (x + 1);
+			const int index = (z + 1) * 3 + (x + 1);
 			terrainComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * (int)planeSize, z * (int)planeSize));
 			m_HeightMaps[index]->BindImage();
 			terrainComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 16), ceil(planeSize / 16), 1));
@@ -285,7 +285,7 @@ void GameLayer::GenerateTerrain()
 	}
 }
 
-void GameLayer::UpdateFPS(float dt)
+void GameLayer::UpdateFPS(const float dt)
 {
 	static float lastFPSUpdate = 0.0f;
 	static float sumDt = 0.0f;

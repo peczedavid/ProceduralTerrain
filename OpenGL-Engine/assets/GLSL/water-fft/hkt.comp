@@ -1,4 +1,7 @@
-#version 460 core
+#version 450 core
+precision highp float;
+
+#define PI 3.141592653589793238
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
@@ -7,8 +10,6 @@ layout(rgba32f, binding = 1) uniform image2D u_Hkt_Dx;
 layout(rgba32f, binding = 2) uniform image2D u_Hkt_Dz;
 layout(rgba32f, binding = 3) uniform image2D u_H0k;
 layout(rgba32f, binding = 4) uniform image2D u_H0minusk;
-
-#define PI 3.141592653589793238
 
 const int L = 1000;
 

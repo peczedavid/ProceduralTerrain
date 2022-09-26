@@ -16,8 +16,8 @@ class GameLayer : public Layer
 public:
 	GameLayer();
 
-	void OnUpdate(float dt) override;
-	void OnImGuiRender(float dt) override;
+	void OnUpdate(const float dt) override;
+	void OnImGuiRender(const float dt) override;
 
 	void OnScreenshot() override;
 private:
@@ -25,7 +25,7 @@ private:
 	void RenderEnd();
 
 	void GenerateTerrain();
-	void UpdateFPS(float dt);
+	void UpdateFPS(const float dt);
 	void GenerateFFTTextures();
 	void FFTLoop();
 private:
