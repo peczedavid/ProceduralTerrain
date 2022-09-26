@@ -16,17 +16,20 @@
 //		 - precompiled header						DONE
 //		 - logging									DONE
 //		 - macros for logging, assert				DONE
-//		 - uniform buffer objects eg camera uniform 
+//		 - uniform buffer objects eg camera uniform DONE
 //       - Shader outColor not in constructor ->
-//       - variable length parameters
+//         variable length parameters
 // 
 //		 - scene system (switching between scenes)
+//		 - infinite grid CTRL+G toggle
+//		 - materials, pbr rendering?
 //       - object loading
 //		 - tree rendering
-//		 - screenshots in dist mode
 // 
+//		 - screenshots in dist mode
 //		 - profiling (maybe benchmark scene)
 //		 - trackball camera controls
+
 #include "pch.h"
 
 #include "Sandbox/GameLayer.h"
@@ -118,6 +121,14 @@ GameLayer::GameLayer()
 	GenerateFFTTextures();
 
 	m_UI = CreateScope<GameLayerImGui>(this);
+
+	glGenBuffers(1, &m_CameraUBO);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, m_CameraUBO);
+	glBufferData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_CameraUBO, 0, 3 * sizeof(glm::mat4));
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -133,19 +144,21 @@ void GameLayer::OnUpdate(float dt)
 	if (!Application::Get().IsCursor())
 		m_Camera->Update(dt);
 
-	auto terrainShader = m_ShaderLibrary.Get("Terrain shader");
-	terrainShader->Use();
-	terrainShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
+	glBindBuffer(GL_UNIFORM_BUFFER, m_CameraUBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetProj()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetMatrix()[0][0]);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	m_Skybox->Render(m_Camera);
 
-	static glm::mat4 model;
+	glm::mat4 model;
 
+	auto terrainShader = m_ShaderLibrary.Get("Terrain shader");
 	terrainShader->Use();
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
-	terrainShader->SetUniform("u_View", m_Camera->GetView());
 	terrainShader->SetUniform("u_FogGradient", m_FogGradient);
 	terrainShader->SetUniform("u_FogDensity", m_FogDensity);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
@@ -163,19 +176,18 @@ void GameLayer::OnUpdate(float dt)
 	}
 
 #if 0
-	m_WaterShader->Use();
+	auto waterShader = m_ShaderLibrary.Get("Water shader");
+	waterShader->Use();
 	m_WaterTexture->Bind(0);
-	m_WaterShader->SetUniform("u_ViewProj", m_Camera->GetMatrix());
-	m_WaterShader->SetUniform("u_View", m_Camera->GetView());
-	m_WaterShader->SetUniform("u_FogGradient", m_FogGradient);
-	m_WaterShader->SetUniform("u_FogDensity", m_FogDensity);
-	m_WaterShader->SetUniform("u_WaveA", m_WaveA);
-	m_WaterShader->SetUniform("u_WaveB", m_WaveB);
-	m_WaterShader->SetUniform("u_WaveC", m_WaveC);
-	m_WaterShader->SetUniform("u_Time", t);
-	m_WaterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);
+	waterShader->SetUniform("u_FogGradient", m_FogGradient);
+	waterShader->SetUniform("u_FogDensity", m_FogDensity);
+	waterShader->SetUniform("u_WaveA", m_WaveA);
+	waterShader->SetUniform("u_WaveB", m_WaveB);
+	waterShader->SetUniform("u_WaveC", m_WaveC);
+	waterShader->SetUniform("u_Time", t);
+	waterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
-	m_WaterShader->SetUniform("u_Model", model);
+	waterShader->SetUniform("u_Model", model);
 	m_WaterPlane->Render();
 #endif
 

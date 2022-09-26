@@ -121,8 +121,6 @@ void Skybox::Render(Ref<Camera> camera)
 	// The skybox is on the edge
 	glDepthFunc(GL_LEQUAL);
 	m_Shader->Use();
-	m_Shader->SetUniform("u_View", glm::mat4(glm::mat3(camera->GetView())));
-	m_Shader->SetUniform("u_Proj", camera->GetProj());
 
 	glBindVertexArray(m_Vao);
 	glActiveTexture(GL_TEXTURE0);

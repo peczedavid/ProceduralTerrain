@@ -2,11 +2,17 @@
 
 layout(vertices = 4) out;
 
+layout (std140, binding = 0) uniform CameraBufferObject
+{
+	mat4 View;
+	mat4 Proj;
+	mat4 ViewProj;
+} u_Camera;
+
 in vec2 v_TexCoords[];
 out vec2 v_UVsCoord[];
 
 uniform mat4 u_Model;
-uniform mat4 u_View;
 
 void main() {
   gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
@@ -18,10 +24,12 @@ void main() {
     const float MIN_DISTANCE = 200;
     const float MAX_DISTANCE = 1000;
 
-    vec4 eyeSpacePos00 = u_View * u_Model * gl_in[0].gl_Position;
-    vec4 eyeSpacePos01 = u_View * u_Model * gl_in[1].gl_Position;
-    vec4 eyeSpacePos10 = u_View * u_Model * gl_in[3].gl_Position;
-    vec4 eyeSpacePos11 = u_View * u_Model * gl_in[2].gl_Position;
+    mat4 transform = u_Camera.View * u_Model;
+
+    vec4 eyeSpacePos00 = transform * gl_in[0].gl_Position;
+    vec4 eyeSpacePos01 = transform * gl_in[1].gl_Position;
+    vec4 eyeSpacePos11 = transform * gl_in[2].gl_Position;
+    vec4 eyeSpacePos10 = transform * gl_in[3].gl_Position;
 
     float distance00 = clamp((abs(eyeSpacePos00.z) - MIN_DISTANCE) /
                                  (MAX_DISTANCE - MIN_DISTANCE),

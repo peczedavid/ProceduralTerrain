@@ -1,14 +1,18 @@
 #version 460 core
 
-layout(quads, fractional_odd_spacing, ccw) in;
-
 #define M_PI 3.1415926535897932384626433832795
 #define M_GRAVITY 9.81
 
-uniform mat4 u_Model;
-uniform mat4 u_View;
-uniform mat4 u_ViewProj;
+layout(quads, fractional_odd_spacing, ccw) in;
 
+layout (std140, binding = 0) uniform CameraBufferObject
+{
+	mat4 View;
+	mat4 Proj;
+	mat4 ViewProj;
+} u_Camera;
+
+uniform mat4 u_Model;
 
 in vec2 v_UVsCoord[];
 out vec3 v_WorldPos;
@@ -81,12 +85,12 @@ void main() {
   pos.xyz += GerstnerWave(u_WaveB, pos.xyz, tangent, binormal);
   pos.xyz += GerstnerWave(u_WaveC, pos.xyz, tangent, binormal);
 
-  gl_Position = u_ViewProj * u_Model * pos;
+  gl_Position = u_Camera.ViewProj * u_Model * pos;
   v_WorldPos = gl_Position.xyz;
   v_TexCoords = texCoord * 35.0;
   v_Normal = normalize(vec3(cross(binormal, tangent)));
 
-  float vertexDistance = length((u_View * u_Model * pos).xyz);
+  float vertexDistance = length((u_Camera.View * u_Model * pos).xyz);
   v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));
   v_Visibility = clamp(v_Visibility, 0.0, 1.0);
 }

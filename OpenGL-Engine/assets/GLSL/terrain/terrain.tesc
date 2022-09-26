@@ -1,12 +1,18 @@
 #version 460 core
 
-layout(vertices = 4) out;
+layout (vertices = 4) out;
+
+layout (std140, binding = 0) uniform CameraBufferObject
+{
+	mat4 View;
+	mat4 Proj;
+	mat4 ViewProj;
+} u_Camera;
 
 in vec2 v_TexCoords[];
 out vec2 v_UVsCoord[];
 
 uniform mat4 u_Model;
-uniform mat4 u_View;
 
 void main() {
   gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
@@ -18,7 +24,7 @@ void main() {
     const float MIN_DISTANCE = 100;
     const float MAX_DISTANCE = 750;
 
-    mat4 transform = u_View * u_Model;
+    mat4 transform = u_Camera.View * u_Model;
 
     vec4 eyeSpacePos00 = transform * gl_in[0].gl_Position;
     vec4 eyeSpacePos01 = transform * gl_in[1].gl_Position;

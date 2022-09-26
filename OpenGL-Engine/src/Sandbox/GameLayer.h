@@ -30,6 +30,7 @@ private:
 	void FFTLoop();
 private:
 	ShaderLibrary m_ShaderLibrary;
+	GLuint m_CameraUBO;
 
 	Ref<Plane> m_GroundPlane;
 	int m_TessLevel = 1;

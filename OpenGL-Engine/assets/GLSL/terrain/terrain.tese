@@ -1,10 +1,15 @@
-#version 460 core
+#version 450 core
 
-layout(quads, fractional_odd_spacing, ccw) in;
+layout (quads, fractional_odd_spacing, ccw) in;
+
+layout (std140, binding = 0) uniform CameraBufferObject
+{
+	mat4 View;
+	mat4 Proj;
+	mat4 ViewProj;
+} u_Camera;
 
 uniform mat4 u_Model;
-uniform mat4 u_ViewProj;
-uniform mat4 u_View;
 uniform float u_MaxLevel;
 
 uniform float u_FogDensity;
@@ -18,7 +23,8 @@ out float v_Height;
 out vec4 v_Normal;
 out float v_Visibility;
 
-void main() {
+void main()
+{
   float u = gl_TessCoord.x;
   float v = gl_TessCoord.y;
 
@@ -47,11 +53,11 @@ void main() {
   v_Height = vertexInfo.x;
   worldPos.y = v_Height * u_MaxLevel;
 
-  gl_Position = u_ViewProj * worldPos;
+  gl_Position = u_Camera.ViewProj * worldPos;
   v_Normal = normalize(vec4(-vertexInfo.y, 1.0, -vertexInfo.z, 0.0));
   v_TexCoords = worldPos.xz / 12.5;
 
-  float vertexDistance = length((u_View * worldPos).xyz);
+  float vertexDistance = length((u_Camera.View * worldPos).xyz);
   v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));
   v_Visibility = clamp(v_Visibility, 0.0, 1.0);
 }
