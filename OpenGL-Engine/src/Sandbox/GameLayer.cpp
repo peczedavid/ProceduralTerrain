@@ -17,8 +17,6 @@
 //		 - logging									DONE
 //		 - macros for logging, assert				DONE
 //		 - uniform buffer objects eg camera uniform DONE
-//       - Shader outColor not in constructor ->
-//         variable length parameters
 // 
 //		 - scene system (switching between scenes)
 //		 - infinite grid CTRL+G toggle

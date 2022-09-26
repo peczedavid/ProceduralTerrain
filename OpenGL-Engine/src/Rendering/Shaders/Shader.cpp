@@ -56,7 +56,7 @@ void Shader::Compile(const std::vector<std::string>& shaderFiles)
 	}
 
 	glLinkProgram(m_ProgramId);
-
+	CheckLinked();
 	glUseProgram(m_ProgramId);
 	ActivateTexUnits();
 }
@@ -98,6 +98,7 @@ void Shader::ReCompile()
 	}
 
 	glLinkProgram(m_ProgramId);
+	CheckLinked();
 	glUseProgram(m_ProgramId);
 	ActivateTexUnits();
 	glUseProgram(0);
@@ -179,7 +180,7 @@ void Shader::SetUniform(const std::string& name, const glm::mat4& value) const
 		WARN("Uniform {0} not found in shader!", name.c_str());
 }
 
-void Shader::CheckCompiled(GLuint shader) const
+void Shader::CheckCompiled(const GLuint shader) const
 {
 	GLint isCompiled = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
@@ -187,13 +188,28 @@ void Shader::CheckCompiled(GLuint shader) const
 	{
 		GLint maxLength = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-
 		std::vector<GLchar> errorLog(maxLength);
 		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
-
 		ERROR("Failed to compile shader\n{0}", &errorLog[0]);
 
 		glDeleteShader(shader);
+	}
+}
+
+void Shader::CheckLinked()
+{
+	GLint isLinked = 0;
+	glGetProgramiv(m_ProgramId, GL_LINK_STATUS, &isLinked);
+	if (isLinked == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetProgramiv(m_ProgramId, GL_INFO_LOG_LENGTH, &maxLength);
+		std::vector<GLchar> errorLog(maxLength);
+		glGetProgramInfoLog(m_ProgramId, maxLength, &maxLength, &errorLog[0]);
+		ERROR("Failed to link program\n{0}", &errorLog[0]);
+
+		glDeleteProgram(m_ProgramId);
+		m_ProgramId = 0;
 	}
 }
 

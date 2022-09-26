@@ -49,8 +49,8 @@ private:
 private:
     void Compile(const std::vector<std::string>& shaderFiles);
     void ActivateTexUnits();
-    void CheckCompiled(GLuint shader) const;
-    // TODO: Check linked function
+    void CheckCompiled(const GLuint shader) const;
+    void CheckLinked();
     GLint getUniformLocation(const std::string& name) const;
     GLenum GetShaderType(const std::string& path) const;
     GLenum GetSamplerType(const std::string& typeStr) const;
