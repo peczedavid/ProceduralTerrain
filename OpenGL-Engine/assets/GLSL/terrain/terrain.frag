@@ -24,7 +24,7 @@ void main()
 		// Diffuse lighting
 		float cost = dot(v_Normal, normalize(vec4(0.254, 0.341, 0.905, 0.0)));
 		// Ambient lighting
-		outColor.xyz *= clamp(cost, 0.15, 1.0);
+		outColor.xyz *= clamp(cost, 0.25, 1.0);
 		// Fog
 		outColor.rgb = mix(vec3(0.4, 0.5, 0.6), outColor.xyz, v_Visibility);
 	}

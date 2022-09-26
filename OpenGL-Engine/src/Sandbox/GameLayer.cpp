@@ -207,6 +207,9 @@ void GameLayer::OnUpdate(const float dt)
 	waterShader->SetUniform("u_FogGradient", m_FogGradient);
 	waterShader->SetUniform("u_FogDensity", m_FogDensity);
 	waterShader->SetUniform("u_Time", m_Time);
+	waterShader->SetUniform("u_Shininess", m_WaterShininess);
+	waterShader->SetUniform("u_Reflectivity", m_WaterReflectivity);
+	waterShader->SetUniform("u_CameraPos", m_Camera->GetPosition());
 	waterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
 	waterShader->SetUniform("u_Model", model);
