@@ -14,8 +14,8 @@
 //		 - reference								DONE
 // 
 //		 - precompiled header						DONE
-//		 - logging
-//		 - Core.h macros for logging, assert,...
+//		 - logging									DONE
+//		 - macros for logging, assert				DONE
 //		 - uniform buffer objects eg camera uniform 
 //       - Shader outColor not in constructor ->
 //       - variable length parameters

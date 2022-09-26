@@ -18,15 +18,6 @@ WinMain(
 	_In_ LPSTR lpCmdLine,
 	_In_ int nShowCmd)
 {
-#ifndef DIST_BUILD
-#pragma warning push
-#pragma warning(disable: 6031)
-	AllocConsole();
-	freopen("CONIN$", "r", stdin);
-	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);
-#pragma pop
-#endif
 	auto app = CreateApplication();
 	app->Run();
 	delete app;

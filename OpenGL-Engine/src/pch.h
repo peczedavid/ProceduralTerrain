@@ -22,12 +22,19 @@
 #include <random>
 #include <thread>
 
-// Vendors
+// Vendors start
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
+
 #include <stb_image.h>
 #include <stb_image_write.h>
+
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+// Vendors end
+
+#include "Core/Log.h"
 
 #include <Windows.h>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "Core/Log.h"
 
 template<typename T>
 using Scope = std::unique_ptr<T>;
@@ -19,3 +20,9 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 }
 
 #define CreateShaderRef(...) CreateRef<Shader>(std::vector<std::string>{##__VA_ARGS__})
+
+#ifdef ENABLE_ASSERTS
+#define ASSERT(x, ...) { if(!(x)) { ERROR("Assertion failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#else
+#define ASSERT(x, ...)
+#endif

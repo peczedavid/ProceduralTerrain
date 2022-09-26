@@ -1,12 +1,13 @@
 #include "pch.h"
 
+#include "Core/Core.h"
 #include "Core/Window.h"
 #include "Core/Application.h"
 #include "Rendering/Renderer.h"
 
 void error_callback(int error, const char* description)
 {
-	fprintf(stderr, "Error: %s\n", description);
+	ERROR("{0}", description);
 }
 
 void window_size_callback(GLFWwindow* window, int width, int height)
@@ -46,8 +47,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 Window::Window(const WindowProps& props)
 	: m_Width(props.Width), m_Height(props.Height)
 {
-	if (!glfwInit())
-		printf("Initialization failed!");
+	ASSERT(glfwInit(), "GLFW Initialization failed!");
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -56,8 +56,7 @@ Window::Window(const WindowProps& props)
 		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
 	m_Window = glfwCreateWindow(props.Width, props.Height, props.Title.c_str(), NULL, NULL);
-	if (!m_Window)
-		printf("Window or OpenGL context creation failed!");
+	ASSERT(m_Window, "Window creation failed!");
 
 	if (!props.Maximized)
 	{
@@ -75,7 +74,7 @@ Window::Window(const WindowProps& props)
 	}
 
 	glfwMakeContextCurrent(m_Window);
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "OpenGL context creation failed!");
 
 	m_VSync = true;
 	glfwSwapInterval(m_VSync ? 1 : 0);

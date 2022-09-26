@@ -8,16 +8,22 @@ Application* Application::s_Instance = nullptr;
 Application::Application(const WindowProps& props)
 	: m_Cursor(false)
 {
-	m_Window = new Window(props);
-	m_Window->SetCursor(m_Cursor);
 	s_Instance = this;
+	Log::Initialize();
+
+	m_Window = new Window(props);
+	TRACE("Created window");
+	m_Window->SetCursor(m_Cursor);
 
 	Renderer::Initialize();
-	
+	TRACE("Initialized renderer");
+
 	m_LayerStack = new LayerStack();
+	TRACE("Created LayerStack");
 
 	m_ImGuiLayer = new ImGuiLayer();
 	this->PushOverlay(m_ImGuiLayer);
+	TRACE("Created ImGuiLayer");
 }
 
 Application::~Application()

@@ -9,6 +9,7 @@ public:
 	Sandbox(const WindowProps& props)
 		: Application(props)
 	{
+		TRACE("Pushing GameLayer");
 		this->PushLayer(new GameLayer());
 	}
 
