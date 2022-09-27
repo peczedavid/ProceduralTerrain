@@ -57,6 +57,7 @@ void GameLayerImGui::LandscapePanel()
 		ImGui::SliderFloat("FogGradient", &m_GameLayer->m_FogGradient, 0.0f, 5.f);
 		ImGui::SliderFloat("FogDensity", &m_GameLayer->m_FogDensity, 0.0f, 0.01f);
 		ImGui::Checkbox("Normals", &m_GameLayer->m_TerrainNormals);
+		ImGui::Checkbox("Shade", &m_GameLayer->m_ShadeTerrain);
 	}
 	ImGui::End();
 }

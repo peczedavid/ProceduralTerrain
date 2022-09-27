@@ -27,7 +27,7 @@ vec4 shade() {
 	waterColor.rgb += specularHighlight;
 
 	pixelColor.rgb = mix(vec3(0.4, 0.5, 0.6), waterColor, v_Visibility);
-	pixelColor.a = 0.6;
+	pixelColor.a = 0.575;
 	
 	return pixelColor;
 }

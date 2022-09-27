@@ -36,6 +36,7 @@ private:
 	int m_TessLevel = 1;
 	float m_MaxHeight = 87.0f;
 	bool m_TerrainNormals = false;
+	bool m_ShadeTerrain = true;
 
 	std::vector<Ref<Texture2D>> m_HeightMaps;
 

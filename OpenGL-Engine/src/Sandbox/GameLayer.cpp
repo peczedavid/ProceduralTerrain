@@ -187,6 +187,7 @@ void GameLayer::OnUpdate(const float dt)
 	terrainShader->SetUniform("u_FogGradient", m_FogGradient);
 	terrainShader->SetUniform("u_FogDensity", m_FogDensity);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
+	terrainShader->SetUniform("u_Shade", m_ShadeTerrain ? 1 : 0);
 
 	for (int z = -1; z <= 1; z++)
 	{
@@ -201,6 +202,7 @@ void GameLayer::OnUpdate(const float dt)
 	}
 
 #if 1
+	glDepthMask(GL_FALSE);
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
 	waterShader->Use();
 	m_WaterTexture->Bind(0);
@@ -214,6 +216,7 @@ void GameLayer::OnUpdate(const float dt)
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
 	waterShader->SetUniform("u_Model", model);
 	m_WaterPlane->Render();
+	glDepthMask(GL_TRUE);
 #endif
 
 	if (Renderer::DebugView)

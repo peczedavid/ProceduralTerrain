@@ -97,7 +97,7 @@ void main() {
     v_WorldPos = u_Model * pos;
     gl_Position = u_Camera.ViewProj * v_WorldPos;
     v_TexCoords = texCoord * 75.0;
-    v_Normal = normalize(vec3(cross(binormal, tangent)));
+    v_Normal = normalize(cross(binormal, tangent));
     
     const float vertexDistance = length((u_Camera.View * v_WorldPos).xyz);
     v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));

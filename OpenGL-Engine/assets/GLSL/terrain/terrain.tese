@@ -19,46 +19,47 @@ uniform float u_FogGradient;
 uniform sampler2D u_NoiseTexture;
 
 in vec2 v_UVsCoord[];
-out vec2 v_TexCoords;
-out float v_Height;
+
 out vec4 v_Normal;
+out vec2 v_TexCoords;
 out float v_Visibility;
 
 void main()
 {
-  float u = gl_TessCoord.x;
-  float v = gl_TessCoord.y;
-
-  vec2 uv0 = v_UVsCoord[0];
-  vec2 uv1 = v_UVsCoord[1];
-  vec2 uv2 = v_UVsCoord[2];
-  vec2 uv3 = v_UVsCoord[3];
-
-  vec2 leftUV = uv0 + v * (uv3 - uv0);
-  vec2 rightUV = uv1 + v * (uv2 - uv1);
-  vec2 texCoord = leftUV + u * (rightUV - leftUV);
-
-  vec4 pos0 = gl_in[0].gl_Position;
-  vec4 pos1 = gl_in[1].gl_Position;
-  vec4 pos2 = gl_in[2].gl_Position;
-  vec4 pos3 = gl_in[3].gl_Position;
-
-  vec4 leftPos = pos0 + v * (pos3 - pos0);
-  vec4 rightPos = pos1 + v * (pos2 - pos1);
-  vec4 pos = leftPos + u * (rightPos - leftPos);
-  vec4 worldPos = u_Model * pos;
-  
-  if(texCoord.x < 0) texCoord.x = 1 - texCoord.x;
-  texCoord.y = 1 - texCoord.y;
-  vec3 vertexInfo = texture(u_NoiseTexture, texCoord).xyz;
-  v_Height = vertexInfo.x;
-  worldPos.y = v_Height * u_MaxLevel;
-
-  gl_Position = u_Camera.ViewProj * worldPos;
-  v_Normal = normalize(vec4(-vertexInfo.y, 1.0, -vertexInfo.z, 0.0));
-  v_TexCoords = worldPos.xz / 12.5;
-
-  float vertexDistance = length((u_Camera.View * worldPos).xyz);
-  v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));
-  v_Visibility = clamp(v_Visibility, 0.0, 1.0);
+	const float u = gl_TessCoord.x;
+	const float v = gl_TessCoord.y;
+	
+	const vec2 uv0 = v_UVsCoord[0];
+	const vec2 uv1 = v_UVsCoord[1];
+	const vec2 uv2 = v_UVsCoord[2];
+	const vec2 uv3 = v_UVsCoord[3];
+	
+	const vec2 leftUV = uv0 + v * (uv3 - uv0);
+	const vec2 rightUV = uv1 + v * (uv2 - uv1);
+	vec2 texCoord = leftUV + u * (rightUV - leftUV);
+	
+	const vec4 pos0 = gl_in[0].gl_Position;
+	const vec4 pos1 = gl_in[1].gl_Position;
+	const vec4 pos2 = gl_in[2].gl_Position;
+	const vec4 pos3 = gl_in[3].gl_Position;
+	
+	const vec4 leftPos = pos0 + v * (pos3 - pos0);
+	const vec4 rightPos = pos1 + v * (pos2 - pos1);
+	vec4 pos = leftPos + u * (rightPos - leftPos);
+	vec4 worldPos = u_Model * pos;
+	
+	if(texCoord.x < 0) texCoord.x = 1 - texCoord.x;
+	texCoord.y = 1 - texCoord.y;
+	const vec3 vertexInfo = texture(u_NoiseTexture, texCoord).xyz;
+	worldPos.y = vertexInfo.x * u_MaxLevel;
+	
+	gl_Position = u_Camera.ViewProj * worldPos;
+	vec4 normal = vec4(-vertexInfo.y, 1.0, -vertexInfo.z, 0.0);
+	//normal.y /= worldPos.y;
+	v_Normal = normalize(normal);
+	v_TexCoords = worldPos.xz / 12.5;
+	
+	const float vertexDistance = length((u_Camera.View * worldPos).xyz);
+	v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));
+	v_Visibility = clamp(v_Visibility, 0.0, 1.0);
 }
