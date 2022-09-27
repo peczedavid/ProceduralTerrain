@@ -202,7 +202,6 @@ void GameLayer::OnUpdate(const float dt)
 	}
 
 #if 1
-	glDepthMask(GL_FALSE);
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
 	waterShader->Use();
 	m_WaterTexture->Bind(0);
@@ -216,7 +215,6 @@ void GameLayer::OnUpdate(const float dt)
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
 	waterShader->SetUniform("u_Model", model);
 	m_WaterPlane->Render();
-	glDepthMask(GL_TRUE);
 #endif
 
 	if (Renderer::DebugView)
