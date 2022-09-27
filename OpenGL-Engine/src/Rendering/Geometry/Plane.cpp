@@ -64,11 +64,11 @@ void Plane::GenerateMesh(uint32_t width, uint32_t div)
 		}
 	}
 
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(uint32_t), &m_Indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(uint16_t), &m_Indices[0], GL_STATIC_DRAW);
 }
 
 void Plane::Render()
 {
 	glBindVertexArray(m_Vao);
-	glDrawElements(GL_PATCHES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_PATCHES, m_Indices.size(), GL_UNSIGNED_SHORT, 0);
 }

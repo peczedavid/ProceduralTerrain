@@ -15,5 +15,5 @@ public:
 private:
 	uint32_t m_Vao, m_Vbo, m_Ebo;
 	std::vector<GLfloat> m_Vertices;
-	std::vector<GLuint> m_Indices;
+	std::vector<uint16_t> m_Indices;
 };
