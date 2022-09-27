@@ -10,19 +10,19 @@ Texture2D::Texture2D(const char* path, GLenum filter, GLenum wrap, GLenum intern
 	unsigned char* bytes = stbi_load(path, &width, &height, &colorCh, 0);
 	m_Width = width;
 	m_Height = height;
-	m_ColorChannels = colorCh;
 
-	glGenTextures(1, &m_Id);
-	glActiveTexture(GL_TEXTURE0);
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_Id);
 	glBindTexture(GL_TEXTURE_2D, m_Id);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+	const GLenum minFilter = filter == GL_LINEAR ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR_MIPMAP_NEAREST;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, format, pixelType, bytes);
-	glGenerateMipmap(m_Id);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
 	stbi_image_free(bytes);
 }
 
@@ -31,10 +31,12 @@ Texture2D::Texture2D(uint32_t width, uint32_t height, GLenum filter, GLenum wrap
 {
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_Id);
 	glBindTexture(GL_TEXTURE_2D, m_Id);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+
 	glTextureStorage2D(m_Id, 1, internalFormat, m_Width, m_Height);
 }
 

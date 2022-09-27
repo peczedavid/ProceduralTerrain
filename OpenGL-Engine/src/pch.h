@@ -23,6 +23,7 @@
 #include <thread>
 
 // Vendors start
+#define GLM_FORCE_SIMD_AVX2
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>

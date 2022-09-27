@@ -55,11 +55,11 @@ private:
 	Ref<Texture2D> m_WaterTexture;
 	float m_WaterLevel = 25.0f;
 	std::vector<glm::vec4> m_Waves;
-	std::vector<glm::vec4> m_WavesInitial;
+	std::vector<glm::vec4> m_WavesInitial	;
 	GLuint m_WavesUBO;
-	const size_t m_WavesCount = 8;
-	float m_WaterShininess = 185.0f, m_WaterReflectivity = 0.75f;
-	float m_SteepnessDropoff = 0.5f, m_WavelengthDropoff = 0.275f;
+	const size_t m_WavesCount = 16;
+	float m_WaterShininess = 140.0f, m_WaterReflectivity = 1.05f;
+	float m_SteepnessDropoff = 0.496f, m_WavelengthDropoff = 0.138f;
 	bool m_WaterNormals = false;
 
 	Ref<FrameBuffer> m_FrameBuffer;

@@ -16,7 +16,7 @@ public:
 	void BindImage(uint32_t slot = 0u, GLenum access = GL_READ_WRITE);
 private:
 	uint32_t m_Id;
-	uint32_t m_Width, m_Height, m_ColorChannels;
+	uint32_t m_Width, m_Height;
 	uint32_t m_InternalFormat;
 
 public:
@@ -27,8 +27,6 @@ public:
 	inline const uint32_t GetWidth() const { return m_Width; }
 	inline uint32_t GetHeight() { return m_Height; }
 	inline const uint32_t GetHeight() const { return m_Height; }
-	inline uint32_t ColorChannels() { return m_ColorChannels; }
-	inline const uint32_t ColorChannels() const { return m_ColorChannels; }
 
 	inline uint32_t GetInternalFormat() { return m_InternalFormat; }
 	inline const uint32_t GetInternalFormat() const { return m_InternalFormat; }

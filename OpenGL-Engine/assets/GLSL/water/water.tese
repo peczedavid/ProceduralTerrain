@@ -3,7 +3,7 @@ precision highp float;
 
 #define M_PI 3.1415926535897932384626433832795
 #define M_GRAVITY 9.81
-#define WAVES_COUNT 8
+#define WAVES_COUNT 16
 
 layout(quads, fractional_odd_spacing, ccw) in;
 
@@ -96,7 +96,7 @@ void main() {
     
     v_WorldPos = u_Model * pos;
     gl_Position = u_Camera.ViewProj * v_WorldPos;
-    v_TexCoords = texCoord * 35.0;
+    v_TexCoords = texCoord * 75.0;
     v_Normal = normalize(vec3(cross(binormal, tangent)));
     
     const float vertexDistance = length((u_Camera.View * v_WorldPos).xyz);

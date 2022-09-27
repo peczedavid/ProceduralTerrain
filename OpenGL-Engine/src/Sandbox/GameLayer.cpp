@@ -45,7 +45,7 @@ constexpr uint32_t planeDivision = 25u;
 constexpr uint32_t waterPlaneSize = 1024;
 constexpr uint32_t waterPlaneDivision = 25u;
 
-float Random(float max, float min)
+float Random(float max = 1.0f, float min = 0.0f)
 {
 	return min + static_cast<float>(rand()) / static_cast<float>(RAND_MAX / (max - min));
 }
@@ -106,7 +106,7 @@ GameLayer::GameLayer()
 			m_HeightMaps.push_back(CreateRef<Texture2D>(planeSize, planeSize, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F));
 
 	GenerateTerrain();
-
+	
 	//m_ShaderLibrary.Add("H0 compute shader", CreateShaderRef("assets/GLSL/water-fft/h0.comp"));
 	//m_ShaderLibrary.Add("Hkt compute shader", CreateShaderRef("assets/GLSL/water-fft/hkt.comp"));
 	//m_ShaderLibrary.Add("Twiddle shader", CreateShaderRef("assets/GLSL/water-fft/twiddle.comp"));
@@ -148,9 +148,9 @@ GameLayer::GameLayer()
 	m_Waves.resize(m_WavesCount);
 	for (size_t i = 0; i < m_WavesCount; i++)
 	{
-		const float steepness = Random(0.15f, 0.05f) / (i + 1);
-		const float wavelength = Random(65.0f, 50.f) / (i + 1);
-		m_WavesInitial[i] = glm::vec4(Random(1.0f, 0.0f), Random(1.0f, 0.0f), steepness, wavelength);
+		const float steepness = Random(0.20f, 0.05f) / (i + 1);
+		const float wavelength = Random(65.0f, 45.f) / (i + 1);
+		m_WavesInitial[i] = glm::vec4(Random(1.0f), Random(1.0f), steepness, wavelength);
 		glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::vec4), sizeof(glm::vec4), &m_WavesInitial[i][0]);
 	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);

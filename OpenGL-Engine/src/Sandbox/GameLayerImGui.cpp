@@ -68,14 +68,14 @@ void GameLayerImGui::WaterPanel()
 		ImGui::SliderFloat("Level", &m_GameLayer->m_WaterLevel, -50.0f, 100.0f);
 		ImGui::SliderFloat("Steepness dropoff", &m_GameLayer->m_SteepnessDropoff, 0.01f, 5.0f);
 		ImGui::SliderFloat("Wavelength dropoff", &m_GameLayer->m_WavelengthDropoff, 0.01f, 5.0f);
-		ImGui::SliderFloat("Shininess", &m_GameLayer->m_WaterShininess, 10.0f, 300.0f);
-		ImGui::SliderFloat("Reflectivity", &m_GameLayer->m_WaterReflectivity, 0.001f, 1.5f);
+		ImGui::SliderFloat("Shininess", &m_GameLayer->m_WaterShininess, 10.0f, 600.f);
+		ImGui::SliderFloat("Reflectivity", &m_GameLayer->m_WaterReflectivity, 0.001f, 5.0f);
 		ImGui::Checkbox("Normals", &m_GameLayer->m_WaterNormals);
 		glBindBuffer(GL_UNIFORM_BUFFER, m_GameLayer->m_WavesUBO);
 		for (size_t i = 0; i < m_GameLayer->m_WavesCount; i++)
 		{
-			const float steepness = m_GameLayer->m_WavesInitial[i].z * m_GameLayer->m_SteepnessDropoff;
-			const float wavelength = m_GameLayer->m_WavesInitial[i].w * m_GameLayer->m_WavelengthDropoff;
+			const float steepness = std::max(m_GameLayer->m_WavesInitial[i].z * (m_GameLayer->m_SteepnessDropoff * i), 0.0001f);// m_GameLayer->m_SteepnessDropoff;
+			const float wavelength = std::max(m_GameLayer->m_WavesInitial[i].w * (m_GameLayer->m_WavelengthDropoff * i), 0.0001f);// m_GameLayer->m_WavelengthDropoff;
 			m_GameLayer->m_Waves[i] = glm::vec4(m_GameLayer->m_WavesInitial[i].x, m_GameLayer->m_WavesInitial[i].y, steepness, wavelength);
 			glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::vec4), sizeof(glm::vec4), &m_GameLayer->m_Waves[i][0]);
 		}
