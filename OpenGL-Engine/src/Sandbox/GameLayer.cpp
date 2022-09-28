@@ -151,7 +151,7 @@ GameLayer::GameLayer()
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, 2, m_EnviromentUBO, 0, enviromentUBOSize);
 
-	m_TestModel = CreateRef<Model>("");
+	m_TestModel = CreateRef<Model>("assets/Models/teapot.obj");
 }
 
 void GameLayer::OnUpdate(const float dt)
