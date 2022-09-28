@@ -18,12 +18,14 @@
 //		 - macros for logging, assert				DONE
 //		 - uniform buffer objects eg camera uniform DONE
 // 
-//		 - nice gerstner waves
+//		 - don't pass shared_ptr -> pass by
+//		   reference .get() return value
+//       - object loading
 // 
+//		 - nice gerstner waves
 //		 - scene system (switching between scenes)
 //		 - infinite grid CTRL+G toggle
 //		 - materials, pbr rendering?
-//       - object loading
 //		 - tree rendering
 // 
 //		 - screenshots in dist mode
