@@ -1,6 +1,15 @@
 #version 450 core
 precision highp float;
 
+layout (std140, binding = 2) uniform EnviromentBuffer
+{
+	vec4 SunDirection;
+	vec4 FogColor;
+	float FogDensity;
+	float FogGradient;
+	float Time;
+} u_Enviroment;
+
 out vec4 outColor;
 
 in vec4 v_Normal;
@@ -25,13 +34,13 @@ void main()
 		if(u_Shade == 1)
 		{
 			// Diffuse lighting
-			const float cost = dot(v_Normal, normalize(vec4(0.254, 0.341, 0.905, 0.0)));
+			const float cost = dot(v_Normal, normalize(u_Enviroment.SunDirection));
 			// Ambient lighting
 			outColor.xyz *= clamp(cost, 0.25, 1.0);
 		}
 		
 		// Fog
-		outColor.rgb = mix(vec3(0.4, 0.5, 0.6), outColor.xyz, v_Visibility);
+		outColor = mix(u_Enviroment.FogColor, outColor, v_Visibility);
 	}
 	else
 	{
@@ -40,7 +49,7 @@ void main()
 		if(u_Shade == 1)
 		{
 			// Diffuse lighting
-			const float cost = dot(v_Normal, normalize(vec4(0.254, 0.341, 0.905, 0.0)));
+			const float cost = dot(v_Normal, normalize(u_Enviroment.SunDirection));
 			// Ambient lighting
 			outColor.xyz *= clamp(cost, 0.25, 1.0);
 		}

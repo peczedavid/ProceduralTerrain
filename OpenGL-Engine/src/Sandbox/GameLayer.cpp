@@ -66,6 +66,11 @@ GameLayer::GameLayer()
 		"assets/GLSL/water/water.frag"));
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
+	m_ShaderLibrary.Add("Basic shader", CreateShaderRef(
+		"assets/GLSL/default.vert",
+		"assets/GLSL/default.frag"
+	));
+
 	m_GroundPlane = CreateRef<Plane>(planeSize, planeDivision);
 	m_WaterPlane = CreateRef<Plane>(waterPlaneSize, waterPlaneDivision);
 
@@ -85,6 +90,7 @@ GameLayer::GameLayer()
 	m_GroundTexture = CreateRef<Texture2D>("assets/Textures/ground-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_RockTexture = CreateRef<Texture2D>("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_WaterTexture = CreateRef<Texture2D>("assets/Textures/water-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_UVTexture = CreateRef<Texture2D>("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 
 	m_FrameBuffer = CreateRef<FrameBuffer>(1, 1);
 	m_ShaderLibrary.Add("Post-process shader", CreateShaderRef(
@@ -106,24 +112,6 @@ GameLayer::GameLayer()
 			m_HeightMaps.push_back(CreateRef<Texture2D>(planeSize, planeSize, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA32F));
 
 	GenerateTerrain();
-	
-	//m_ShaderLibrary.Add("H0 compute shader", CreateShaderRef("assets/GLSL/water-fft/h0.comp"));
-	//m_ShaderLibrary.Add("Hkt compute shader", CreateShaderRef("assets/GLSL/water-fft/hkt.comp"));
-	//m_ShaderLibrary.Add("Twiddle shader", CreateShaderRef("assets/GLSL/water-fft/twiddle.comp"));
-	//m_ShaderLibrary.Add("Butterfly shader", CreateShaderRef("assets/GLSL/water-fft/butterfly.comp"));
-	//m_ShaderLibrary.Add("Copy compute shader", CreateShaderRef("assets/GLSL/water-fft/copy.comp"));
-	//m_ShaderLibrary.Add("Inversion shader", CreateShaderRef("assets/GLSL/water-fft/inversion.comp"));
-	//m_H0k = CreateRef<Texture2D>(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	//m_H0minusk = CreateRef<Texture2D>(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	//m_HtDy = CreateRef<Texture2D>(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	//m_HtDx = CreateRef<Texture2D>(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	//m_HtDz = CreateRef<Texture2D>(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	//m_TwiddleTexture = CreateRef<Texture2D>(8, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	//m_PingPong0 = CreateRef<Texture2D>(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	//m_PingPong1 = CreateRef<Texture2D>(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-	//m_Displacement = CreateRef<Texture2D>(FFTResoltion, FFTResoltion, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA32F);
-
-	//GenerateFFTTextures();
 
 	m_UI = CreateScope<GameLayerImGui>(this);
 
@@ -154,6 +142,16 @@ GameLayer::GameLayer()
 		glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::vec4), sizeof(glm::vec4), &m_WavesInitial[i][0]);
 	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glGenBuffers(1, &m_EnviromentUBO);
+	constexpr size_t enviromentUBOSize = 2 * sizeof(glm::vec4) + sizeof(glm::vec2) + sizeof(float);
+	glBindBuffer(GL_UNIFORM_BUFFER, m_EnviromentUBO);
+	glBufferData(GL_UNIFORM_BUFFER, enviromentUBOSize, NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBufferRange(GL_UNIFORM_BUFFER, 2, m_EnviromentUBO, 0, enviromentUBOSize);
+
+	m_TestModel = CreateRef<Model>("");
 }
 
 void GameLayer::OnUpdate(const float dt)
@@ -169,23 +167,19 @@ void GameLayer::OnUpdate(const float dt)
 	if (!Application::Get().IsCursor())
 		m_Camera->Update(dt);
 
-	glBindBuffer(GL_UNIFORM_BUFFER, m_CameraUBO);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetProj()[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetMatrix()[0][0]);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	SetUniformBuffers();
 
 	m_Skybox->Render(m_Camera);
 
 	glm::mat4 model;
 
+#if 1
 	auto terrainShader = m_ShaderLibrary.Get("Terrain shader");
 	terrainShader->Use();
 	m_GroundTexture->Bind(1);
 	m_RockTexture->Bind(2);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
-	terrainShader->SetUniform("u_FogGradient", m_FogGradient);
-	terrainShader->SetUniform("u_FogDensity", m_FogDensity);
+	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
 	terrainShader->SetUniform("u_Shade", m_ShadeTerrain ? 1 : 0);
 
@@ -200,14 +194,19 @@ void GameLayer::OnUpdate(const float dt)
 			m_GroundPlane->Render();
 		}
 	}
+#endif
+
+	auto basicShader = m_ShaderLibrary.Get("Basic shader");
+	basicShader->Use();
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 50.0f, -50.0f));
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 15.0f);
+	basicShader->SetUniform("u_Model", model);
+	m_TestModel->Draw(basicShader);
 
 #if 1
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
 	waterShader->Use();
 	m_WaterTexture->Bind(0);
-	waterShader->SetUniform("u_FogGradient", m_FogGradient);
-	waterShader->SetUniform("u_FogDensity", m_FogDensity);
-	waterShader->SetUniform("u_Time", m_Time);
 	waterShader->SetUniform("u_Shininess", m_WaterShininess);
 	waterShader->SetUniform("u_Reflectivity", m_WaterReflectivity);
 	waterShader->SetUniform("u_CameraPos", m_Camera->GetPosition());
@@ -236,6 +235,7 @@ void GameLayer::OnImGuiRender(const float dt)
 	m_UI->VendorInfoPanel();
 	//m_UI->FFTPanel();
 	m_UI->GraphicsSettingsPanel();
+	m_UI->EnviromentPanel();
 	m_UI->ShadersPanel();
 	if (Renderer::DebugView) m_UI->DebugOverlayPanel();
 }
@@ -289,6 +289,34 @@ void GameLayer::RenderEnd()
 #endif
 }
 
+void GameLayer::SetUniformBuffers()
+{
+	glBindBuffer(GL_UNIFORM_BUFFER, m_CameraUBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetProj()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetMatrix()[0][0]);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, m_WavesUBO);
+	for (size_t i = 0; i < m_WavesCount; i++)
+	{
+		const float steepness = std::max(m_WavesInitial[i].z * (m_SteepnessDropoff * i), 0.0001f);
+		const float wavelength = std::max(m_WavesInitial[i].w * (m_WavelengthDropoff * i), 0.0001f);
+		m_Waves[i] = glm::vec4(m_WavesInitial[i].x, m_WavesInitial[i].y, steepness, wavelength);
+		glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::vec4), sizeof(glm::vec4), &m_Waves[i][0]);
+	}
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, m_EnviromentUBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * 0, sizeof(float) * 4, &m_SunDirection[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * 4, sizeof(float) * 4, &m_FogColor[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * 8, sizeof(float) * 1, &m_FogData[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * 9, sizeof(float) * 1, &m_FogData[1]);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * 10, sizeof(float) * 1, &m_Time);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 void GameLayer::GenerateTerrain()
 {
 	auto terrainComputeShader = m_ShaderLibrary.Get("Terrain compute shader");
@@ -337,72 +365,4 @@ void GameLayer::UpdateFPS(const float dt)
 		auto result = std::max_element(samples.begin(), samples.end());
 		Renderer::FPSPool.SetMax(samples.at(std::distance(samples.begin(), result)));
 	}
-}
-
-void GameLayer::GenerateFFTTextures()
-{
-	auto h0computeShader = m_ShaderLibrary.Get("H0 compute shader");
-	h0computeShader->Use();
-	m_H0k->BindImage(0);
-	m_H0minusk->BindImage(1);
-	h0computeShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
-
-	auto twiddleShader = m_ShaderLibrary.Get("Twiddle shader");
-	twiddleShader->Use();
-	m_TwiddleTexture->BindImage(0);
-	twiddleShader->Dispatch(glm::uvec3(8, ceil(FFTResoltion / 16), 1));
-}
-
-void GameLayer::FFTLoop()
-{
-	auto hktComputeShader = m_ShaderLibrary.Get("Hkt compute shader");
-	hktComputeShader->Use();
-	m_HtDy->BindImage(0);
-	m_HtDx->BindImage(1);
-	m_HtDz->BindImage(2);
-	m_H0k->BindImage(3);
-	m_H0minusk->BindImage(4);
-	hktComputeShader->SetUniform("u_Time", m_Time);
-	hktComputeShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
-
-	auto copyShader = m_ShaderLibrary.Get("Copy compute shader");
-	auto butterflyShader = m_ShaderLibrary.Get("Butterfly shader");
-	copyShader->Use();
-	m_HtDy->BindImage(0);
-	m_PingPong0->BindImage(1);
-	copyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
-	butterflyShader->Use();
-	m_TwiddleTexture->BindImage(0);
-	m_PingPong0->BindImage(1);
-	m_PingPong1->BindImage(2);
-
-	int pingpong = 0;
-
-	butterflyShader->SetUniform("u_Direction", 0);
-	for (int i = 0; i < log2(FFTResoltion); i++)
-	{
-		butterflyShader->SetUniform("u_Stage", i);
-		butterflyShader->SetUniform("u_PingPong", pingpong);
-		butterflyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
-		pingpong++;
-		pingpong = pingpong % 2;
-	}
-
-	butterflyShader->SetUniform("u_Direction", 1);
-	for (int i = 0; i < log2(FFTResoltion); i++)
-	{
-		butterflyShader->SetUniform("u_Stage", i);
-		butterflyShader->SetUniform("u_PingPong", pingpong);
-		butterflyShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
-		pingpong++;
-		pingpong = pingpong % 2;
-	}
-
-	auto inversionShader = m_ShaderLibrary.Get("Inversion shader");
-	inversionShader->Use();
-	m_Displacement->BindImage(0);
-	m_PingPong0->BindImage(1);
-	m_PingPong1->BindImage(2);
-	inversionShader->SetUniform("u_PingPong", pingpong);
-	inversionShader->Dispatch(glm::uvec3(ceil(FFTResoltion / 16), ceil(FFTResoltion / 16), 1));
 }

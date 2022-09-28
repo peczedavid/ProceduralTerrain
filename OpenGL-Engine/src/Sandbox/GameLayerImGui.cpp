@@ -54,8 +54,6 @@ void GameLayerImGui::LandscapePanel()
 	if (ImGui::Begin("Landscape"))
 	{
 		ImGui::SliderFloat("MaxHeight", &m_GameLayer->m_MaxHeight, 0.0f, 1000.f);
-		ImGui::SliderFloat("FogGradient", &m_GameLayer->m_FogGradient, 0.0f, 5.f);
-		ImGui::SliderFloat("FogDensity", &m_GameLayer->m_FogDensity, 0.0f, 0.01f);
 		ImGui::Checkbox("Normals", &m_GameLayer->m_TerrainNormals);
 		ImGui::Checkbox("Shade", &m_GameLayer->m_ShadeTerrain);
 	}
@@ -72,15 +70,6 @@ void GameLayerImGui::WaterPanel()
 		ImGui::SliderFloat("Shininess", &m_GameLayer->m_WaterShininess, 10.0f, 600.f);
 		ImGui::SliderFloat("Reflectivity", &m_GameLayer->m_WaterReflectivity, 0.001f, 5.0f);
 		ImGui::Checkbox("Normals", &m_GameLayer->m_WaterNormals);
-		glBindBuffer(GL_UNIFORM_BUFFER, m_GameLayer->m_WavesUBO);
-		for (size_t i = 0; i < m_GameLayer->m_WavesCount; i++)
-		{
-			const float steepness = std::max(m_GameLayer->m_WavesInitial[i].z * (m_GameLayer->m_SteepnessDropoff * i), 0.0001f);// m_GameLayer->m_SteepnessDropoff;
-			const float wavelength = std::max(m_GameLayer->m_WavesInitial[i].w * (m_GameLayer->m_WavelengthDropoff * i), 0.0001f);// m_GameLayer->m_WavelengthDropoff;
-			m_GameLayer->m_Waves[i] = glm::vec4(m_GameLayer->m_WavesInitial[i].x, m_GameLayer->m_WavesInitial[i].y, steepness, wavelength);
-			glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::vec4), sizeof(glm::vec4), &m_GameLayer->m_Waves[i][0]);
-		}
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 	ImGui::End();
 }
@@ -177,31 +166,6 @@ void GameLayerImGui::TexturesPanel()
 	ImGui::End();
 }
 
-void GameLayerImGui::FFTPanel()
-{
-	if (ImGui::Begin("FFT textures"))
-	{
-		DrawImage(m_GameLayer->m_H0k->GetId());
-		ImGui::SameLine();
-		DrawImage(m_GameLayer->m_H0minusk->GetId());
-		ImGui::SameLine();
-		DrawImage(m_GameLayer->m_TwiddleTexture->GetId());
-		
-		DrawImage(m_GameLayer->m_HtDy->GetId());
-		ImGui::SameLine();
-		DrawImage(m_GameLayer->m_HtDx->GetId());
-		ImGui::SameLine();
-		DrawImage(m_GameLayer->m_HtDz->GetId());
-
-		DrawImage(m_GameLayer->m_PingPong0->GetId());
-		ImGui::SameLine();
-		DrawImage(m_GameLayer->m_PingPong1->GetId());
-		ImGui::SameLine();
-		DrawImage(m_GameLayer->m_Displacement->GetId());
-	}
-	ImGui::End();
-}
-
 void GameLayerImGui::GraphicsSettingsPanel()
 {
 	if (ImGui::Begin("Graphics settings"))
@@ -210,6 +174,18 @@ void GameLayerImGui::GraphicsSettingsPanel()
 		bool vSync = window->IsVSync();
 		ImGui::Checkbox("VSync", &vSync);
 		window->SetVSync(vSync);
+	}
+	ImGui::End();
+}
+
+void GameLayerImGui::EnviromentPanel()
+{
+	if (ImGui::Begin("Enviroment"))
+	{
+		ImGui::SliderFloat3("Sun direction", &m_GameLayer->m_SunDirection[0], -10.0f, 10.f);
+		ImGui::SliderFloat("Fog density", &m_GameLayer->m_FogData[0], 0.0f, 0.01f);
+		ImGui::SliderFloat("Fog gradient", &m_GameLayer->m_FogData[1], 0.0f, 5.f);
+		ImGui::SliderFloat3("Fog color", &m_GameLayer->m_FogColor[0], 0.0f, 1.f);
 	}
 	ImGui::End();
 }

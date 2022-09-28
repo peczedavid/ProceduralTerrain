@@ -19,6 +19,15 @@ layout (std140, binding = 1) uniform WavesBufferObject
 	vec4[WAVES_COUNT] Waves;
 } u_Waves;
 
+layout (std140, binding = 2) uniform EnviromentBuffer
+{
+	vec4 SunDirection;
+	vec4 FogColor;
+	float FogDensity;
+	float FogGradient;
+    float Time;
+} u_Enviroment;
+
 uniform mat4 u_Model;
 
 in vec2 v_UVsCoord[];
@@ -26,10 +35,6 @@ out vec4 v_WorldPos;
 out vec3 v_Normal;
 out vec2 v_TexCoords;
 out float v_Visibility;
-
-uniform float u_Time;
-uniform float u_FogDensity;
-uniform float u_FogGradient;
 
 uniform vec3 u_CameraPos;
 
@@ -40,7 +45,7 @@ vec3 GerstnerWave(vec4 wave, vec3 pos, inout vec3 tangent, inout vec3 binormal)
     const float k = 2 * M_PI / waveLength;
     const float c = sqrt(9.81 / k);
     const vec2 d = normalize(wave.xy);
-    const float f = k * (dot(d, pos.xz) - u_Time * c);
+    const float f = k * (dot(d, pos.xz) - u_Enviroment.Time * c);
     const float a = steepness / k;
     
     const float sinf = sin(f);
@@ -100,6 +105,6 @@ void main() {
     v_Normal = normalize(cross(binormal, tangent));
     
     const float vertexDistance = length((u_Camera.View * v_WorldPos).xyz);
-    v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));
+    v_Visibility = exp(-pow((vertexDistance * u_Enviroment.FogDensity), u_Enviroment.FogGradient));
     v_Visibility = clamp(v_Visibility, 0.0, 1.0);
 }

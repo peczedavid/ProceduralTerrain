@@ -1,6 +1,15 @@
 #version 450 core
 precision highp float;
 
+layout (std140, binding = 2) uniform EnviromentBuffer
+{
+	vec4 SunDirection;
+	vec4 FogColor;
+	float FogDensity;
+	float FogGradient;
+	float Time;
+} u_Enviroment;
+
 out vec4 outColor;
 
 in vec4 v_WorldPos;
@@ -18,15 +27,15 @@ vec4 shade() {
 	vec4 pixelColor;
 
 	const vec3 view = normalize(u_CameraPos - v_WorldPos.xyz);
-	const vec3 lightDirection = normalize(vec3(0.254, 0.341, 0.905));
-	vec3 waterColor = texture(u_WaterTexture, v_TexCoords).rgb;
+	const vec3 lightDirection = normalize(u_Enviroment.SunDirection.xyz);
+	vec4 waterColor = texture(u_WaterTexture, v_TexCoords);
 
 	vec3 reflectedLight = reflect(normalize(-lightDirection), v_Normal);
 	const float specular = pow(max(dot(reflectedLight, view), 0.0), u_Shininess);
 	const vec3 specularHighlight = vec3(specular) * u_Reflectivity;
 	waterColor.rgb += specularHighlight;
 
-	pixelColor.rgb = mix(vec3(0.4, 0.5, 0.6), waterColor, v_Visibility);
+	pixelColor = mix(u_Enviroment.FogColor, waterColor, v_Visibility);
 	pixelColor.a = 0.575;
 	
 	return pixelColor;

@@ -10,11 +10,17 @@ layout (std140, binding = 0) uniform CameraBufferObject
 	mat4 ViewProj;
 } u_Camera;
 
+layout (std140, binding = 2) uniform EnviromentBuffer
+{
+	vec4 SunDirection;
+	vec4 FogColor;
+	float FogDensity;
+	float FogGradient;
+	float Time;
+} u_Enviroment;
+
 uniform mat4 u_Model;
 uniform float u_MaxLevel;
-
-uniform float u_FogDensity;
-uniform float u_FogGradient;
 
 uniform sampler2D u_NoiseTexture;
 
@@ -60,6 +66,6 @@ void main()
 	v_TexCoords = worldPos.xz / 12.5;
 	
 	const float vertexDistance = length((u_Camera.View * worldPos).xyz);
-	v_Visibility = exp(-pow((vertexDistance * u_FogDensity), u_FogGradient));
+	v_Visibility = exp(-pow((vertexDistance * u_Enviroment.FogDensity), u_Enviroment.FogGradient));
 	v_Visibility = clamp(v_Visibility, 0.0, 1.0);
 }
