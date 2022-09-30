@@ -21,4 +21,5 @@ void main()
 	const float cost = dot(lightDirection, v_Normal);
 	outColor.rgb = vec3(1.0, 1.0, 1.0) * cost;
 	outColor.a = 1.0;
+	//outColor = vec4(1, 1, 1, 1);
 }

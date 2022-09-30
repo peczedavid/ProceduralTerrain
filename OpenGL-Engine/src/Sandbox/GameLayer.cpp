@@ -201,7 +201,7 @@ void GameLayer::OnUpdate(const float dt)
 	auto basicShader = m_ShaderLibrary.Get("Basic shader");
 	basicShader->Use();
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 50.0f, -50.0f));
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 15.0f);
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 3.0f);
 	basicShader->SetUniform("u_Model", model);
 	m_TestModel->Draw(basicShader);
 
