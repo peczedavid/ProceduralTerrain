@@ -257,8 +257,8 @@ void GameLayer::OnImGuiRender(const float dt)
 	m_UI->ViewportPanel();
 	m_UI->TexturesPanel();
 	m_UI->VendorInfoPanel();
-	m_UI->PropertiesPanel();
-	m_UI->GameObjectsPanel();
+	m_UI->GameObjectsPanel(); // FIRST
+	m_UI->PropertiesPanel();  // SECOND
 	m_UI->GraphicsSettingsPanel();
 	m_UI->EnviromentPanel();
 	m_UI->ShadersPanel();
