@@ -41,13 +41,11 @@ Model::Model(const std::string& path)
 		}
 		else if (line.rfind("f ", 0) == 0)
 		{
-			static bool first = true;
-
-			if (first)
+			if (m_FirstFace)
 			{
-				m_TexCoords.resize(texcoords.size());
-				m_Normals.resize(normals.size());
-				first = false;
+				m_TexCoords.resize(m_Vertices.size());
+				m_Normals.resize(m_Vertices.size());
+				m_FirstFace = false;
 			}
 
 			const char* chh = line.c_str();
@@ -90,21 +88,20 @@ Model::Model(const std::string& path)
 		}
 	}
 
-	std::vector<float> vertexBuffer;
-	vertexBuffer.resize(m_Vertices.size() * 8);
+	m_VertexBuffer.resize(m_Vertices.size() * 8);
 	for (size_t i = 0; i < m_Vertices.size(); i++)
 	{
 		const size_t vboIdx = 8 * i;
-		vertexBuffer[vboIdx + 0] = m_Vertices[i].x;
-		vertexBuffer[vboIdx + 1] = m_Vertices[i].y;
-		vertexBuffer[vboIdx + 2] = m_Vertices[i].z;
+		m_VertexBuffer[vboIdx + 0] = m_Vertices[i].x;
+		m_VertexBuffer[vboIdx + 1] = m_Vertices[i].y;
+		m_VertexBuffer[vboIdx + 2] = m_Vertices[i].z;
 
-		vertexBuffer[vboIdx + 3] = m_Normals[i].x;
-		vertexBuffer[vboIdx + 4] = m_Normals[i].y;
-		vertexBuffer[vboIdx + 5] = m_Normals[i].z;
+		m_VertexBuffer[vboIdx + 3] = m_Normals[i].x;
+		m_VertexBuffer[vboIdx + 4] = m_Normals[i].y;
+		m_VertexBuffer[vboIdx + 5] = m_Normals[i].z;
 		
-		vertexBuffer[vboIdx + 6] = m_TexCoords[i].x;
-		vertexBuffer[vboIdx + 7] = m_TexCoords[i].y;
+		m_VertexBuffer[vboIdx + 6] = m_TexCoords[i].x;
+		m_VertexBuffer[vboIdx + 7] = m_TexCoords[i].y;
 	}
 
 	glGenVertexArrays(1, &m_Vao);
@@ -114,7 +111,7 @@ Model::Model(const std::string& path)
 	glBindVertexArray(m_Vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexBuffer.size(), &vertexBuffer[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_VertexBuffer.size(), &m_VertexBuffer[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);

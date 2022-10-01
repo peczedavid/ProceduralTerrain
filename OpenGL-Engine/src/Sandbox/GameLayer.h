@@ -42,8 +42,8 @@ private:
 	Ref<Texture2D> m_GroundTexture, m_RockTexture, m_WaterTexture;
 	std::vector<Ref<Texture2D>> m_HeightMaps;
 
-	Ref<Plane> m_GroundPlane;
-	Ref<Plane> m_WaterPlane;
+	Ref<Plane> m_GroundPlane, m_WaterPlane;
+	Ref<Model> m_Monkey, m_Teapot, m_Sphere;
 	Ref<Model> m_TestModel;
 
 	glm::vec4 m_SunDirection = glm::vec4(0.254f, 0.341f, 0.905f, 0.0f);

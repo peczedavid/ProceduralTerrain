@@ -153,7 +153,10 @@ GameLayer::GameLayer()
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, 2, m_EnviromentUBO, 0, enviromentUBOSize);
 
-	m_TestModel = CreateRef<Model>("assets/Models/teapot.obj");
+	m_Sphere = CreateRef<Model>("assets/Models/sphere.obj");
+	m_Teapot = CreateRef<Model>("assets/Models/teapot.obj");
+	m_Monkey = CreateRef<Model>("assets/Models/monkey.obj");
+	m_TestModel = CreateRef<Model>("assets/Models/birch_tree.obj");
 }
 
 void GameLayer::OnUpdate(const float dt)
@@ -202,6 +205,18 @@ void GameLayer::OnUpdate(const float dt)
 	basicShader->Use();
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 50.0f, -50.0f));
 	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 3.0f);
+	basicShader->SetUniform("u_Model", model);
+	m_Monkey->Draw(basicShader);
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 50.0f, -50.0f));
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 0.5f);
+	basicShader->SetUniform("u_Model", model);
+	m_Teapot->Draw(basicShader);
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-12.5f, 50.0f, -50.0f));
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 3.0f);
+	basicShader->SetUniform("u_Model", model);
+	m_Sphere->Draw(basicShader);
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 65.0f, -50.0f));
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 15.0f);
 	basicShader->SetUniform("u_Model", model);
 	m_TestModel->Draw(basicShader);
 
