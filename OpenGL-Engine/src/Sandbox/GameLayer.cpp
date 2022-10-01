@@ -153,10 +153,22 @@ GameLayer::GameLayer()
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, 2, m_EnviromentUBO, 0, enviromentUBOSize);
 
-	m_Sphere = CreateRef<Model>("assets/Models/sphere.obj");
-	m_Teapot = CreateRef<Model>("assets/Models/teapot.obj");
-	m_Monkey = CreateRef<Model>("assets/Models/monkey.obj");
-	m_TestModel = CreateRef<Model>("assets/Models/birch_tree.obj");
+	m_SphereModel = CreateRef<Model>("assets/Models/sphere.obj");
+	m_TeapotModel = CreateRef<Model>("assets/Models/teapot.obj");
+	m_MonkeyModel = CreateRef<Model>("assets/Models/monkey.obj");
+	m_TreeModel = CreateRef<Model>("assets/Models/birch_tree.obj");
+
+	m_Sphere = CreateRef<GameObject>(m_SphereModel.get());
+	m_Sphere->SetPosition(glm::vec3(30.0f, 50.0f, -50.0f));
+	m_Sphere->SetScale(10.0f);
+	m_Teapot = CreateRef<GameObject>(m_TeapotModel.get());
+	m_Teapot->SetPosition(glm::vec3(-30.0f, 50.0f, -50.0f));
+	m_Monkey = CreateRef<GameObject>(m_MonkeyModel.get());
+	m_Monkey->SetPosition(glm::vec3(0.0f, 50.0f, -50.0f));
+	m_Monkey->SetScale(10.0f);
+	m_Tree = CreateRef<GameObject>(m_TreeModel.get());
+	m_Tree->SetPosition(glm::vec3(0.0f, 50.0f, -75.0f));
+	m_Tree->SetScale(15.0f);
 }
 
 void GameLayer::OnUpdate(const float dt)
@@ -203,22 +215,10 @@ void GameLayer::OnUpdate(const float dt)
 
 	auto basicShader = m_ShaderLibrary.Get("Basic shader");
 	basicShader->Use();
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 50.0f, -50.0f));
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 3.0f);
-	basicShader->SetUniform("u_Model", model);
-	m_Monkey->Draw(basicShader);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 50.0f, -50.0f));
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 0.5f);
-	basicShader->SetUniform("u_Model", model);
-	m_Teapot->Draw(basicShader);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-12.5f, 50.0f, -50.0f));
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 3.0f);
-	basicShader->SetUniform("u_Model", model);
-	m_Sphere->Draw(basicShader);
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 65.0f, -50.0f));
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f) * 15.0f);
-	basicShader->SetUniform("u_Model", model);
-	m_TestModel->Draw(basicShader);
+	m_Sphere->Draw(*basicShader.get());
+	m_Teapot->Draw(*basicShader.get());
+	m_Monkey->Draw(*basicShader.get());
+	m_Tree->Draw(*basicShader.get());
 
 #if 1
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
@@ -243,6 +243,8 @@ void GameLayer::OnUpdate(const float dt)
 
 void GameLayer::OnImGuiRender(const float dt)
 {
+	static bool show = true;
+	ImGui::ShowDemoWindow(&show);
 	m_UI->ContolsPanel();
 	m_UI->NoisePanel();
 	m_UI->LandscapePanel();
@@ -250,7 +252,7 @@ void GameLayer::OnImGuiRender(const float dt)
 	m_UI->ViewportPanel();
 	m_UI->TexturesPanel();
 	m_UI->VendorInfoPanel();
-	//m_UI->FFTPanel();
+	m_UI->GameObjectsPanel();
 	m_UI->GraphicsSettingsPanel();
 	m_UI->EnviromentPanel();
 	m_UI->ShadersPanel();

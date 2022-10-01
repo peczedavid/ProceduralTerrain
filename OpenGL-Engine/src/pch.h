@@ -28,6 +28,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #include <stb_image.h>
 #include <stb_image_write.h>

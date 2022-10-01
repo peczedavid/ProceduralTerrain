@@ -132,7 +132,7 @@ Model::~Model()
 {
 }
 
-void Model::Draw(Ref<Shader> shader)
+void Model::Draw()
 {
 	glBindVertexArray(m_Vao);
 	glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);

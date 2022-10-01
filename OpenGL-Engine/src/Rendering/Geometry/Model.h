@@ -11,7 +11,7 @@ public:
 	Model operator=(const Model&) = delete;
 	~Model();
 
-	void Draw(Ref<Shader> shader);
+	void Draw();
 private:
 	GLuint m_Vao, m_Vbo, m_Ebo;
 	std::vector<float> m_VertexBuffer;

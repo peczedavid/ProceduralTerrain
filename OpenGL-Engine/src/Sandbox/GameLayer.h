@@ -9,7 +9,7 @@
 #include "Rendering/Geometry/Axis.h"
 #include "Rendering/FrameBuffer.h"
 #include "Rendering/Geometry/FullscreenQuad.h"
-#include "Rendering/Geometry/Model.h"
+#include "Rendering/GameObject.h"
 
 class GameLayer : public Layer
 {
@@ -43,8 +43,8 @@ private:
 	std::vector<Ref<Texture2D>> m_HeightMaps;
 
 	Ref<Plane> m_GroundPlane, m_WaterPlane;
-	Ref<Model> m_Monkey, m_Teapot, m_Sphere;
-	Ref<Model> m_TestModel;
+	Ref<Model> m_MonkeyModel, m_TeapotModel, m_SphereModel, m_TreeModel;
+	Ref<GameObject> m_Monkey, m_Teapot, m_Sphere, m_Tree;
 
 	glm::vec4 m_SunDirection = glm::vec4(0.254f, 0.341f, 0.905f, 0.0f);
 	float m_Time = 0.0f;

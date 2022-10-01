@@ -16,6 +16,7 @@ public:
 	void DebugOverlayPanel();
 	void TexturesPanel();
 	void GraphicsSettingsPanel();
+	void GameObjectsPanel();
 	void EnviromentPanel();
 	void ShadersPanel();
 private:
