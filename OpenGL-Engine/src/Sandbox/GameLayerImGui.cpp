@@ -22,6 +22,7 @@ void GameLayerImGui::ViewportPanel()
 		{
 			m_GameLayer->m_FrameBuffer->Resize(my_tex_w, my_tex_h);
 			m_GameLayer->m_Camera->Resize(my_tex_w, my_tex_h);
+			m_GameLayer->m_TrackballCamera->Resize(my_tex_w, my_tex_h);
 			m_GameLayer->m_ViewportSize.x = viewportPanelSize.x;
 			m_GameLayer->m_ViewportSize.y = viewportPanelSize.y;
 		}
@@ -322,6 +323,7 @@ void GameLayerImGui::PropertiesPanel()
 
 void GameLayerImGui::GameObjectsPanel()
 {
+
 	if (ImGui::Begin("Game objects"))
 	{
 		static ImGuiTreeNodeFlags baseFlags = ImGuiTreeNodeFlags_OpenOnArrow |

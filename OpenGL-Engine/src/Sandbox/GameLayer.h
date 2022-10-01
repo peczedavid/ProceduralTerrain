@@ -10,6 +10,7 @@
 #include "Rendering/FrameBuffer.h"
 #include "Rendering/Geometry/FullscreenQuad.h"
 #include "Rendering/GameObject.h"
+#include "Rendering/TrackballCamera.h"
 
 class GameLayer : public Layer
 {
@@ -35,6 +36,7 @@ private:
 	GLuint m_EnviromentUBO;
 
 	Ref<Camera> m_Camera;
+	Ref<TrackballCamera> m_TrackballCamera;
 	Ref<Skybox> m_Skybox;
 	Ref<Axis> m_Axis;
 
