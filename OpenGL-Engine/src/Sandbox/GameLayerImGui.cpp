@@ -247,75 +247,72 @@ void GameLayerImGui::DrawImage(uint32_t textureId, float my_tex_w, float my_tex_
 	}
 }
 
+static int gameObjectPropsId = 0;
+
+int DrawVectorComponent(const char* name, float* num, const ImVec4& color, const float defaultValue = 0.0f)
+{
+	int changed = 0;
+
+	ImGui::PushStyleColor(ImGuiCol_Button, color);
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+	ImGui::PushID(gameObjectPropsId++);
+	if (ImGui::Button(name, ImVec2(20, 0)))
+	{
+		changed |= 1;
+		*num = defaultValue;
+	}
+	ImGui::PopID();
+	ImGui::PopStyleColor(3);
+	ImGui::SameLine();
+	ImGui::PushID(gameObjectPropsId++);
+	ImGui::SetNextItemWidth(60.0f);
+	changed |= ImGui::DragFloat("", num, 0.05f, -FLT_MAX, FLT_MAX, "%.2f");
+	ImGui::PopID();
+
+	return changed;
+}
+
+int DrawVector(glm::vec3& vector, const float defaultValue = 0.0f)
+{
+	static ImVec4 xColor = ImVec4(216.0f / 255.0f, 27.0f / 255.0f, 5.0f / 255.0f, 1);
+	static ImVec4 yColor = ImVec4(34.0f / 255.0f, 177.0f / 255.0f, 76.0f / 255.0f, 1);
+	static ImVec4 zColor = ImVec4(2.0f / 255.0f, 68.0f / 255.0f, 168.0f / 255.0f, 1);
+
+	int dirty = 0;
+
+	dirty |= DrawVectorComponent("X", &vector[0], xColor, defaultValue);
+	ImGui::SameLine();
+	dirty |= DrawVectorComponent("Y", &vector[1], yColor, defaultValue);
+	ImGui::SameLine();
+	dirty |= DrawVectorComponent("Z", &vector[2], zColor, defaultValue);
+
+	return dirty;
+}
+
 void GameLayerImGui::GameObjectsPanel()
 {
 	if (ImGui::Begin("Game objects"))
 	{
-		int dirty = 0;
+		gameObjectPropsId = 0;
+
 		auto& position = m_GameLayer->m_Monkey->GetPosition();
 		ImGui::Text("Position");
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1, 0, 0, 1));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1, 0, 0, 1));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1, 0, 0, 1));
-		ImGui::Button("X", ImVec2(20, 0));
-		ImGui::PopStyleColor(3);
-		ImGui::SameLine();
-		ImGui::PushID(0);
-		ImGui::SetNextItemWidth(60.0f);
-		dirty |= ImGui::DragFloat("", &position[0], 0.05f, -FLT_MAX, FLT_MAX, "%.2f");
-		ImGui::PopID();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 1, 0, 1));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 1, 0, 1));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 1, 0, 1));
-		ImGui::Button("Y", ImVec2(20, 0));
-		ImGui::PopStyleColor(3);
-		ImGui::SameLine();
-		ImGui::PushID(1);
-		ImGui::SetNextItemWidth(60.0f);
-		dirty |= ImGui::DragFloat("", &position[1], 0.05f, -FLT_MAX, FLT_MAX, "%.2f");
-		ImGui::PopID();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 1, 1));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 1, 1));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 1, 1));
-		ImGui::Button("Z", ImVec2(20, 0));
-		ImGui::PopStyleColor(3);
-		ImGui::SameLine();
-		ImGui::PushID(2);
-		ImGui::SetNextItemWidth(60.0f);
-		dirty |= ImGui::DragFloat("", &position[2], 0.05f, -FLT_MAX, FLT_MAX, "%.2f");
-		ImGui::PopID();
-
-		if (dirty)
+		if (DrawVector(position))
 			m_GameLayer->m_Monkey->SetPosition(position);
 
-		//auto& position = m_GameLayer->m_Monkey->GetPosition();
-		//if (ImGui::SliderFloat3("Position", &position[0], -150.0f, 150.0f))
-		//{
-		//	/*ImGui::PushID(0);
-		//	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(i / 7.0f, 0.6f, 0.6f));
-		//	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(i / 7.0f, 0.7f, 0.7f));
-		//	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(i / 7.0f, 0.8f, 0.8f));
-		//	ImGui::Button("X");
-		//	ImGui::PopStyleColor(3);
-		//	ImGui::PopID();*/
-		//	m_GameLayer->m_Monkey->SetPosition(position);
-		//}
-		//auto rotation = glm::degrees(m_GameLayer->m_Monkey->GetRotation());
-		//if (ImGui::SliderFloat3("Rotation", &rotation[0], -360.0f, 360.0f))
-		//{
-		//	rotation = glm::radians(rotation);
-		//	m_GameLayer->m_Monkey->SetRotation(rotation);
-		//}
-		//auto& scale = m_GameLayer->m_Monkey->GetScale();
-		//if (ImGui::SliderFloat3("Scale", &scale[0], 0.1f, 50.0f))
-		//{
-		//	m_GameLayer->m_Monkey->SetScale(scale);
-		//}
+		auto rotation = glm::degrees(m_GameLayer->m_Monkey->GetRotation());
+		ImGui::Text("Rotation");
+		if (DrawVector(rotation))
+		{
+			rotation = glm::radians(rotation);
+			m_GameLayer->m_Monkey->SetRotation(rotation);
+		}
+
+		auto& scale = m_GameLayer->m_Monkey->GetScale();
+		ImGui::Text("Scale");
+		if (DrawVector(scale, 1.0f))
+			m_GameLayer->m_Monkey->SetScale(scale);
 	}
 	ImGui::End();
 }
