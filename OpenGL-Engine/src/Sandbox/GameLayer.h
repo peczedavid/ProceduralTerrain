@@ -45,6 +45,7 @@ private:
 	Ref<Plane> m_GroundPlane, m_WaterPlane;
 	Ref<Model> m_MonkeyModel, m_TeapotModel, m_SphereModel, m_TreeModel;
 	Ref<GameObject> m_Monkey, m_Teapot, m_Sphere, m_Tree;
+	std::unordered_map<std::string, Ref<GameObject>> m_GameObjects;
 
 	glm::vec4 m_SunDirection = glm::vec4(0.254f, 0.341f, 0.905f, 0.0f);
 	float m_Time = 0.0f;

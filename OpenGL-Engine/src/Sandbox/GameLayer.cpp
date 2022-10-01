@@ -169,6 +169,11 @@ GameLayer::GameLayer()
 	m_Tree = CreateRef<GameObject>(m_TreeModel.get());
 	m_Tree->SetPosition(glm::vec3(0.0f, 50.0f, -75.0f));
 	m_Tree->SetScale(15.0f);
+
+	m_GameObjects["Sphere"] = m_Sphere;
+	m_GameObjects["Tree"] = m_Tree;
+	m_GameObjects["Monkey"] = m_Monkey;
+	m_GameObjects["Teapot"] = m_Teapot;
 }
 
 void GameLayer::OnUpdate(const float dt)
@@ -215,10 +220,10 @@ void GameLayer::OnUpdate(const float dt)
 
 	auto basicShader = m_ShaderLibrary.Get("Basic shader");
 	basicShader->Use();
-	m_Sphere->Draw(*basicShader.get());
-	m_Teapot->Draw(*basicShader.get());
-	m_Monkey->Draw(*basicShader.get());
-	m_Tree->Draw(*basicShader.get());
+	for (auto& gameObject : m_GameObjects)
+	{
+		gameObject.second->Draw(*basicShader.get());
+	}
 
 #if 1
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
@@ -252,6 +257,7 @@ void GameLayer::OnImGuiRender(const float dt)
 	m_UI->ViewportPanel();
 	m_UI->TexturesPanel();
 	m_UI->VendorInfoPanel();
+	m_UI->PropertiesPanel();
 	m_UI->GameObjectsPanel();
 	m_UI->GraphicsSettingsPanel();
 	m_UI->EnviromentPanel();

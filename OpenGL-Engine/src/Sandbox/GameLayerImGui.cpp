@@ -248,6 +248,7 @@ void GameLayerImGui::DrawImage(uint32_t textureId, float my_tex_w, float my_tex_
 }
 
 static int gameObjectPropsId = 0;
+static int selectionMask = 1;
 
 int DrawVectorComponent(const char* name, float* num, const ImVec4& color, const float defaultValue = 0.0f)
 {
@@ -256,6 +257,7 @@ int DrawVectorComponent(const char* name, float* num, const ImVec4& color, const
 	ImGui::PushStyleColor(ImGuiCol_Button, color);
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(25.0f, 0.0f));
 	ImGui::PushID(gameObjectPropsId++);
 	if (ImGui::Button(name, ImVec2(20, 0)))
 	{
@@ -264,6 +266,7 @@ int DrawVectorComponent(const char* name, float* num, const ImVec4& color, const
 	}
 	ImGui::PopID();
 	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar();
 	ImGui::SameLine();
 	ImGui::PushID(gameObjectPropsId++);
 	ImGui::SetNextItemWidth(60.0f);
@@ -290,29 +293,66 @@ int DrawVector(glm::vec3& vector, const float defaultValue = 0.0f)
 	return dirty;
 }
 
-void GameLayerImGui::GameObjectsPanel()
+void GameLayerImGui::PropertiesPanel()
 {
-	if (ImGui::Begin("Game objects"))
+	if (ImGui::Begin("Properties"))
 	{
 		gameObjectPropsId = 0;
 
-		auto& position = m_GameLayer->m_Monkey->GetPosition();
+		auto& position = m_SelectedObject->GetPosition();
 		ImGui::Text("Position");
 		if (DrawVector(position))
-			m_GameLayer->m_Monkey->SetPosition(position);
+			m_SelectedObject->SetPosition(position);
 
-		auto rotation = glm::degrees(m_GameLayer->m_Monkey->GetRotation());
+		auto rotation = glm::degrees(m_SelectedObject->GetRotation());
 		ImGui::Text("Rotation");
 		if (DrawVector(rotation))
 		{
 			rotation = glm::radians(rotation);
-			m_GameLayer->m_Monkey->SetRotation(rotation);
+			m_SelectedObject->SetRotation(rotation);
 		}
 
-		auto& scale = m_GameLayer->m_Monkey->GetScale();
+		auto& scale = m_SelectedObject->GetScale();
 		ImGui::Text("Scale");
 		if (DrawVector(scale, 1.0f))
-			m_GameLayer->m_Monkey->SetScale(scale);
+			m_SelectedObject->SetScale(scale);
+	}
+	ImGui::End();
+}
+
+void GameLayerImGui::GameObjectsPanel()
+{
+	if (ImGui::Begin("Game objects"))
+	{
+		static ImGuiTreeNodeFlags baseFlags = ImGuiTreeNodeFlags_OpenOnArrow |
+											  ImGuiTreeNodeFlags_OpenOnDoubleClick |
+											  ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		int nodeClicked = -1;
+		int i = 0;
+		for (auto& element : m_GameLayer->m_GameObjects)
+		{
+			ImGuiTreeNodeFlags nodeFlags = baseFlags;
+			const bool isSelected = (selectionMask & (1 << i)) != 0;
+			if (isSelected)
+			{
+				nodeFlags |= ImGuiTreeNodeFlags_Selected;
+				m_SelectedObject = element.second.get();
+			}
+
+			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)i, nodeFlags, element.first.c_str());
+			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+				nodeClicked = i;
+
+			if (nodeOpen)
+			{
+				// Child gameObjects
+				ImGui::TreePop();
+			}
+			i++;
+		}
+		if (nodeClicked != -1)
+			selectionMask = (1 << nodeClicked); // Click to single-select
 	}
 	ImGui::End();
 }
