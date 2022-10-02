@@ -26,11 +26,12 @@ uniform float u_Reflectivity;
 vec4 shade() {
 	vec4 pixelColor;
 
+	const vec3 N = normalize(v_Normal);
 	const vec3 view = normalize(u_CameraPos - v_WorldPos.xyz);
 	const vec3 lightDirection = normalize(u_Enviroment.SunDirection.xyz);
 	vec4 waterColor = texture(u_WaterTexture, v_TexCoords);
 
-	vec3 reflectedLight = reflect(normalize(-lightDirection), v_Normal);
+	vec3 reflectedLight = reflect(normalize(-lightDirection), N);
 	const float specular = pow(max(dot(reflectedLight, view), 0.0), u_Shininess);
 	const vec3 specularHighlight = vec3(specular) * u_Reflectivity;
 	waterColor.rgb += specularHighlight;
@@ -43,7 +44,7 @@ vec4 shade() {
 
 void main() {
 	if(u_NormalView == 1)
-		outColor = vec4(vec3(v_Normal + 0.7) / 1.7, 1.0);
+		outColor = vec4(vec3(normalize(v_Normal) + 0.7) / 1.7, 1.0);
 	else
 		outColor = shade();
 }
