@@ -20,6 +20,7 @@ void main()
 	//const vec3 lightDirection = normalize(u_Enviroment.SunDirection);
 	//const float cost = dot(lightDirection, v_Normal);
 	//outColor.rgb = vec3(1.0, 1.0, 1.0) * cost;
-	outColor.rgb = v_Normal;
+	const vec3 N = normalize(v_Normal);
+	outColor.rgb = N;
 	outColor.a = 1.0;
 }

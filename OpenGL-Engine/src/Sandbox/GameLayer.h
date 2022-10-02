@@ -37,6 +37,7 @@ private:
 
 	Ref<Camera> m_Camera;
 	Ref<TrackballCamera> m_TrackballCamera;
+	uint32_t m_SelectedCamera = 0;
 	Ref<Skybox> m_Skybox;
 	Ref<Axis> m_Axis;
 

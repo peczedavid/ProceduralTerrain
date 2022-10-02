@@ -31,6 +31,7 @@
 //		 - screenshots in dist mode
 //		 - profiling (maybe benchmark scene)
 //		 - trackball camera controls
+//		 https://computergraphics.stackexchange.com/questions/151/how-to-implement-a-trackball-in-opengl
 
 #include "pch.h"
 
@@ -192,8 +193,8 @@ void GameLayer::OnUpdate(const float dt)
 	if (!Application::Get().IsCursor())
 	{
 		m_Camera->Update(dt);
-		m_TrackballCamera->Update(dt);
 	}
+	m_TrackballCamera->Update(dt);
 
 	SetUniformBuffers();
 
@@ -323,12 +324,18 @@ void GameLayer::RenderEnd()
 void GameLayer::SetUniformBuffers()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, m_CameraUBO);
-	/*glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetProj()[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetMatrix()[0][0]);*/
-	glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetView()[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetProj()[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetViewProj()[0][0]);
+	if (m_SelectedCamera == 0)
+	{
+		glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetProj()[0][0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetMatrix()[0][0]);
+	}
+	else if (m_SelectedCamera == 1)
+	{
+		glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetView()[0][0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetProj()[0][0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetViewProj()[0][0]);
+	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, m_WavesUBO);

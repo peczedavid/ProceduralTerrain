@@ -175,6 +175,10 @@ void GameLayerImGui::GraphicsSettingsPanel()
 		bool vSync = window->IsVSync();
 		ImGui::Checkbox("VSync", &vSync);
 		window->SetVSync(vSync);
+		if (ImGui::Button("Toggle camera"))
+		{
+			m_GameLayer->m_SelectedCamera = (m_GameLayer->m_SelectedCamera + 1) % 2;
+		}
 	}
 	ImGui::End();
 }
