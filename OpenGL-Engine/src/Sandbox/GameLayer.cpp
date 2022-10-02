@@ -74,6 +74,11 @@ GameLayer::GameLayer()
 		"assets/GLSL/default.frag"
 	));
 
+	m_ShaderLibrary.Add("PBR shader", CreateShaderRef(
+		"assets/GLSL/pbr/pbr.vert",
+		"assets/GLSL/pbr/pbr.frag"
+	));
+
 	m_GroundPlane = CreateRef<Plane>(planeSize, planeDivision);
 	m_WaterPlane = CreateRef<Plane>(waterPlaneSize, waterPlaneDivision);
 
@@ -121,7 +126,7 @@ GameLayer::GameLayer()
 	m_UI = CreateScope<GameLayerImGui>(this);
 
 	glGenBuffers(1, &m_CameraUBO);
-	const size_t cameraUBOsize = 3 * sizeof(glm::mat4);
+	const size_t cameraUBOsize = 3 * sizeof(glm::mat4) + sizeof(glm::vec4);
 	glBindBuffer(GL_UNIFORM_BUFFER, m_CameraUBO);
 	glBufferData(GL_UNIFORM_BUFFER, cameraUBOsize, NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -160,6 +165,8 @@ GameLayer::GameLayer()
 	m_TeapotModel = CreateRef<Model>("assets/Models/teapot.obj");
 	m_MonkeyModel = CreateRef<Model>("assets/Models/monkey.obj");
 	m_TreeModel = CreateRef<Model>("assets/Models/birch_tree.obj");
+	m_ErenModel = CreateRef<Model>("assets/Models/eren.obj");
+	m_ColossalModel = CreateRef<Model>("assets/Models/colossal.obj");
 
 	m_Sphere = CreateRef<GameObject>(m_SphereModel.get());
 	m_Sphere->SetPosition(glm::vec3(30.0f, 50.0f, -50.0f));
@@ -172,11 +179,19 @@ GameLayer::GameLayer()
 	m_Tree = CreateRef<GameObject>(m_TreeModel.get());
 	m_Tree->SetPosition(glm::vec3(0.0f, 50.0f, -75.0f));
 	m_Tree->SetScale(15.0f);
+	m_Eren = CreateRef<GameObject>(m_ErenModel.get());
+	m_Eren->SetPosition(glm::vec3(-50.0f, 50.0f, -125.0f));
+	m_Eren->SetScale(15.0f);
+	m_Colossal = CreateRef<GameObject>(m_ColossalModel.get());
+	m_Colossal->SetPosition(glm::vec3(50.0f, 50.0f, -175.0f));
+	m_Colossal->SetScale(2.0f);
 
 	m_GameObjects["Sphere"] = m_Sphere;
 	m_GameObjects["Tree"] = m_Tree;
 	m_GameObjects["Monkey"] = m_Monkey;
 	m_GameObjects["Teapot"] = m_Teapot;
+	m_GameObjects["Eren"] = m_Eren;
+	m_GameObjects["Colossal"] = m_Colossal;
 }
 
 void GameLayer::OnUpdate(const float dt)
@@ -225,12 +240,11 @@ void GameLayer::OnUpdate(const float dt)
 	}
 #endif
 
-	auto basicShader = m_ShaderLibrary.Get("Basic shader");
-	basicShader->Use();
+	auto shader = m_ShaderLibrary.Get("PBR shader");
+	shader->Use();
+	//shader->SetUniform("u_Albedo", glm::vec3(1.0f, 1.0f, 1.0f));
 	for (auto& gameObject : m_GameObjects)
-	{
-		gameObject.second->Draw(*basicShader.get());
-	}
+		gameObject.second->Draw(*shader.get());
 
 #if 1
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
@@ -329,12 +343,14 @@ void GameLayer::SetUniformBuffers()
 		glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
 		glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetProj()[0][0]);
 		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetMatrix()[0][0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), sizeof(glm::vec4), &m_Camera->GetPosition()[0]);
 	}
 	else if (m_SelectedCamera == 1)
 	{
 		glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetView()[0][0]);
 		glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetProj()[0][0]);
 		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetViewProj()[0][0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), sizeof(glm::vec4), &m_TrackballCamera->GetPosition()[0]);
 	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 

@@ -1,6 +1,14 @@
 #version 450 core
 precision highp float;
 
+layout (std140, binding = 0) uniform CameraBufferObject
+{
+	mat4 View;
+	mat4 Proj;
+	mat4 ViewProj;
+	vec4 Position;
+} u_Camera;
+
 layout (std140, binding = 2) uniform EnviromentBuffer
 {
 	vec3 SunDirection;
@@ -17,10 +25,6 @@ in vec2 v_TexCoord;
 
 void main()
 {
-	//const vec3 lightDirection = normalize(u_Enviroment.SunDirection);
-	//const float cost = dot(lightDirection, v_Normal);
-	//outColor.rgb = vec3(1.0, 1.0, 1.0) * cost;
-	const vec3 N = normalize(v_Normal);
-	outColor.rgb = N;
+	outColor.rgb = normalize(v_Normal);
 	outColor.a = 1.0;
 }

@@ -8,6 +8,7 @@ layout (std140, binding = 0) uniform CameraBufferObject
 	mat4 View;
 	mat4 Proj;
 	mat4 ViewProj;
+	vec4 Position;
 } u_Camera;
 
 layout (std140, binding = 2) uniform EnviromentBuffer
