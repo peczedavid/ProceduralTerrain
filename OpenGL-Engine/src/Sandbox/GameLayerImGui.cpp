@@ -331,8 +331,8 @@ void GameLayerImGui::GameObjectsPanel()
 	if (ImGui::Begin("Game objects"))
 	{
 		static ImGuiTreeNodeFlags baseFlags = ImGuiTreeNodeFlags_OpenOnArrow |
-											  ImGuiTreeNodeFlags_OpenOnDoubleClick |
-											  ImGuiTreeNodeFlags_SpanAvailWidth;
+			ImGuiTreeNodeFlags_OpenOnDoubleClick |
+			ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		int nodeClicked = -1;
 		int i = 0;

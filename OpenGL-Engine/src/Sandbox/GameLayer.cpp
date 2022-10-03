@@ -21,6 +21,7 @@
 //       - object loading							DONE
 //		 - don't pass shared_ptr -> pass by
 //		   reference .get() return value
+//		 - logging to imgui window
 //			
 //		 - nice gerstner waves
 //		 - scene system (switching between scenes)
@@ -55,6 +56,11 @@ float Random(float max = 1.0f, float min = 0.0f)
 
 GameLayer::GameLayer()
 {
+	TRACE("Trace");
+	INFO("Info");
+	WARN("Warning");
+	ERROR("Error");
+
 	m_ShaderLibrary.Add("Terrain shader", CreateShaderRef(
 		"assets/GLSL/terrain/terrain.vert",
 		"assets/GLSL/terrain/terrain.tesc",
@@ -283,6 +289,7 @@ void GameLayer::OnImGuiRender(const float dt)
 	m_UI->GraphicsSettingsPanel();
 	m_UI->ShadersPanel();
 	m_UI->EnviromentPanel();
+	Log::Draw();
 	if (Renderer::DebugView) m_UI->DebugOverlayPanel();
 }
 

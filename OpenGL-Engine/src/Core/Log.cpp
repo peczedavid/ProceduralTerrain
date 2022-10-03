@@ -2,11 +2,14 @@
 
 #include "Core/Log.h"
 
-Ref<spdlog::logger> Log::s_Logger;
+Ref<Log::ImGuiLog> Log::s_Logger;
 
 void Log::Initialize()
 {
-	spdlog::set_pattern("%^[%T] %n: %v%$");
-	s_Logger = spdlog::stdout_color_mt("APP");
-	s_Logger->set_level(spdlog::level::trace);
+	s_Logger = CreateRef<ImGuiLog>();
+}
+
+void Log::Draw()
+{
+	s_Logger->Draw("Log");
 }
