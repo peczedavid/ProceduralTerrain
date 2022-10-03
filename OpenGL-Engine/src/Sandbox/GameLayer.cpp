@@ -173,6 +173,7 @@ GameLayer::GameLayer()
 	m_TreeModel = CreateRef<Model>("assets/Models/birch_tree.obj");
 	m_ErenModel = CreateRef<Model>("assets/Models/eren.obj");
 	m_ColossalModel = CreateRef<Model>("assets/Models/colossal.obj");
+	m_AmongUsModel = CreateRef<Model>("assets/Models/amogus.obj");
 
 	m_Sphere = CreateRef<GameObject>(m_SphereModel.get());
 	m_Sphere->SetPosition(glm::vec3(30.0f, 50.0f, -50.0f));
@@ -191,6 +192,9 @@ GameLayer::GameLayer()
 	m_Colossal = CreateRef<GameObject>(m_ColossalModel.get());
 	m_Colossal->SetPosition(glm::vec3(50.0f, 50.0f, -175.0f));
 	m_Colossal->SetScale(2.0f);
+	m_AmongUs = CreateRef<GameObject>(m_AmongUsModel.get());
+	m_AmongUs->SetPosition(glm::vec3(0.0f, 50.0f, -100.0f));
+	m_AmongUs->SetScale(10.0f);
 
 	m_GameObjects["Sphere"] = m_Sphere;
 	m_GameObjects["Tree"] = m_Tree;
@@ -198,6 +202,7 @@ GameLayer::GameLayer()
 	m_GameObjects["Teapot"] = m_Teapot;
 	m_GameObjects["Eren"] = m_Eren;
 	m_GameObjects["Colossal"] = m_Colossal;
+	m_GameObjects["Among us"] = m_AmongUs;
 }
 
 void GameLayer::OnUpdate(const float dt)

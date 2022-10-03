@@ -275,7 +275,7 @@ int DrawVectorComponent(const char* name, float* num, const ImVec4& color, const
 	ImGui::SameLine();
 	ImGui::PushID(gameObjectPropsId++);
 	ImGui::SetNextItemWidth(60.0f);
-	changed |= ImGui::DragFloat("", num, 0.05f, -FLT_MAX, FLT_MAX, "%.2f");
+	changed |= ImGui::DragFloat("", num, 0.15f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::PopID();
 
 	return changed;

@@ -26,7 +26,7 @@ in vec3 v_WorldPos;
 in vec3 v_Normal;
 in vec2 v_TexCoord;
 
-const vec3 u_Albedo = vec3(1.0, 1.0, 1.0);
+const vec3 u_Albedo = vec3(1.0, 0.0, 0.0);
 const float u_Metallic = 0.0;
 const float u_Roughness = 0.5;
 const float u_AmbientOcclusion = 0.3;
