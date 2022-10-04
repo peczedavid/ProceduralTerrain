@@ -26,39 +26,23 @@ in vec3 v_WorldPos;
 in vec3 v_Normal;
 in vec2 v_TexCoord;
 
-const vec3 u_Albedo = vec3(1.0, 0.0, 0.0);
-const float u_Metallic = 0.0;
-const float u_Roughness = 0.5;
-const float u_AmbientOcclusion = 0.3;
-const float u_F0 = 0.4;
+uniform vec3 u_Albedo;
+uniform float u_Metallic;
+uniform float u_Roughness;
+uniform float u_AmbientOcclusion;
+uniform float u_F0;
 
 float distributionGGX(vec3 N, vec3 H, float roughness);
 float geometrySchlickGGX(float NdotV, float roughness);
 float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 
-struct PBRMaterial
-{
-    // Color
-	vec3 Albedo;
-	sampler2D AlbedoMap;
-	bool UseAlbedoMap;
-
-	// Modifiers
-	vec3 F0;
-	float Metallic;
-	float Roughness;
-	float AmbientOcclusion;
-};
-
-uniform PBRMaterial u_Material;
-
 void main()
 {
 	const vec3 N = normalize(v_Normal);
     const vec3 V = normalize(u_Camera.Position.xyz - v_WorldPos);
 
-    vec3 F0 = vec3(0.04);
+    vec3 F0 = vec3(u_F0);
 	F0 = mix(F0, u_Albedo, u_Metallic);
 
     const vec3 L = normalize(u_Enviroment.SunDirection);

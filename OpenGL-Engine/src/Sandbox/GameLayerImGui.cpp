@@ -6,6 +6,7 @@
 #include <dxgi1_4.h>
 #include "Rendering/Renderer.h"
 #include "Core/Application.h"
+#include "Rendering/Material.h"
 
 GameLayerImGui::GameLayerImGui(GameLayer* gameLayer)
 	: m_GameLayer(gameLayer)
@@ -357,23 +358,47 @@ void GameLayerImGui::PropertiesPanel()
 			return;
 		}
 
-		auto& position = m_SelectedObject->GetPosition();
-		ImGui::Text("Position");
-		if (DrawVector(position))
-			m_SelectedObject->SetPosition(position);
-
-		auto rotation = glm::degrees(m_SelectedObject->GetRotation());
-		ImGui::Text("Rotation");
-		if (DrawVector(rotation))
+		// Transform
 		{
-			rotation = glm::radians(rotation);
-			m_SelectedObject->SetRotation(rotation);
-		}
+			ImGui::Spacing();
+			ImGui::Text("Transform");
+			ImGui::Spacing();
+			ImGui::Spacing();
 
-		auto& scale = m_SelectedObject->GetScale();
-		ImGui::Text("Scale");
-		if (DrawVector(scale, 1.0f))
-			m_SelectedObject->SetScale(scale);
+			auto& position = m_SelectedObject->GetPosition();
+			ImGui::Text("Position");
+			ImGui::SameLine();
+			if (DrawVector(position))
+				m_SelectedObject->SetPosition(position);
+
+			auto rotation = glm::degrees(m_SelectedObject->GetRotation());
+			ImGui::Text("Rotation");
+			ImGui::SameLine();
+			if (DrawVector(rotation))
+			{
+				rotation = glm::radians(rotation);
+				m_SelectedObject->SetRotation(rotation);
+			}
+
+			auto& scale = m_SelectedObject->GetScale();
+			ImGui::Text("Scale   ");
+			ImGui::SameLine();
+			if (DrawVector(scale, 1.0f))
+				m_SelectedObject->SetScale(scale);
+		
+			ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Separator();
+		}
+	
+		{
+			ImGui::Spacing();
+			ImGui::Text("Material");
+			ImGui::Spacing();
+			ImGui::Spacing();
+			Ref<PBRMaterial> material = m_SelectedObject->GetMaterial();
+			ImGui::ColorEdit3("Abledo", &material->Albedo[0], 0);
+		}
 	}
 	ImGui::End();
 }

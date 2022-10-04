@@ -11,6 +11,7 @@
 #include "Rendering/Geometry/FullscreenQuad.h"
 #include "Rendering/GameObject.h"
 #include "Rendering/TrackballCamera.h"
+#include "Rendering/Material.h"
 
 class GameLayer : public Layer
 {

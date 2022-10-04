@@ -2,8 +2,9 @@
 
 #include "Rendering/GameObject.h"
 
-GameObject::GameObject(Model* model)
+GameObject::GameObject(Model* model, Ref<PBRMaterial> material)
 	: m_Model(model),
+	  m_Material(material),
 	  m_Translation(0.0f, 0.0, 0.0f),
 	  m_EulerRotation(0.0f, 0.0f, 0.0f),
 	  m_Scale(1.0f, 1.0f, 1.0f),
@@ -16,9 +17,10 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::Draw(const Shader& shader)
+void GameObject::Draw()
 {
-	shader.SetUniform("u_Model", m_Transform);
+	m_Material->SetUniforms();
+	m_Material->Shader->SetUniform("u_Model", m_Transform);
 	m_Model->Draw();
 }
 
@@ -72,6 +74,11 @@ glm::vec3& GameObject::GetRotation()
 glm::vec3& GameObject::GetScale()
 {
 	return m_Scale;
+}
+
+Ref<PBRMaterial> GameObject::GetMaterial()
+{
+	return m_Material;
 }
 
 void GameObject::CalculateTransform()

@@ -175,24 +175,31 @@ GameLayer::GameLayer()
 	m_ColossalModel = CreateRef<Model>("assets/Models/colossal.obj");
 	m_AmongUsModel = CreateRef<Model>("assets/Models/amogus.obj");
 
-	m_Sphere = CreateRef<GameObject>(m_SphereModel.get());
+	Ref<PBRMaterial> whitePBRmaterial = CreateRef<PBRMaterial>();
+	whitePBRmaterial->Shader = m_ShaderLibrary.Get("PBR shader");
+
+	Ref<PBRMaterial> redPBRMaterial = CreateRef<PBRMaterial>();
+	redPBRMaterial->Shader = m_ShaderLibrary.Get("PBR shader");
+	redPBRMaterial->Albedo = glm::vec3(1, 0, 0);
+
+	m_Sphere = CreateRef<GameObject>(m_SphereModel.get(), whitePBRmaterial);
 	m_Sphere->SetPosition(glm::vec3(30.0f, 50.0f, -50.0f));
 	m_Sphere->SetScale(10.0f);
-	m_Teapot = CreateRef<GameObject>(m_TeapotModel.get());
+	m_Teapot = CreateRef<GameObject>(m_TeapotModel.get(), whitePBRmaterial);
 	m_Teapot->SetPosition(glm::vec3(-30.0f, 50.0f, -50.0f));
-	m_Monkey = CreateRef<GameObject>(m_MonkeyModel.get());
+	m_Monkey = CreateRef<GameObject>(m_MonkeyModel.get(), whitePBRmaterial);
 	m_Monkey->SetPosition(glm::vec3(0.0f, 50.0f, -50.0f));
 	m_Monkey->SetScale(10.0f);
-	m_Tree = CreateRef<GameObject>(m_TreeModel.get());
-	m_Tree->SetPosition(glm::vec3(0.0f, 50.0f, -75.0f));
+	m_Tree = CreateRef<GameObject>(m_TreeModel.get(), whitePBRmaterial);
+	m_Tree->SetPosition(glm::vec3(-50.0f, 50.0f, -50.0f));
 	m_Tree->SetScale(15.0f);
-	m_Eren = CreateRef<GameObject>(m_ErenModel.get());
+	m_Eren = CreateRef<GameObject>(m_ErenModel.get(), whitePBRmaterial);
 	m_Eren->SetPosition(glm::vec3(-50.0f, 50.0f, -125.0f));
 	m_Eren->SetScale(15.0f);
-	m_Colossal = CreateRef<GameObject>(m_ColossalModel.get());
+	m_Colossal = CreateRef<GameObject>(m_ColossalModel.get(), redPBRMaterial);
 	m_Colossal->SetPosition(glm::vec3(50.0f, 50.0f, -175.0f));
 	m_Colossal->SetScale(2.0f);
-	m_AmongUs = CreateRef<GameObject>(m_AmongUsModel.get());
+	m_AmongUs = CreateRef<GameObject>(m_AmongUsModel.get(), redPBRMaterial);
 	m_AmongUs->SetPosition(glm::vec3(0.0f, 50.0f, -100.0f));
 	m_AmongUs->SetScale(10.0f);
 
@@ -255,7 +262,7 @@ void GameLayer::OnUpdate(const float dt)
 	shader->Use();
 	//shader->SetUniform("u_Albedo", glm::vec3(1.0f, 1.0f, 1.0f));
 	for (auto& gameObject : m_GameObjects)
-		gameObject.second->Draw(*shader.get());
+		gameObject.second->Draw();
 
 #if 1
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
