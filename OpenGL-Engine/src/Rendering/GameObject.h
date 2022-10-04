@@ -12,6 +12,7 @@ public:
 
 	void Draw(const Shader& shader);
 	
+	void Set(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale);
 	void SetPosition(const glm::vec3& position);
 	void SetRotation(const glm::vec3& rotation);
 	void SetScale(const float scale);

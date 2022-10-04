@@ -45,13 +45,38 @@ void GameLayerImGui::ViewportPanel()
 				const glm::mat4 view = camera->GetView();
 				const glm::mat4 proj = camera->GetProj();
 				glm::mat4 transform = m_SelectedObject->GetTransform();
+				const auto originalRotation = m_SelectedObject->GetRotation();
 
-				ImGuizmo::Manipulate(&view[0][0], &proj[0][0], ImGuizmo::OPERATION::TRANSLATE,
-					ImGuizmo::MODE::WORLD, &transform[0][0]);
+				static ImGuizmo::OPERATION operation = ImGuizmo::OPERATION::TRANSLATE;
+				static ImGuizmo::MODE mode = ImGuizmo::MODE::WORLD;
+
+				if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+				{
+					if (ImGui::IsKeyDown(ImGuiKey_Q))
+					{
+						operation = ImGuizmo::OPERATION::TRANSLATE;
+						mode = ImGuizmo::MODE::WORLD;
+					}
+					if (ImGui::IsKeyDown(ImGuiKey_W))
+					{
+						operation = ImGuizmo::OPERATION::ROTATE;
+						mode = ImGuizmo::MODE::WORLD;
+					}
+					if (ImGui::IsKeyDown(ImGuiKey_E))
+					{
+						operation = ImGuizmo::OPERATION::SCALE;
+						mode = ImGuizmo::MODE::WORLD;
+					}
+				}
+
+				ImGuizmo::Manipulate(&view[0][0], &proj[0][0], operation, mode, &transform[0][0]);
 
 				if (ImGuizmo::IsUsing())
 				{
-					m_SelectedObject->SetPosition(transform[3]);
+					glm::vec3 translation, rotation, scale;
+					ImGuizmo::DecomposeMatrixToComponents(&transform[0][0], &translation[0], &rotation[0], &scale[0]);
+					glm::vec3 deltaRotation = glm::radians(rotation) - originalRotation;
+					m_SelectedObject->Set(translation, originalRotation + deltaRotation, scale);
 				}
 			}
 		}

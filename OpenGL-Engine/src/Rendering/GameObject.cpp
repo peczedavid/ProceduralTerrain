@@ -22,6 +22,14 @@ void GameObject::Draw(const Shader& shader)
 	m_Model->Draw();
 }
 
+void GameObject::Set(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
+{
+	m_Translation = position;
+	m_EulerRotation = rotation;
+	m_Scale = scale;
+	CalculateTransform();
+}
+
 void GameObject::SetPosition(const glm::vec3& position)
 {
 	m_Translation = position;
