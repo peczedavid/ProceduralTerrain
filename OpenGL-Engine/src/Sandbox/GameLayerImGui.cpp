@@ -60,7 +60,7 @@ void GameLayerImGui::ViewportPanel()
 					if (ImGui::IsKeyDown(ImGuiKey_W))
 					{
 						operation = ImGuizmo::OPERATION::ROTATE;
-						mode = ImGuizmo::MODE::WORLD;
+						mode = ImGuizmo::MODE::LOCAL;
 					}
 					if (ImGui::IsKeyDown(ImGuiKey_E))
 					{

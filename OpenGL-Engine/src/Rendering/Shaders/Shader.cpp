@@ -258,16 +258,36 @@ void Shader::ParseTexUnits(Shader::ShaderInfo& shaderInfo)
 			std::istringstream lineStream(line);
 			int tokenIndex = 0;
 			TextureUnit textureUnit{};
+			bool globalUniform = true;
 			while (std::getline(lineStream, token, ' '))
 			{
-				if (tokenIndex == 1) // type
+				if (tokenIndex == 0)
 				{
-					textureUnit.Type = GetSamplerType(token);
+					if (token != "uniform") // type
+					{
+						globalUniform = false;
+						textureUnit.Type = GetSamplerType(token);
+					}
 				}
-				else if (tokenIndex == 2) // name
+				else if (tokenIndex == 1) 
 				{
-					token = token.substr(0, token.find(';'));
-					textureUnit.Name = token;
+					if (globalUniform) // type
+					{
+						textureUnit.Type = GetSamplerType(token);
+					}
+					else // name
+					{
+						token = token.substr(0, token.find(';'));
+						textureUnit.Name = token;
+					}
+				}
+				else if (tokenIndex == 2) 
+				{
+					if (globalUniform) // name
+					{
+						token = token.substr(0, token.find(';'));
+						textureUnit.Name = token;
+					}
 				}
 
 				tokenIndex++;

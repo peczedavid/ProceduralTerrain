@@ -37,6 +37,22 @@ float geometrySchlickGGX(float NdotV, float roughness);
 float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 
+struct PBRMaterial
+{
+    // Color
+	vec3 Albedo;
+	sampler2D AlbedoMap;
+	bool UseAlbedoMap;
+
+	// Modifiers
+	vec3 F0;
+	float Metallic;
+	float Roughness;
+	float AmbientOcclusion;
+};
+
+uniform PBRMaterial u_Material;
+
 void main()
 {
 	const vec3 N = normalize(v_Normal);
