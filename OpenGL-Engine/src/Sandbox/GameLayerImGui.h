@@ -24,5 +24,5 @@ private:
 	void DrawImage(uint32_t textureId, float my_tex_w = 200.0f, float my_tex_h = 200.0f);
 private:
 	GameLayer* m_GameLayer;
-	GameObject* m_SelectedObject;
+	GameObject* m_SelectedObject = nullptr;
 };

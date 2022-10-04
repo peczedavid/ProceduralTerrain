@@ -35,7 +35,7 @@ void GameLayerImGui::ViewportPanel()
 
 			if (m_SelectedObject)
 			{
-				ImGuizmo::SetOrthographic(true);
+				ImGuizmo::SetOrthographic(false);
 				ImGuizmo::SetDrawlist();
 				float windowWidth = (float)ImGui::GetWindowWidth();
 				float windowHeight = (float)ImGui::GetWindowHeight();
@@ -276,7 +276,7 @@ void GameLayerImGui::DrawImage(uint32_t textureId, float my_tex_w, float my_tex_
 }
 
 static int gameObjectPropsId = 0;
-static int selectionMask = 1;
+static int selectionMask = -1;
 
 int DrawVectorComponent(const char* name, float* num, const ImVec4& color, const float defaultValue = 0.0f)
 {
@@ -326,6 +326,11 @@ void GameLayerImGui::PropertiesPanel()
 	if (ImGui::Begin("Properties"))
 	{
 		gameObjectPropsId = 0;
+		if (!m_SelectedObject)
+		{
+			ImGui::End();
+			return;
+		}
 
 		auto& position = m_SelectedObject->GetPosition();
 		ImGui::Text("Position");
@@ -362,7 +367,7 @@ void GameLayerImGui::GameObjectsPanel()
 		for (auto& element : m_GameLayer->m_GameObjects)
 		{
 			ImGuiTreeNodeFlags nodeFlags = baseFlags;
-			const bool isSelected = (selectionMask & (1 << i)) != 0;
+			const bool isSelected = selectionMask == -1 ? false : (selectionMask & (1 << i)) != 0;
 			if (isSelected)
 			{
 				nodeFlags |= ImGuiTreeNodeFlags_Selected;
@@ -381,7 +386,17 @@ void GameLayerImGui::GameObjectsPanel()
 			i++;
 		}
 		if (nodeClicked != -1)
-			selectionMask = (1 << nodeClicked); // Click to single-select
+		{
+			if (selectionMask == (1 << nodeClicked)) // De-selected
+			{
+				selectionMask = -1;
+				m_SelectedObject = nullptr;
+			}
+			else
+			{
+				selectionMask = (1 << nodeClicked); // Selected
+			}
+		}
 	}
 	ImGui::End();
 }
