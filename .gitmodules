@@ -11,3 +11,6 @@
 [submodule "OpenGL-Engine/vendor/spdlog"]
 	path = OpenGL-Engine/vendor/spdlog
 	url = https://github.com/peczedavid/spdlog
+[submodule "OpenGL-Engine/vendor/ImGuizmo"]
+	path = OpenGL-Engine/vendor/ImGuizmo
+	url = https://github.com/peczedavid/ImGuizmo.git

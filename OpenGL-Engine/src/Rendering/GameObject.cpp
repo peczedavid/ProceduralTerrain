@@ -46,6 +46,11 @@ void GameObject::SetScale(const glm::vec3& scale)
 	CalculateTransform();
 }
 
+glm::mat4& GameObject::GetTransform()
+{
+	return m_Transform;
+}
+
 glm::vec3& GameObject::GetPosition()
 {
 	return m_Translation;

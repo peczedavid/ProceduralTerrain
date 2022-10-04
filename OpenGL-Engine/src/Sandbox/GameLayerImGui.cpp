@@ -2,6 +2,7 @@
 
 #include "Sandbox/GameLayerImGui.h"
 #include <imgui.h>
+#include <ImGuizmo.h>
 #include <dxgi1_4.h>
 #include "Rendering/Renderer.h"
 #include "Core/Application.h"
@@ -31,6 +32,28 @@ void GameLayerImGui::ViewportPanel()
 			const ImVec2 uv_min(0.0f, 1.0f); // Top-left
 			const ImVec2 uv_max(1.0f, 0.0f); // Lower-right
 			ImGui::Image((ImTextureID)m_GameLayer->m_FrameBuffer->GetTextureId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+
+			if (m_SelectedObject)
+			{
+				ImGuizmo::SetOrthographic(true);
+				ImGuizmo::SetDrawlist();
+				float windowWidth = (float)ImGui::GetWindowWidth();
+				float windowHeight = (float)ImGui::GetWindowHeight();
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+				auto camera = m_GameLayer->m_Camera.get();
+				const glm::mat4 view = camera->GetView();
+				const glm::mat4 proj = camera->GetProj();
+				glm::mat4 transform = m_SelectedObject->GetTransform();
+
+				ImGuizmo::Manipulate(&view[0][0], &proj[0][0], ImGuizmo::OPERATION::TRANSLATE,
+					ImGuizmo::MODE::WORLD, &transform[0][0]);
+
+				if (ImGuizmo::IsUsing())
+				{
+					m_SelectedObject->SetPosition(transform[3]);
+				}
+			}
 		}
 	}
 	ImGui::End();

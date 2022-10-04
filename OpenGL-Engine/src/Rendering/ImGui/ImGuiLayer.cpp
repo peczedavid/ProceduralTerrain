@@ -1,9 +1,10 @@
 #include "pch.h"
 
 #include "Rendering/ImGui/ImGuiLayer.h"
+#include "Core/Application.h"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
-#include <Core/Application.h>
+#include <ImGuizmo.h>
 
 ImGuiLayer::ImGuiLayer()
 {
@@ -24,6 +25,8 @@ void ImGuiLayer::OnAttach()
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 	io.MouseDrawCursor = false;
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
+	ImGuizmo::AllowAxisFlip(false);
 
 	this->SetBlackTheme();
 	this->SetStyle();
@@ -55,6 +58,7 @@ void ImGuiLayer::Begin()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	const static bool opt_fullscreen = true;
 	const static bool opt_padding = false;

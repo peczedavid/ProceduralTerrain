@@ -19,6 +19,7 @@ IncludeDir["ImGui"] = "OpenGL-Engine/vendor/imgui"
 IncludeDir["glm"] = "OpenGL-Engine/vendor/glm"
 IncludeDir["stb_image"] = "OpenGL-Engine/vendor/stb_image"
 IncludeDir["spdlog"] = "OpenGL-Engine/vendor/spdlog/include"
+IncludeDir["ImGuizmo"] = "OpenGL-Engine/vendor/ImGuizmo"
 
 group "Dependencies"
     -- Include projects with the premake5.lua file in it
@@ -48,7 +49,9 @@ project "OpenGL-Engine"
         "%{prj.name}/vendor/glm/glm/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.inl",
         "%{prj.name}/vendor/stb_image/**.h",
-        "%{prj.name}/vendor/stb_image/**.cpp"
+        "%{prj.name}/vendor/stb_image/**.cpp",
+        "%{prj.name}/vendor/ImGuizmo/ImGuizmo.h",
+        "%{prj.name}/vendor/ImGuizmo/ImGuizmo.cpp",
     }
 
     defines
@@ -64,7 +67,8 @@ project "OpenGL-Engine"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb_image}",
-        "%{IncludeDir.spdlog}"
+        "%{IncludeDir.spdlog}",
+        "%{IncludeDir.ImGuizmo}",
     }
 
     links
@@ -76,6 +80,9 @@ project "OpenGL-Engine"
         "Dxgi.lib",
         "Dxgi.dll"
     }
+
+    filter "files:OpenGL-Engine/vendor/ImGuizmo/ImGuizmo.cpp"
+    flags { "NoPCH" }
 
     filter "system:windows"
         systemversion "latest"

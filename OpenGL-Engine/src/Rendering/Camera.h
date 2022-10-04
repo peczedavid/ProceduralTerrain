@@ -43,7 +43,7 @@ public:
 	inline const glm::vec3& GetUp() const { return m_Up; }
 
 	inline glm::mat4& GetView() { return m_View; }
-	inline const glm::mat4& GetView() const { return m_View; }
+	//inline const glm::mat4& GetView() const { return m_View; }
 	inline glm::mat4& GetProj() { return m_Proj; }
-	inline const glm::mat4& GetProj() const { return m_Proj; }
+	//inline const glm::mat4& GetProj() const { return m_Proj; }
 };

@@ -17,6 +17,8 @@ public:
 	void SetScale(const float scale);
 	void SetScale(const glm::vec3& scale);
 
+	glm::mat4& GetTransform();
+
 	glm::vec3& GetPosition();
 	glm::vec3& GetRotation();
 	glm::vec3& GetScale();
