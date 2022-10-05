@@ -8,9 +8,12 @@
 #include "Core/Application.h"
 #include "Rendering/Material.h"
 
+Ref<Texture2D> GameLayerImGui::s_PlaceHolderTexture;
+
 GameLayerImGui::GameLayerImGui(GameLayer* gameLayer)
 	: m_GameLayer(gameLayer)
 {
+	s_PlaceHolderTexture = CreateRef<Texture2D>("assets/Textures/placeholder.png", GL_NEAREST, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 }
 
 void GameLayerImGui::ViewportPanel()

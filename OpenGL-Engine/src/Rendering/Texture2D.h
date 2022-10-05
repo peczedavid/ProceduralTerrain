@@ -15,7 +15,7 @@ public:
 	void Bind(uint32_t slot = 0u);
 	void BindImage(uint32_t slot = 0u, GLenum access = GL_READ_WRITE);
 private:
-	uint32_t m_Id;
+	uint32_t m_Id = 0;
 	uint32_t m_Width, m_Height;
 	uint32_t m_InternalFormat;
 
