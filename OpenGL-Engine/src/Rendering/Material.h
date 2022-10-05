@@ -5,11 +5,21 @@
 #include "Core/Core.h"
 #include "Rendering/Shaders/Shader.h"
 
-struct PBRMaterial
-{
-	// Shader
-	Ref<Shader> Shader;
+struct Material {
 
+	virtual void SetUniforms() = 0;
+	virtual Ref<Shader> GetShader() = 0;
+	virtual void SetShader(Ref<Shader> shader) = 0;
+
+	virtual void DrawImGui() {}
+};
+
+struct PBRMaterial : Material
+{
+private:
+	// Shader
+	Ref<Shader> m_Shader;
+public:
 	// Color
 	glm::vec3 Albedo = glm::vec3(1.0f, 1.0f, 1.0f);
 	Ref<Texture2D> AlbedoMap;
@@ -21,13 +31,9 @@ struct PBRMaterial
 	float Roughness = 0.5f;
 	float AmbientOcclusion = 0.3f;
 
-	void SetUniforms()
-	{
-		Shader->Use();
-		Shader->SetUniform("u_Albedo", Albedo);
-		Shader->SetUniform("u_AmbientOcclusion", AmbientOcclusion);
-		Shader->SetUniform("u_Roughness", Roughness);
-		Shader->SetUniform("u_F0", F0);
-		Shader->SetUniform("u_Metallic", Metallic);
-	}
+	Ref<Shader> GetShader() override;
+	void SetShader(Ref<Shader> shader) override;
+
+	void SetUniforms() override;
+	void DrawImGui() override;
 };

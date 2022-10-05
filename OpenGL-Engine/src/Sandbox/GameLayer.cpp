@@ -21,17 +21,17 @@
 //       - object loading							DONE
 //		 - don't pass shared_ptr -> pass by
 //		   reference .get() return value
-//		 - logging to imgui window
+//		 - logging to imgui window					DONE
 //			
-//		 - nice gerstner waves
+//		 - nice gerstner waves						DONE
 //		 - scene system (switching between scenes)
 //		 - infinite grid CTRL+G toggle
-//		 - materials, pbr rendering?
-//		 - tree rendering
+//		 - materials, pbr rendering?				WIP    - material interface
+//		 - tree rendering							WIP
 // 
 //		 - screenshots in dist mode
 //		 - profiling (maybe benchmark scene)
-//		 - trackball camera controls
+//		 - trackball camera controls				WIP    - camera interface
 //		 https://computergraphics.stackexchange.com/questions/151/how-to-implement-a-trackball-in-opengl
 
 #include "pch.h"
@@ -176,10 +176,10 @@ GameLayer::GameLayer()
 	m_AmongUsModel = CreateRef<Model>("assets/Models/amogus.obj");
 
 	Ref<PBRMaterial> whitePBRmaterial = CreateRef<PBRMaterial>();
-	whitePBRmaterial->Shader = m_ShaderLibrary.Get("PBR shader");
+	whitePBRmaterial->SetShader(m_ShaderLibrary.Get("PBR shader"));
 
 	Ref<PBRMaterial> redPBRMaterial = CreateRef<PBRMaterial>();
-	redPBRMaterial->Shader = m_ShaderLibrary.Get("PBR shader");
+	redPBRMaterial->SetShader(m_ShaderLibrary.Get("PBR shader"));
 	redPBRMaterial->Albedo = glm::vec3(1, 0, 0);
 
 	m_Sphere = CreateRef<GameObject>(m_SphereModel.get(), whitePBRmaterial);

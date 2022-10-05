@@ -7,7 +7,7 @@
 class GameObject
 {
 public:
-	GameObject(Model* model, Ref<PBRMaterial> material);
+	GameObject(Model* model, Ref<Material> material);
 	GameObject(const GameObject&) = delete;
 	GameObject operator=(const GameObject&) = delete;
 	~GameObject();
@@ -25,12 +25,12 @@ public:
 	glm::vec3& GetPosition();
 	glm::vec3& GetRotation();
 	glm::vec3& GetScale();
-	Ref<PBRMaterial> GetMaterial();
+	Ref<Material> GetMaterial();
 private:
 	void CalculateTransform();
 private:
 	Model* m_Model;
-	Ref<PBRMaterial> m_Material;
+	Ref<Material> m_Material;
 	glm::mat4 m_Transform;
 	glm::vec3 m_Translation, m_EulerRotation, m_Scale;
 };

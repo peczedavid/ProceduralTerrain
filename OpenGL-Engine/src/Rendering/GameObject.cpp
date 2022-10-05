@@ -2,7 +2,7 @@
 
 #include "Rendering/GameObject.h"
 
-GameObject::GameObject(Model* model, Ref<PBRMaterial> material)
+GameObject::GameObject(Model* model, Ref<Material> material)
 	: m_Model(model),
 	  m_Material(material),
 	  m_Translation(0.0f, 0.0, 0.0f),
@@ -20,7 +20,7 @@ GameObject::~GameObject()
 void GameObject::Draw()
 {
 	m_Material->SetUniforms();
-	m_Material->Shader->SetUniform("u_Model", m_Transform);
+	m_Material->GetShader()->SetUniform("u_Model", m_Transform);
 	m_Model->Draw();
 }
 
@@ -76,7 +76,7 @@ glm::vec3& GameObject::GetScale()
 	return m_Scale;
 }
 
-Ref<PBRMaterial> GameObject::GetMaterial()
+Ref<Material> GameObject::GetMaterial()
 {
 	return m_Material;
 }

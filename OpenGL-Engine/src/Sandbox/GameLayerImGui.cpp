@@ -396,12 +396,7 @@ void GameLayerImGui::PropertiesPanel()
 			ImGui::Text("Material");
 			ImGui::Spacing();
 			ImGui::Spacing();
-			Ref<PBRMaterial> material = m_SelectedObject->GetMaterial();
-			ImGui::ColorEdit3("Abledo", &material->Albedo[0], 0);
-			ImGui::DragFloat("Roughness", &material->Roughness, 0.001f, 0.0f, 1.0f);
-			ImGui::DragFloat("Metallic", &material->Metallic, 0.001f, 0.0f, 1.0f);
-			ImGui::DragFloat("Ambient occlusion", &material->AmbientOcclusion, 0.001f, 0.0f, 1.0f);
-			ImGui::DragFloat("F0", &material->F0, 0.0001f, 0.0f, 1.0f);
+			m_SelectedObject->GetMaterial()->DrawImGui();
 		}
 	}
 	ImGui::End();
