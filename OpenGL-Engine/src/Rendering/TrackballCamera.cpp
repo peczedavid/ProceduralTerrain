@@ -30,16 +30,21 @@ void TrackballCamera::Update(const float dt)
 	static bool first = true;
 	GLFWwindow* glfwWindow = Application::Get().GetWindow()->GetNativeWindow();
 
-	if (glfwGetKey(glfwWindow, GLFW_KEY_UP) == GLFW_PRESS)
+	if (glfwGetKey(glfwWindow, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		m_Radius -= 25.0f * dt;
+		Zoom(25.0f * dt);
 	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_DOWN) == GLFW_PRESS)
+	if (glfwGetKey(glfwWindow, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-		m_Radius += 25.0f * dt;
+		Zoom(-25.0f * dt);
 	}
 
 	m_Radius = glm::clamp(m_Radius, 1.0f, FLT_MAX);
+}
+
+void TrackballCamera::Zoom(float dist)
+{
+	m_Radius -= dist;
 }
 
 void TrackballCamera::Resize(const uint32_t width, const uint32_t height)

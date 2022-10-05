@@ -13,12 +13,14 @@ public:
 	void UpdateMatrix(const float fovDeg, const float nearPlane, const float farPlane);
 	void Update(const float dt);
 
+	void Zoom(float dist);
 	void Resize(const uint32_t width, const uint32_t height);
 private:
 	glm::mat4 m_View, m_Proj, m_ViewProj;
-	glm::vec3 m_Position, m_LookAt;
+	glm::vec3 m_Position;
+	glm::vec3 m_LookAt;
 	glm::vec3 m_Up;
-	float m_Radius;
+	float m_Radius = 50.0f;
 	uint32_t m_Width, m_Height;
 public:
 	inline float GetRadius() { return m_Radius; }

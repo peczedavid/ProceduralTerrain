@@ -85,7 +85,7 @@ GameLayer::GameLayer()
 
 	m_Camera = CreateRef<Camera>(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
-	m_TrackballCamera = CreateRef<TrackballCamera>(128.0f, glm::vec3(0, 0, -75.0f));
+	m_TrackballCamera = CreateRef<TrackballCamera>(128.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	m_TrackballCamera->Resize(1, 1);
 
 	auto skyboxShader = CreateShaderRef("assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag");
@@ -270,7 +270,6 @@ void GameLayer::OnUpdate(const float dt)
 	m_WaterTexture->Bind(0);
 	waterShader->SetUniform("u_Shininess", m_WaterShininess);
 	waterShader->SetUniform("u_Reflectivity", m_WaterReflectivity);
-	waterShader->SetUniform("u_CameraPos", m_Camera->GetPosition());
 	waterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
 	waterShader->SetUniform("u_Model", model);
