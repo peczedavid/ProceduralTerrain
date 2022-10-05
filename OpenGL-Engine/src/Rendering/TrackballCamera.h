@@ -20,7 +20,9 @@ private:
 	glm::vec3 m_Position;
 	glm::vec3 m_LookAt;
 	glm::vec3 m_Up;
-	float m_Radius = 50.0f;
+	float m_Theta = 3.141f / 4.0f;
+	float m_Phi = 3.141f / 2.0f;
+	float m_Radius;
 	uint32_t m_Width, m_Height;
 public:
 	inline float GetRadius() { return m_Radius; }
