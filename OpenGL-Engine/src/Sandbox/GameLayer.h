@@ -10,7 +10,6 @@
 #include "Rendering/FrameBuffer.h"
 #include "Rendering/Geometry/FullscreenQuad.h"
 #include "Rendering/GameObject.h"
-#include "Rendering/TrackballCamera.h"
 #include "Rendering/Material.h"
 
 class GameLayer : public Layer
@@ -27,6 +26,7 @@ private:
 	void RenderStart();
 	void RenderEnd();
 
+	void ToggleCamera();
 	void SetUniformBuffers();
 	void GenerateTerrain();
 	void UpdateFPS(const float dt);
@@ -36,9 +36,10 @@ private:
 	GLuint m_WavesUBO;
 	GLuint m_EnviromentUBO;
 
-	Ref<Camera> m_Camera;
+	Ref<FPSCamera> m_Camera;
 	Ref<TrackballCamera> m_TrackballCamera;
-	uint32_t m_SelectedCamera = 1;
+	Camera* m_ActiveCamera;
+	uint32_t m_SelectedCamera = 0;
 	Ref<Skybox> m_Skybox;
 	Ref<Axis> m_Axis;
 

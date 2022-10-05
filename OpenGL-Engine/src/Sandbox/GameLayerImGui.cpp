@@ -191,9 +191,9 @@ void GameLayerImGui::DebugOverlayPanel()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::Begin("Debug overaly", (bool*)1, window_flags);
 	ImGui::Text("Viewport size: %.0fx%.0f", m_GameLayer->m_ViewportSize.x, m_GameLayer->m_ViewportSize.y);
-	const glm::vec3 cameraPos = m_GameLayer->m_Camera->GetPosition();
+	const glm::vec3 cameraPos = m_GameLayer->m_ActiveCamera->GetPosition();
 	ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.z);
-	const glm::vec3 cameraOri = m_GameLayer->m_Camera->GetOrientation();
+	const glm::vec3 cameraOri = m_GameLayer->m_ActiveCamera->GetOrientation();
 	ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.z);
 	ImGui::Text("%d FPS (max: %.0f)", m_GameLayer->m_FPS, Renderer::FPSPool.GetMax());
 	ImGui::Text("%.4f ms", 1.0f / m_GameLayer->m_FPS);
@@ -229,7 +229,7 @@ void GameLayerImGui::GraphicsSettingsPanel()
 		window->SetVSync(vSync);
 		if (ImGui::Button("Toggle camera"))
 		{
-			m_GameLayer->m_SelectedCamera = (m_GameLayer->m_SelectedCamera + 1) % 2;
+			m_GameLayer->ToggleCamera();
 		}
 	}
 	ImGui::End();

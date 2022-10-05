@@ -5,12 +5,12 @@
 #include <GLFW/glfw3.h>
 #include <Core/Application.h>
 
-Camera::Camera(const glm::vec3& position, const glm::vec3& orientation)
+FPSCamera::FPSCamera(const glm::vec3& position, const glm::vec3& orientation)
 	: m_Position(position), m_Orientation(glm::normalize(orientation)), m_Up({ 0.0f, 1.0f, 0.0f })
 {
 }
 
-void Camera::UpdateMatrix(const float fovDeg, const float nearPlane, const float farPlane)
+void FPSCamera::CalculateMatrix(const float fovDeg, const float nearPlane, const float farPlane)
 {
 	m_Proj = glm::mat4(1.0f);
 	m_View = glm::mat4(1.0f);
@@ -25,8 +25,11 @@ void Camera::UpdateMatrix(const float fovDeg, const float nearPlane, const float
 	m_CameraMatrix = m_Proj * m_View;
 }
 
-void Camera::Update(const float dt)
+void FPSCamera::Update(const float dt)
 {
+	if (Application::Get().IsCursor())
+		return;
+
 	GLFWwindow* glfwWindow = Application::Get().GetWindow()->GetNativeWindow();
 
 	if (glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS)
@@ -102,7 +105,86 @@ void Camera::Update(const float dt)
 	glfwSetCursorPos(glfwWindow, (m_Width / 2), (m_Height / 2));
 }
 
-void Camera::Resize(const uint32_t width, const uint32_t height)
+void FPSCamera::Resize(const uint32_t width, const uint32_t height)
+{
+	m_Width = width;
+	m_Height = height;
+}
+
+
+TrackballCamera::TrackballCamera(const float radius, const glm::vec3& lookat)
+	: m_Radius(radius), m_LookAt(lookat), m_Up({ 0.0f, 1.0f, 0.0f })
+{
+	float x = m_Radius * sinf(m_Theta) * cosf(m_Phi);
+	float y = m_Radius * cosf(m_Theta);
+	float z = m_Radius * sinf(m_Theta) * sinf(m_Phi);
+
+	m_Position = glm::vec3(x, y, z);
+}
+
+// 0 <= theta <= pi (0 = top most position, pi = lower most position)
+// 0 <= phi <= 2pi (0 = looking from +x towars -x)
+// 
+// x = r * sin(theta) * cos(phi)
+// y = r * cos(theta)
+// z = r * sin(theta) * sin(phi)
+
+void TrackballCamera::CalculateMatrix(const float fovDeg, const float nearPlane, const float farPlane)
+{
+	m_Proj = glm::mat4(1.0f);
+	m_View = glm::mat4(1.0f);
+
+	float x = m_Radius * sinf(m_Theta) * cosf(m_Phi);
+	float y = m_Radius * cosf(m_Theta);
+	float z = m_Radius * sinf(m_Theta) * sinf(m_Phi);
+
+	m_Position = glm::vec3(x, y, z);
+
+	m_View = glm::lookAt(m_Position, m_LookAt, m_Up);
+	m_Proj = glm::perspective(
+		glm::radians(fovDeg),
+		(float)m_Width / (float)m_Height,
+		nearPlane,
+		farPlane
+	);
+	m_ViewProj = m_Proj * m_View;
+}
+
+void TrackballCamera::Update(const float dt)
+{
+	if (!Application::Get().IsCursor())
+		return;
+
+	GLFWwindow* glfwWindow = Application::Get().GetWindow()->GetNativeWindow();
+
+	if (glfwGetKey(glfwWindow, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		m_Radius -= 25.0f * dt;
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		m_Radius -= -25.0f * dt;
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		m_Phi += 3.141f / 3.0f * dt;
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		m_Phi -= 3.141f / 3.0f * dt;
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		m_Theta -= 3.141f / 3.0f * dt;
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		m_Theta += 3.141f / 3.0f * dt;
+	}
+	m_Radius = glm::clamp(m_Radius, 1.0f, FLT_MAX);
+}
+
+void TrackballCamera::Resize(const uint32_t width, const uint32_t height)
 {
 	m_Width = width;
 	m_Height = height;

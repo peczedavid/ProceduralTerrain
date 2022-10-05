@@ -12,7 +12,7 @@ public:
 	Axis(Ref<Shader> m_Shader);
 	~Axis();
 
-	void Render(Ref<Camera> camera);
+	void Render(Camera* camera);
 	Ref<Shader> m_Shader;
 private:
 	uint32_t m_Vao, m_Vbo;

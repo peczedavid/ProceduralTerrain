@@ -84,10 +84,12 @@ GameLayer::GameLayer()
 	m_GroundPlane = CreateRef<Plane>(planeSize, planeDivision);
 	m_WaterPlane = CreateRef<Plane>(waterPlaneSize, waterPlaneDivision);
 
-	m_Camera = CreateRef<Camera>(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
+	m_Camera = CreateRef<FPSCamera>(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
 	m_TrackballCamera = CreateRef<TrackballCamera>(192.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	m_TrackballCamera->Resize(1, 1);
+	ToggleCamera();
+
 
 	auto skyboxShader = CreateShaderRef("assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag");
 	m_ShaderLibrary.Add("Skybox shader", skyboxShader);
@@ -222,12 +224,10 @@ void GameLayer::OnUpdate(const float dt)
 	m_Time += dt;
 	const float fov = 45.0f, const nearPlane = 0.1f, const farPlane = 3000.0f;
 
-	m_Camera->UpdateMatrix(fov, nearPlane, farPlane);
-	m_TrackballCamera->UpdateMatrix(fov, nearPlane, farPlane);
-	if (!Application::Get().IsCursor())
-	{
-		m_Camera->Update(dt);
-	}
+	m_Camera->CalculateMatrix(fov, nearPlane, farPlane);
+	m_TrackballCamera->CalculateMatrix(fov, nearPlane, farPlane);
+
+	m_Camera->Update(dt);
 	m_TrackballCamera->Update(dt);
 
 	SetUniformBuffers();
@@ -278,7 +278,7 @@ void GameLayer::OnUpdate(const float dt)
 #endif
 
 	if (Renderer::DebugView)
-		m_Axis->Render(m_Camera);
+		m_Axis->Render(m_ActiveCamera);
 
 	//FFTLoop();
 
@@ -354,23 +354,22 @@ void GameLayer::RenderEnd()
 #endif
 }
 
+void GameLayer::ToggleCamera()
+{
+	m_SelectedCamera = (m_SelectedCamera + 1) % 2;
+	if (m_SelectedCamera == 0)
+		m_ActiveCamera = m_Camera.get();
+	else if (m_SelectedCamera == 1)
+		m_ActiveCamera = m_TrackballCamera.get();
+}
+
 void GameLayer::SetUniformBuffers()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, m_CameraUBO);
-	if (m_SelectedCamera == 0)
-	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetProj()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetMatrix()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), sizeof(glm::vec4), &m_Camera->GetPosition()[0]);
-	}
-	else if (m_SelectedCamera == 1)
-	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetView()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetProj()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetViewProj()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), sizeof(glm::vec4), &m_TrackballCamera->GetPosition()[0]);
-	}
+	glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_ActiveCamera->GetView()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_ActiveCamera->GetProj()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_ActiveCamera->GetViewProj()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), sizeof(glm::vec4), &m_ActiveCamera->GetPosition()[0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, m_WavesUBO);
