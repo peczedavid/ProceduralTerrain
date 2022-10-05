@@ -159,27 +159,27 @@ void TrackballCamera::Update(const float dt)
 
 	if (glfwGetKey(glfwWindow, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		m_Radius -= 25.0f * dt;
+		m_Radius -= 200.0f * dt;
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-		m_Radius -= -25.0f * dt;
+		m_Radius -= -200.0f * dt;
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
-		m_Phi += 3.141f / 3.0f * dt;
+		m_Phi += 3.141f * dt;
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
-		m_Phi -= 3.141f / 3.0f * dt;
+		m_Phi -= 3.141f * dt;
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		m_Theta -= 3.141f / 3.0f * dt;
+		m_Theta -= 3.141f * dt;
 	}
 	if (glfwGetKey(glfwWindow, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		m_Theta += 3.141f / 3.0f * dt;
+		m_Theta += 3.141f * dt;
 	}
 	m_Radius = glm::clamp(m_Radius, 1.0f, FLT_MAX);
 }

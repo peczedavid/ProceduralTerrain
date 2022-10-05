@@ -23,11 +23,10 @@ void GameLayerImGui::ViewportPanel()
 		const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		const float my_tex_w = viewportPanelSize.x;
 		const float my_tex_h = viewportPanelSize.y;
+		m_GameLayer->m_ActiveCamera->Resize(my_tex_w, my_tex_h);
 		if (m_GameLayer->m_ViewportSize.x != viewportPanelSize.x || m_GameLayer->m_ViewportSize.y != viewportPanelSize.y)
 		{
 			m_GameLayer->m_FrameBuffer->Resize(my_tex_w, my_tex_h);
-			m_GameLayer->m_Camera->Resize(my_tex_w, my_tex_h);
-			m_GameLayer->m_TrackballCamera->Resize(my_tex_w, my_tex_h);
 			m_GameLayer->m_ViewportSize.x = viewportPanelSize.x;
 			m_GameLayer->m_ViewportSize.y = viewportPanelSize.y;
 		}

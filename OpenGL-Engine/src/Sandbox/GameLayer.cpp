@@ -31,7 +31,7 @@
 // 
 //		 - screenshots in dist mode
 //		 - profiling (maybe benchmark scene)
-//		 - trackball camera controls				WIP    - camera interface
+//		 - trackball camera controls				WIP
 //		 https://computergraphics.stackexchange.com/questions/151/how-to-implement-a-trackball-in-opengl
 //		 https://physicscatalyst.com/graduation/wp-content/uploads/2016/09/rectangular-to-spherical-coordinates-300x256.png
 
