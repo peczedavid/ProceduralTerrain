@@ -33,6 +33,7 @@
 //		 - profiling (maybe benchmark scene)
 //		 - trackball camera controls				WIP    - camera interface
 //		 https://computergraphics.stackexchange.com/questions/151/how-to-implement-a-trackball-in-opengl
+//		 https://physicscatalyst.com/graduation/wp-content/uploads/2016/09/rectangular-to-spherical-coordinates-300x256.png
 
 #include "pch.h"
 
@@ -85,7 +86,7 @@ GameLayer::GameLayer()
 
 	m_Camera = CreateRef<Camera>(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
-	m_TrackballCamera = CreateRef<TrackballCamera>(128.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	m_TrackballCamera = CreateRef<TrackballCamera>(256.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	m_TrackballCamera->Resize(1, 1);
 
 	auto skyboxShader = CreateShaderRef("assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag");
