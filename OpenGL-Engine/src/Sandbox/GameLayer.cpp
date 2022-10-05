@@ -26,7 +26,7 @@
 //		 - nice gerstner waves						DONE
 //		 - scene system (switching between scenes)
 //		 - infinite grid CTRL+G toggle
-//		 - materials, pbr rendering?				WIP    - material interface
+//		 - materials, pbr rendering?				WIP    - optional textures
 //		 - tree rendering							WIP
 // 
 //		 - screenshots in dist mode
@@ -56,11 +56,6 @@ float Random(float max = 1.0f, float min = 0.0f)
 
 GameLayer::GameLayer()
 {
-	TRACE("Trace");
-	INFO("Info");
-	WARN("Warning");
-	ERROR("Error");
-
 	m_ShaderLibrary.Add("Terrain shader", CreateShaderRef(
 		"assets/GLSL/terrain/terrain.vert",
 		"assets/GLSL/terrain/terrain.tesc",
@@ -182,7 +177,12 @@ GameLayer::GameLayer()
 	redPBRMaterial->SetShader(m_ShaderLibrary.Get("PBR shader"));
 	redPBRMaterial->Albedo = glm::vec3(1, 0, 0);
 
-	m_Sphere = CreateRef<GameObject>(m_SphereModel.get(), whitePBRmaterial);
+	Ref<PBRMaterial> textuerPBRMaterial = CreateRef<PBRMaterial>();
+	textuerPBRMaterial->SetShader(m_ShaderLibrary.Get("PBR shader"));
+	textuerPBRMaterial->UseAlbedoMap = true;
+	textuerPBRMaterial->AlbedoMap = m_WaterTexture;
+
+	m_Sphere = CreateRef<GameObject>(m_SphereModel.get(), textuerPBRMaterial);
 	m_Sphere->SetPosition(glm::vec3(30.0f, 50.0f, -50.0f));
 	m_Sphere->SetScale(10.0f);
 	m_Teapot = CreateRef<GameObject>(m_TeapotModel.get(), whitePBRmaterial);

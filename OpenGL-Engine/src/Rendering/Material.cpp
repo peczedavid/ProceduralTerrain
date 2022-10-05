@@ -15,7 +15,11 @@ void PBRMaterial::SetShader(Ref<Shader> shader)
 void PBRMaterial::SetUniforms()
 {
 	m_Shader->Use();
-	m_Shader->SetUniform("u_Albedo", Albedo);
+	m_Shader->SetUniform("u_UseAlbedoMap", UseAlbedoMap ? 1 : 0);
+	if (UseAlbedoMap)
+		AlbedoMap->Bind(0);
+	else
+		m_Shader->SetUniform("u_Albedo", Albedo);
 	m_Shader->SetUniform("u_AmbientOcclusion", AmbientOcclusion);
 	m_Shader->SetUniform("u_Roughness", Roughness);
 	m_Shader->SetUniform("u_F0", F0);
@@ -25,6 +29,7 @@ void PBRMaterial::SetUniforms()
 void PBRMaterial::DrawImGui()
 {
 	ImGui::ColorEdit3("Abledo", &Albedo[0], 0);
+	ImGui::Checkbox("Use abledo map", &UseAlbedoMap);
 	ImGui::DragFloat("Roughness", &Roughness, 0.001f, 0.0f, 1.0f);
 	ImGui::DragFloat("Metallic", &Metallic, 0.001f, 0.0f, 1.0f);
 	ImGui::DragFloat("Ambient occlusion", &AmbientOcclusion, 0.001f, 0.0f, 1.0f);

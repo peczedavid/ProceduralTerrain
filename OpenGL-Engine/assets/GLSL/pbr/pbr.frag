@@ -27,6 +27,8 @@ in vec3 v_Normal;
 in vec2 v_TexCoord;
 
 uniform vec3 u_Albedo;
+uniform sampler2D u_AlbedoMap;
+uniform int u_UseAlbedoMap;
 uniform float u_Metallic;
 uniform float u_Roughness;
 uniform float u_AmbientOcclusion;
@@ -41,9 +43,19 @@ void main()
 {
 	const vec3 N = normalize(v_Normal);
     const vec3 V = normalize(u_Camera.Position.xyz - v_WorldPos);
+    vec3 albedo;
+    if(u_UseAlbedoMap == 1)
+    {
+        albedo = texture(u_AlbedoMap, v_TexCoord).rgb;
+        albedo.x = pow(albedo.x, 2.2);
+        albedo.y = pow(albedo.y, 2.2);
+        albedo.z = pow(albedo.z, 2.2);
+    }
+    else
+        albedo = u_Albedo;
 
     vec3 F0 = vec3(u_F0);
-	F0 = mix(F0, u_Albedo, u_Metallic);
+	F0 = mix(F0, albedo, u_Metallic);
 
     const vec3 L = normalize(u_Enviroment.SunDirection);
     const vec3 H = normalize(V + L);
@@ -61,11 +73,10 @@ void main()
     float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
     vec3 specular     = numerator / denominator;  
         
-    // add to outgoing radiance Lo
-    float NdotL = max(dot(N, L), 0.0);                
-    vec3 Lo = (kD * u_Albedo / M_PI + specular) * radiance * NdotL; 
+    float NdotL = max(dot(N, L), 0.0);               
+    vec3 Lo = (kD * albedo / M_PI + specular) * radiance * NdotL; 
 
-    vec3 ambient = vec3(0.03) * u_Albedo * u_AmbientOcclusion;
+    vec3 ambient = vec3(0.03) * albedo * u_AmbientOcclusion;
     vec3 color = ambient + Lo;
 	
     color = color / (color + vec3(1.0));
