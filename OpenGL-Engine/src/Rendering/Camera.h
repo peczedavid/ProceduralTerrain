@@ -80,6 +80,7 @@ private:
 	uint32_t m_Width, m_Height;
 public:
 	float GetRadius() { return m_Radius; }
+	glm::vec3 GetCartesian();
 
 	void SetPosition(const glm::vec3& position) override { m_Position = position; }
 

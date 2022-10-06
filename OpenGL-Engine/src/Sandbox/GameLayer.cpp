@@ -224,11 +224,8 @@ void GameLayer::OnUpdate(const float dt)
 	m_Time += dt;
 	const float fov = 45.0f, const nearPlane = 0.1f, const farPlane = 3000.0f;
 
-	m_Camera->CalculateMatrix(fov, nearPlane, farPlane);
-	m_TrackballCamera->CalculateMatrix(fov, nearPlane, farPlane);
-
-	m_Camera->Update(dt);
-	m_TrackballCamera->Update(dt);
+	m_ActiveCamera->CalculateMatrix(fov, nearPlane, farPlane);
+	m_ActiveCamera->Update(dt);
 
 	SetUniformBuffers();
 
@@ -261,7 +258,6 @@ void GameLayer::OnUpdate(const float dt)
 
 	auto shader = m_ShaderLibrary.Get("PBR shader");
 	shader->Use();
-	//shader->SetUniform("u_Albedo", glm::vec3(1.0f, 1.0f, 1.0f));
 	for (auto& gameObject : m_GameObjects)
 		gameObject.second->Draw();
 
@@ -279,8 +275,6 @@ void GameLayer::OnUpdate(const float dt)
 
 	if (Renderer::DebugView)
 		m_Axis->Render(m_ActiveCamera);
-
-	//FFTLoop();
 
 	RenderEnd();
 }

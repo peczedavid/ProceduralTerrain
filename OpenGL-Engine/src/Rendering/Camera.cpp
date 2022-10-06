@@ -115,11 +115,7 @@ void FPSCamera::Resize(const uint32_t width, const uint32_t height)
 TrackballCamera::TrackballCamera(const float radius, const glm::vec3& lookat)
 	: m_Radius(radius), m_LookAt(lookat), m_Up({ 0.0f, 1.0f, 0.0f })
 {
-	float x = m_Radius * sinf(m_Theta) * cosf(m_Phi);
-	float y = m_Radius * cosf(m_Theta);
-	float z = m_Radius * sinf(m_Theta) * sinf(m_Phi);
-
-	m_Position = glm::vec3(x, y, z);
+	m_Position = GetCartesian();
 }
 
 // 0 <= theta <= pi (0 = top most position, pi = lower most position)
@@ -134,11 +130,7 @@ void TrackballCamera::CalculateMatrix(const float fovDeg, const float nearPlane,
 	m_Proj = glm::mat4(1.0f);
 	m_View = glm::mat4(1.0f);
 
-	float x = m_Radius * sinf(m_Theta) * cosf(m_Phi);
-	float y = m_Radius * cosf(m_Theta);
-	float z = m_Radius * sinf(m_Theta) * sinf(m_Phi);
-
-	m_Position = glm::vec3(x, y, z);
+	m_Position = GetCartesian() + m_LookAt;
 
 	m_View = glm::lookAt(m_Position, m_LookAt, m_Up);
 	m_Proj = glm::perspective(
@@ -181,11 +173,41 @@ void TrackballCamera::Update(const float dt)
 	{
 		m_Theta += 3.141f * dt;
 	}
+	glm::vec3 look = glm::normalize(GetCartesian());
+	glm::vec3 right = glm::cross(look, m_Up);
+	glm::vec3 up = glm::cross(look, right);
+	if (glfwGetKey(glfwWindow, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		m_LookAt = m_LookAt + (right * -100.0f * dt);
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		m_LookAt = m_LookAt + (right * 100.0f * dt);
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		m_LookAt = m_LookAt + (up * -100.0f * dt);
+	}
+	if (glfwGetKey(glfwWindow, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		m_LookAt = m_LookAt + (up * 100.0f * dt);
+	}
+
 	m_Radius = glm::clamp(m_Radius, 1.0f, FLT_MAX);
+	m_Theta = glm::clamp(m_Theta, 0.141f, 3.0f);
 }
 
 void TrackballCamera::Resize(const uint32_t width, const uint32_t height)
 {
 	m_Width = width;
 	m_Height = height;
+}
+
+glm::vec3 TrackballCamera::GetCartesian()
+{
+	float x = m_Radius * sinf(m_Theta) * cosf(m_Phi);
+	float y = m_Radius * cosf(m_Theta);
+	float z = m_Radius * sinf(m_Theta) * sinf(m_Phi);
+
+	return glm::vec3(x, y, z);
 }
