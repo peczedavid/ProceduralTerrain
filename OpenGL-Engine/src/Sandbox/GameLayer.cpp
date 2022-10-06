@@ -19,8 +19,6 @@
 //		 - uniform buffer objects eg camera uniform DONE
 // 
 //       - object loading							DONE
-//		 - don't pass shared_ptr -> pass by
-//		   reference .get() return value
 //		 - logging to imgui window					DONE
 //			
 //		 - nice gerstner waves						DONE
