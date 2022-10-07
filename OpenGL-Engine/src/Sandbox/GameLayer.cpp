@@ -356,6 +356,8 @@ void GameLayer::ToggleCamera()
 		m_ActiveCamera = m_Camera.get();
 	else if (m_SelectedCamera == 1)
 		m_ActiveCamera = m_TrackballCamera.get();
+
+	Application::Get().SetCursor(m_SelectedCamera == 1);
 }
 
 void GameLayer::SetUniformBuffers()

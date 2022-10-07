@@ -151,16 +151,13 @@ void TrackballCamera::CalculateMatrix(const float fovDeg, const float nearPlane,
 	m_ViewProj = m_Proj * m_View;
 }
 
-
-
 void TrackballCamera::Update(const float dt)
 {
 	auto window = Application::Get().GetWindow();
 	auto glfwWindow = window->GetNativeWindow();
 	if (!Application::Get().IsCursor())
 	{
-		glfwSetCursorPos(glfwWindow, (m_Width / 2), (m_Height / 2));
-		return;
+		Application::Get().SetCursor(true);
 	}
 
 	int leftButton = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT);
