@@ -227,7 +227,7 @@ void GameLayer::OnUpdate(const float dt)
 
 	SetUniformBuffers();
 
-	m_Skybox->Render(m_Camera);
+	m_Skybox->Render();
 
 	glm::mat4 model;
 

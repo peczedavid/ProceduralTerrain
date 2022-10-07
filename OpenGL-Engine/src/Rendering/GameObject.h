@@ -20,6 +20,7 @@ public:
 	void SetScale(const float scale);
 	void SetScale(const glm::vec3& scale);
 
+	//void SetTransform(const glm::mat4& transform);
 	glm::mat4& GetTransform();
 
 	glm::vec3& GetPosition();

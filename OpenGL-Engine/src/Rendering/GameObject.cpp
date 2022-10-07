@@ -29,7 +29,6 @@ void GameObject::Set(const glm::vec3& position, const glm::vec3& rotation, const
 	m_Translation = position;
 	m_EulerRotation = rotation;
 	m_Scale = scale;
-	CalculateTransform();
 }
 
 void GameObject::SetPosition(const glm::vec3& position)
@@ -55,6 +54,11 @@ void GameObject::SetScale(const glm::vec3& scale)
 	m_Scale = scale;
 	CalculateTransform();
 }
+
+//void GameObject::SetTransform(const glm::mat4& transform)
+//{
+//	m_Transform = transform;
+//}
 
 glm::mat4& GameObject::GetTransform()
 {
@@ -83,9 +87,7 @@ Ref<Material> GameObject::GetMaterial()
 
 void GameObject::CalculateTransform()
 {
-	glm::mat4 model = glm::identity<glm::mat4>();
-	model = glm::translate(model, m_Translation);
-	model = model * glm::eulerAngleYXZ(m_EulerRotation.y, m_EulerRotation.x, m_EulerRotation.z);
-	model = glm::scale(model, m_Scale);
-	m_Transform = model;
+	m_Transform = glm::translate(glm::identity<glm::mat4>(), m_Translation);
+	m_Transform = m_Transform * glm::eulerAngleYXZ(m_EulerRotation.y, m_EulerRotation.x, m_EulerRotation.z);
+	m_Transform = glm::scale(m_Transform, m_Scale);
 }

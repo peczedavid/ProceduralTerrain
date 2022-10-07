@@ -7,6 +7,10 @@
 #include "Rendering/Renderer.h"
 #include "Core/Application.h"
 #include "Rendering/Material.h"
+#include <glm/gtc/type_ptr.inl>
+#include <glm/gtx/matrix_decompose.inl>
+
+#include "Core/Math/Math.h"
 
 Ref<Texture2D> GameLayerImGui::s_PlaceHolderTexture;
 
@@ -44,14 +48,13 @@ void GameLayerImGui::ViewportPanel()
 				float windowHeight = (float)ImGui::GetWindowHeight();
 				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
-				auto camera = m_GameLayer->m_Camera.get();
+				auto camera = m_GameLayer->m_ActiveCamera;
 				const glm::mat4 view = camera->GetView();
 				const glm::mat4 proj = camera->GetProj();
-				glm::mat4 transform = m_SelectedObject->GetTransform();
-				const auto originalRotation = m_SelectedObject->GetRotation();
+				glm::mat4& transform = m_SelectedObject->GetTransform();
 
 				static ImGuizmo::OPERATION operation = ImGuizmo::OPERATION::TRANSLATE;
-				static ImGuizmo::MODE mode = ImGuizmo::MODE::WORLD;
+				static ImGuizmo::MODE mode = ImGuizmo::MODE::LOCAL;
 
 				if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 				{
@@ -60,15 +63,15 @@ void GameLayerImGui::ViewportPanel()
 						operation = ImGuizmo::OPERATION::TRANSLATE;
 						mode = ImGuizmo::MODE::WORLD;
 					}
-					if (ImGui::IsKeyDown(ImGuiKey_W))
+					else if (ImGui::IsKeyDown(ImGuiKey_W))
 					{
 						operation = ImGuizmo::OPERATION::ROTATE;
 						mode = ImGuizmo::MODE::LOCAL;
 					}
-					if (ImGui::IsKeyDown(ImGuiKey_E))
+					else if (ImGui::IsKeyDown(ImGuiKey_E))
 					{
 						operation = ImGuizmo::OPERATION::SCALE;
-						mode = ImGuizmo::MODE::WORLD;
+						mode = ImGuizmo::MODE::LOCAL;
 					}
 				}
 
@@ -77,9 +80,8 @@ void GameLayerImGui::ViewportPanel()
 				if (ImGuizmo::IsUsing())
 				{
 					glm::vec3 translation, rotation, scale;
-					ImGuizmo::DecomposeMatrixToComponents(&transform[0][0], &translation[0], &rotation[0], &scale[0]);
-					glm::vec3 deltaRotation = glm::radians(rotation) - originalRotation;
-					m_SelectedObject->Set(translation, originalRotation + deltaRotation, scale);
+					DecomposeTransform(transform, translation, rotation, scale);
+					m_SelectedObject->Set(translation, rotation, scale);
 				}
 			}
 		}

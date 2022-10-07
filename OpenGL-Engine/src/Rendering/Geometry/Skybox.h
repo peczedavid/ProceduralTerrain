@@ -11,7 +11,7 @@ public:
 	Skybox(Ref<Shader> shader);
 	~Skybox();
 
-	void Render(Ref<FPSCamera> camera);
+	void Render();
 	Ref<Shader> m_Shader;
 private:
 	uint32_t m_Vao, m_Vbo, m_Ebo;

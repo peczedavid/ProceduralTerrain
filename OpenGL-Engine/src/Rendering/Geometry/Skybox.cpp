@@ -110,7 +110,7 @@ Skybox::~Skybox()
 {
 }
 
-void Skybox::Render(Ref<FPSCamera> camera)
+void Skybox::Render()
 {
 	// The skybox is on the edge
 	glDepthFunc(GL_LEQUAL);
