@@ -112,10 +112,19 @@ void FPSCamera::Resize(const uint32_t width, const uint32_t height)
 }
 
 
+
+// TODO: integrate event system
+static int scrollEvent = 0;
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	scrollEvent = yoffset;
+}
+
 TrackballCamera::TrackballCamera(const float radius, const glm::vec3& lookat)
 	: m_Radius(radius), m_LookAt(lookat), m_Up({ 0.0f, 1.0f, 0.0f })
 {
 	m_Position = GetCartesian();
+	glfwSetScrollCallback(Application::Get().GetWindow()->GetNativeWindow(), scroll_callback);
 }
 
 // 0 <= theta <= pi (0 = top most position, pi = lower most position)
@@ -142,55 +151,63 @@ void TrackballCamera::CalculateMatrix(const float fovDeg, const float nearPlane,
 	m_ViewProj = m_Proj * m_View;
 }
 
+
+
 void TrackballCamera::Update(const float dt)
 {
+	auto window = Application::Get().GetWindow();
+	auto glfwWindow = window->GetNativeWindow();
 	if (!Application::Get().IsCursor())
+	{
+		glfwSetCursorPos(glfwWindow, (m_Width / 2), (m_Height / 2));
 		return;
+	}
 
-	GLFWwindow* glfwWindow = Application::Get().GetWindow()->GetNativeWindow();
+	int leftButton = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT);
+	int rightButton = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT);
+	static bool capturing = false;
+	static double startX, startY;
+	double x, y;
+	if ((leftButton == GLFW_PRESS || rightButton == GLFW_PRESS) && capturing == false)
+	{
+		capturing = true;
+		glfwGetCursorPos(glfwWindow, &startX, &startY);
+	}
+	else if ((leftButton == GLFW_RELEASE && rightButton == GLFW_RELEASE) && capturing == true)
+	{
+		capturing = false;
+	}
 
-	if (glfwGetKey(glfwWindow, GLFW_KEY_E) == GLFW_PRESS)
+	if (capturing)
 	{
-		m_Radius -= 200.0f * dt;
+		glfwGetCursorPos(glfwWindow, &x, &y);
+		double distX = x - startX;
+		double distY = y - startY;
+		double normalizedX = distX / (double)m_Width;
+		double normalizedY = distY / (double)m_Height;
+
+		if (leftButton == GLFW_PRESS)
+		{
+			m_Phi += 3.141f * dt * normalizedX * 50.0f;
+			m_Theta -= 3.141f * dt * normalizedY * 50.0f;
+		}
+		else if (rightButton == GLFW_PRESS)
+		{
+			glm::vec3 look = glm::normalize(GetCartesian());
+			glm::vec3 right = glm::cross(look, m_Up);
+			glm::vec3 up = glm::cross(look, right);
+
+			m_LookAt = m_LookAt + (right * dt * (float)normalizedX * 10000.0f) + (up * dt * (float)normalizedY * -10000.0f);
+		}
+
+		startX = x;
+		startY = y;
 	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_Q) == GLFW_PRESS)
+
+	if (scrollEvent != 0)
 	{
-		m_Radius -= -200.0f * dt;
-	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT) == GLFW_PRESS)
-	{
-		m_Phi += 3.141f * dt;
-	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_RIGHT) == GLFW_PRESS)
-	{
-		m_Phi -= 3.141f * dt;
-	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_UP) == GLFW_PRESS)
-	{
-		m_Theta -= 3.141f * dt;
-	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_DOWN) == GLFW_PRESS)
-	{
-		m_Theta += 3.141f * dt;
-	}
-	glm::vec3 look = glm::normalize(GetCartesian());
-	glm::vec3 right = glm::cross(look, m_Up);
-	glm::vec3 up = glm::cross(look, right);
-	if (glfwGetKey(glfwWindow, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		m_LookAt = m_LookAt + (right * -100.0f * dt);
-	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		m_LookAt = m_LookAt + (right * 100.0f * dt);
-	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		m_LookAt = m_LookAt + (up * -100.0f * dt);
-	}
-	if (glfwGetKey(glfwWindow, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		m_LookAt = m_LookAt + (up * 100.0f * dt);
+		m_Radius -= 1000.0f * dt * scrollEvent;
+		scrollEvent = 0;
 	}
 
 	m_Radius = glm::clamp(m_Radius, 1.0f, FLT_MAX);

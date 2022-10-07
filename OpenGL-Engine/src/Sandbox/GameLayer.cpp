@@ -1,5 +1,4 @@
-// TODO: - offset terrain height relative to amplitude so it starts at 0
-//		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
+// TODO:
 // 
 //		 - make renderer into static class			DONE
 //		 - make FPSPool into own class/struct		DONE
@@ -22,16 +21,20 @@
 //		 - logging to imgui window					DONE
 //			
 //		 - nice gerstner waves						DONE
-//		 - scene system (switching between scenes)
-//		 - infinite grid CTRL+G toggle
-//		 - materials, pbr rendering?				WIP    - optional textures
-//		 - tree rendering							WIP
 // 
-//		 - screenshots in dist mode
-//		 - profiling (maybe benchmark scene)
+//		 - guizmos									DONE
 //		 - trackball camera controls				WIP
 //		 https://computergraphics.stackexchange.com/questions/151/how-to-implement-a-trackball-in-opengl
 //		 https://physicscatalyst.com/graduation/wp-content/uploads/2016/09/rectangular-to-spherical-coordinates-300x256.png
+//		 - materials, pbr rendering?				WIP    - optional textures
+//		 - tree rendering							WIP    - submesh system
+// 
+//		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
+//		 - scene system (switching between scenes)
+//		 - profiling (maybe benchmark scene)
+//		 - infinite grid CTRL+G toggle
+//		http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+//		 - screenshots in dist mode
 
 #include "pch.h"
 

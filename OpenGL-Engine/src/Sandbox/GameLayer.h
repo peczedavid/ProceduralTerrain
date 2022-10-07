@@ -39,7 +39,7 @@ private:
 	Ref<FPSCamera> m_Camera;
 	Ref<TrackballCamera> m_TrackballCamera;
 	Camera* m_ActiveCamera;
-	uint32_t m_SelectedCamera = 1;
+	uint32_t m_SelectedCamera = 0;
 	Ref<Skybox> m_Skybox;
 	Ref<Axis> m_Axis;
 

@@ -82,6 +82,7 @@ public:
 	float GetRadius() { return m_Radius; }
 	glm::vec3 GetCartesian();
 
+	// TODO: Recalculate m_Phi, m_Theta
 	void SetPosition(const glm::vec3& position) override { m_Position = position; }
 
 	glm::vec3& GetPosition() override { return m_Position; }

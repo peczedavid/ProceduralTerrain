@@ -53,6 +53,8 @@ void GameLayerImGui::ViewportPanel()
 				const glm::mat4 proj = camera->GetProj();
 				glm::mat4& transform = m_SelectedObject->GetTransform();
 
+				ImGuizmo::DrawGrid(&view[0][0], &proj[0][0], &glm::identity<glm::mat4>()[0][0], 100.f);
+
 				static ImGuizmo::OPERATION operation = ImGuizmo::OPERATION::TRANSLATE;
 				static ImGuizmo::MODE mode = ImGuizmo::MODE::LOCAL;
 
