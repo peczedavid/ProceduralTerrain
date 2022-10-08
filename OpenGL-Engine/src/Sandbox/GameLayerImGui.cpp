@@ -24,6 +24,7 @@ void GameLayerImGui::ViewportPanel()
 {
 	if (ImGui::Begin("Viewport"))
 	{
+		Application::Get().SetViewportHovered(ImGui::IsWindowHovered());
 		const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		const float my_tex_w = viewportPanelSize.x;
 		const float my_tex_h = viewportPanelSize.y;
@@ -231,6 +232,14 @@ void GameLayerImGui::GraphicsSettingsPanel()
 		if (ImGui::Button("Toggle camera"))
 		{
 			m_GameLayer->ToggleCamera();
+		}
+		if (ImGui::Button("Maximize"))
+		{
+			window->Maximize();
+		}
+		if (ImGui::Button("Restore"))
+		{
+			window->Restore();
 		}
 	}
 	ImGui::End();

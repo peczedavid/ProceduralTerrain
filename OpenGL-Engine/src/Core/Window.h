@@ -34,11 +34,16 @@ public:
 
 	inline void SetCursor(bool cursor) const { glfwSetInputMode(m_Window, GLFW_CURSOR, cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN); }
 
+	void ToggleMaximized();
+	void Maximize();
+	void Restore();
+
 	virtual GLFWwindow* GetNativeWindow() const { return m_Window; }
 private:
 	uint32_t m_Height, m_Width;
 	GLFWwindow* m_Window;
 	bool m_VSync;
+	bool m_Maximized;
 
 public:
 	inline uint32_t GetWidth() { return m_Width; }

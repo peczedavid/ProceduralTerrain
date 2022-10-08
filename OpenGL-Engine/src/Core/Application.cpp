@@ -67,6 +67,11 @@ void Application::PushOverlay(Layer* overlay)
 	overlay->OnAttach();
 }
 
+void Application::Close()
+{
+	glfwSetWindowShouldClose(m_Window->GetNativeWindow(), GLFW_TRUE);
+}
+
 void Application::OnResize(const uint32_t width, const uint32_t height)
 {
 	m_Window->SetWidth(width);

@@ -51,6 +51,28 @@ void ImGuiLayer::OnDetach()
 
 void ImGuiLayer::OnImGuiRender(float dt)
 {
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Quit", "Esc"))
+			{
+				Application::Get().Close();
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Style"))
+		{
+			// Change style
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Help"))
+		{
+			// Show controls window
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
 }
 
 void ImGuiLayer::Begin()
@@ -66,7 +88,7 @@ void ImGuiLayer::Begin()
 
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 	// because it would be confusing to have two docking targets within each others.
-	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
 	if (opt_fullscreen)
 	{
 		const ImGuiViewport* viewport = ImGui::GetMainViewport();

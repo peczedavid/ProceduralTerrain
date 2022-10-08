@@ -13,6 +13,8 @@ void error_callback(int error, const char* description)
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+	Application::Get().GetWindow()->SetWidth(width);
+	Application::Get().GetWindow()->SetHeight(height);
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -20,7 +22,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	auto& app = Application::Get();
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+		Application::Get().Close();
 
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
@@ -45,19 +47,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 Window::Window(const WindowProps& props)
-	: m_Width(props.Width), m_Height(props.Height)
+	: m_Width(props.Width), m_Height(props.Height), m_Maximized(props.Maximized)
 {
 	ASSERT(glfwInit(), "GLFW Initialization failed!");
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	if(props.Maximized)
+	if(m_Maximized)
 		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
 	m_Window = glfwCreateWindow(props.Width, props.Height, props.Title.c_str(), NULL, NULL);
 	ASSERT(m_Window, "Window creation failed!");
 
-	if (!props.Maximized)
+	if (!m_Maximized)
 	{
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		const int x = (mode->width - props.Width) / 2;
@@ -65,7 +67,7 @@ Window::Window(const WindowProps& props)
 		glfwSetWindowPos(m_Window, x, y);
 	}
 
-	if (props.Maximized)
+	if (m_Maximized)
 	{
 		int width, height;
 		glfwGetWindowSize(m_Window, &width, &height);
@@ -95,4 +97,30 @@ void Window::OnUpdate()
 {
 	glfwPollEvents();
 	glfwSwapBuffers(m_Window);
+}
+
+void Window::ToggleMaximized()
+{
+	if (m_Maximized)
+		Restore();
+	else
+		Maximize();
+}
+
+void Window::Maximize()
+{
+	glfwMaximizeWindow(m_Window);
+	int width, height;
+	glfwGetWindowSize(m_Window, &width, &height);
+	m_Width = width, m_Height = height;
+	m_Maximized = true;
+}
+
+void Window::Restore()
+{
+	glfwRestoreWindow(m_Window);
+	int width, height;
+	glfwGetWindowSize(m_Window, &width, &height);
+	m_Width = width, m_Height = height;
+	m_Maximized = false;
 }
