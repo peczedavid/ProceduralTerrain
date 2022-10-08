@@ -1,5 +1,4 @@
 // TODO:
-// 
 //		 - make renderer into static class			DONE
 //		 - make FPSPool into own class/struct		DONE
 //		 - put shaders into assets					DONE
@@ -23,7 +22,7 @@
 //		 - nice gerstner waves						DONE
 // 
 //		 - guizmos									DONE
-//		 - trackball camera controls				WIP
+//		 - trackball camera controls				DONE
 //		 https://computergraphics.stackexchange.com/questions/151/how-to-implement-a-trackball-in-opengl
 //		 https://physicscatalyst.com/graduation/wp-content/uploads/2016/09/rectangular-to-spherical-coordinates-300x256.png
 //		 - materials, pbr rendering?				WIP    - optional textures

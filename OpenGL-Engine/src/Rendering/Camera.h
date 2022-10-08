@@ -86,7 +86,7 @@ public:
 	void SetPosition(const glm::vec3& position) override { m_Position = position; }
 
 	glm::vec3& GetPosition() override { return m_Position; }
-	glm::vec3& GetOrientation() override { return m_Position - m_LookAt; }
+	glm::vec3& GetOrientation() override { return glm::normalize(m_Position - m_LookAt); }
 	glm::vec3& GetLookAt() override { return m_LookAt; }
 	glm::vec3& GetUp() override { return m_Up; }
 	glm::mat4& GetView() override { return m_View; }

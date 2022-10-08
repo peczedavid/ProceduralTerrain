@@ -53,24 +53,22 @@ void GameLayerImGui::ViewportPanel()
 				const glm::mat4 proj = camera->GetProj();
 				glm::mat4& transform = m_SelectedObject->GetTransform();
 
-				ImGuizmo::DrawGrid(&view[0][0], &proj[0][0], &glm::identity<glm::mat4>()[0][0], 100.f);
-
 				static ImGuizmo::OPERATION operation = ImGuizmo::OPERATION::TRANSLATE;
 				static ImGuizmo::MODE mode = ImGuizmo::MODE::LOCAL;
 
 				if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 				{
-					if (ImGui::IsKeyDown(ImGuiKey_Q))
+					if (ImGui::IsKeyDown(ImGuiKey_W))
 					{
 						operation = ImGuizmo::OPERATION::TRANSLATE;
 						mode = ImGuizmo::MODE::WORLD;
 					}
-					else if (ImGui::IsKeyDown(ImGuiKey_W))
+					else if (ImGui::IsKeyDown(ImGuiKey_E))
 					{
 						operation = ImGuizmo::OPERATION::ROTATE;
 						mode = ImGuizmo::MODE::LOCAL;
 					}
-					else if (ImGui::IsKeyDown(ImGuiKey_E))
+					else if (ImGui::IsKeyDown(ImGuiKey_R))
 					{
 						operation = ImGuizmo::OPERATION::SCALE;
 						mode = ImGuizmo::MODE::LOCAL;
@@ -397,6 +395,7 @@ void GameLayerImGui::PropertiesPanel()
 			ImGui::Separator();
 		}
 	
+		if(m_SelectedObject->GetMaterial())
 		{
 			ImGui::Spacing();
 			ImGui::Text("Material");

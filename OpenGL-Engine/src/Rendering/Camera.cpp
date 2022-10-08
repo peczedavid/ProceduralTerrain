@@ -123,7 +123,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 TrackballCamera::TrackballCamera(const float radius, const glm::vec3& lookat)
 	: m_Radius(radius), m_LookAt(lookat), m_Up({ 0.0f, 1.0f, 0.0f })
 {
-	m_Position = GetCartesian();
+	m_Position = GetCartesian() + m_LookAt;
 	glfwSetScrollCallback(Application::Get().GetWindow()->GetNativeWindow(), scroll_callback);
 }
 
@@ -162,15 +162,16 @@ void TrackballCamera::Update(const float dt)
 
 	int leftButton = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT);
 	int rightButton = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT);
+	int altButton = glfwGetKey(glfwWindow, GLFW_KEY_LEFT_ALT);
 	static bool capturing = false;
 	static double startX, startY;
 	double x, y;
-	if ((leftButton == GLFW_PRESS || rightButton == GLFW_PRESS) && capturing == false)
+	if ((leftButton == GLFW_PRESS || rightButton == GLFW_PRESS) && altButton == GLFW_PRESS && capturing == false)
 	{
 		capturing = true;
 		glfwGetCursorPos(glfwWindow, &startX, &startY);
 	}
-	else if ((leftButton == GLFW_RELEASE && rightButton == GLFW_RELEASE) && capturing == true)
+	else if (((leftButton == GLFW_RELEASE && rightButton == GLFW_RELEASE) || altButton == GLFW_RELEASE) && capturing == true)
 	{
 		capturing = false;
 	}
