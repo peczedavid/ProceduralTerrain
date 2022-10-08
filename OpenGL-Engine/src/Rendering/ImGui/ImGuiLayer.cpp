@@ -55,6 +55,9 @@ void ImGuiLayer::OnImGuiRender(float dt)
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::MenuItem("Save", "Ctrl+S")) {}
+			if (ImGui::MenuItem("Save As", "Ctrs+Shift+S")) {}
+			ImGui::Separator();
 			if (ImGui::MenuItem("Quit", "Esc"))
 			{
 				Application::Get().Close();
