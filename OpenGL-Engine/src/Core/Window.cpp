@@ -7,7 +7,7 @@
 
 void error_callback(int error, const char* description)
 {
-	ERROR("{0}", description);
+	ERROR("GLFW error: %s", description);
 }
 
 void window_size_callback(GLFWwindow* window, int width, int height)

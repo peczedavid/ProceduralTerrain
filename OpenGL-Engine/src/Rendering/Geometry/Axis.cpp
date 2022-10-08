@@ -37,7 +37,7 @@ Axis::~Axis()
 {
 }
 
-void Axis::Render(Ref<Camera> camera)
+void Axis::Render(Camera* camera)
 {
 	m_Shader->Use();
 	const glm::vec3 orientation = camera->GetOrientation();

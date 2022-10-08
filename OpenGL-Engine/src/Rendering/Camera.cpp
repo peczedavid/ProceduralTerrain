@@ -5,12 +5,12 @@
 #include <GLFW/glfw3.h>
 #include <Core/Application.h>
 
-Camera::Camera(const glm::vec3& position, const glm::vec3& orientation)
+FPSCamera::FPSCamera(const glm::vec3& position, const glm::vec3& orientation)
 	: m_Position(position), m_Orientation(glm::normalize(orientation)), m_Up({ 0.0f, 1.0f, 0.0f })
 {
 }
 
-void Camera::UpdateMatrix(const float fovDeg, const float nearPlane, const float farPlane)
+void FPSCamera::CalculateMatrix(const float fovDeg, const float nearPlane, const float farPlane)
 {
 	m_Proj = glm::mat4(1.0f);
 	m_View = glm::mat4(1.0f);
@@ -25,8 +25,11 @@ void Camera::UpdateMatrix(const float fovDeg, const float nearPlane, const float
 	m_CameraMatrix = m_Proj * m_View;
 }
 
-void Camera::Update(const float dt)
+void FPSCamera::Update(const float dt)
 {
+	if (Application::Get().IsCursor())
+		return;
+
 	GLFWwindow* glfwWindow = Application::Get().GetWindow()->GetNativeWindow();
 
 	if (glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS)
@@ -102,8 +105,124 @@ void Camera::Update(const float dt)
 	glfwSetCursorPos(glfwWindow, (m_Width / 2), (m_Height / 2));
 }
 
-void Camera::Resize(const uint32_t width, const uint32_t height)
+void FPSCamera::Resize(const uint32_t width, const uint32_t height)
 {
 	m_Width = width;
 	m_Height = height;
+}
+
+
+
+// TODO: integrate event system
+static int scrollEvent = 0;
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	scrollEvent = yoffset;
+}
+
+TrackballCamera::TrackballCamera(const float radius, const glm::vec3& lookat)
+	: m_Radius(radius), m_LookAt(lookat), m_Up({ 0.0f, 1.0f, 0.0f })
+{
+	m_Position = GetCartesian() + m_LookAt;
+	glfwSetScrollCallback(Application::Get().GetWindow()->GetNativeWindow(), scroll_callback);
+}
+
+// 0 <= theta <= pi (0 = top most position, pi = lower most position)
+// 0 <= phi <= 2pi (0 = looking from +x towars -x)
+// 
+// x = r * sin(theta) * cos(phi)
+// y = r * cos(theta)
+// z = r * sin(theta) * sin(phi)
+
+void TrackballCamera::CalculateMatrix(const float fovDeg, const float nearPlane, const float farPlane)
+{
+	m_Proj = glm::mat4(1.0f);
+	m_View = glm::mat4(1.0f);
+
+	m_Position = GetCartesian() + m_LookAt;
+
+	m_View = glm::lookAt(m_Position, m_LookAt, m_Up);
+	m_Proj = glm::perspective(
+		glm::radians(fovDeg),
+		(float)m_Width / (float)m_Height,
+		nearPlane,
+		farPlane
+	);
+	m_ViewProj = m_Proj * m_View;
+}
+
+void TrackballCamera::Update(const float dt)
+{
+	auto window = Application::Get().GetWindow();
+	auto glfwWindow = window->GetNativeWindow();
+	if (!Application::Get().IsCursor())
+	{
+		Application::Get().SetCursor(true);
+	}
+
+	int leftButton = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT);
+	int rightButton = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT);
+	int altButton = glfwGetKey(glfwWindow, GLFW_KEY_LEFT_ALT);
+	static bool capturing = false;
+	static double startX, startY;
+	double x, y;
+	if ((leftButton == GLFW_PRESS || rightButton == GLFW_PRESS) && altButton == GLFW_PRESS && capturing == false)
+	{
+		capturing = true;
+		glfwGetCursorPos(glfwWindow, &startX, &startY);
+	}
+	else if (((leftButton == GLFW_RELEASE && rightButton == GLFW_RELEASE) || altButton == GLFW_RELEASE) && capturing == true)
+	{
+		capturing = false;
+	}
+
+	if (capturing)
+	{
+		glfwGetCursorPos(glfwWindow, &x, &y);
+		double distX = x - startX;
+		double distY = y - startY;
+		double normalizedX = distX / (double)m_Width;
+		double normalizedY = distY / (double)m_Height;
+
+		if (leftButton == GLFW_PRESS)
+		{
+			m_Phi += 3.141f * dt * normalizedX * 50.0f;
+			m_Theta -= 3.141f * dt * normalizedY * 50.0f;
+		}
+		else if (rightButton == GLFW_PRESS)
+		{
+			glm::vec3 look = glm::normalize(GetCartesian());
+			glm::vec3 right = glm::cross(look, m_Up);
+			glm::vec3 up = glm::cross(look, right);
+
+			m_LookAt = m_LookAt + (right * dt * (float)normalizedX * 10000.0f) + (up * dt * (float)normalizedY * -10000.0f);
+		}
+
+		startX = x;
+		startY = y;
+	}
+
+	if (scrollEvent != 0)
+	{
+		m_Radius -= 1000.0f * dt * scrollEvent;
+		scrollEvent = 0;
+	}
+
+	m_Radius = glm::clamp(m_Radius, 1.0f, FLT_MAX);
+	m_Theta = glm::clamp(m_Theta, 0.141f, 3.0f);
+}
+
+void TrackballCamera::Resize(const uint32_t width, const uint32_t height)
+{
+	m_Width = width;
+	m_Height = height;
+}
+
+glm::vec3 TrackballCamera::GetCartesian()
+{
+	float x = m_Radius * sinf(m_Theta) * cosf(m_Phi);
+	float y = m_Radius * cosf(m_Theta);
+	float z = m_Radius * sinf(m_Theta) * sinf(m_Phi);
+
+	return glm::vec3(x, y, z);
 }

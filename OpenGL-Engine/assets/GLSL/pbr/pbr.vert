@@ -24,6 +24,6 @@ void main()
 	vec4 worldPos = u_Model * vec4(a_Position, 1);
 	gl_Position = u_Camera.ViewProj * worldPos;
 	v_WorldPos = worldPos.xyz;
-	v_Normal = a_Normal;
+	v_Normal = vec3(vec4(a_Normal, 0.0) * inverse(u_Model));
 	v_TexCoord = a_TexCoord;
 }

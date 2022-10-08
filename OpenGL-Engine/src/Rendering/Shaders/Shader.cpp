@@ -123,7 +123,7 @@ void Shader::SetUniform(const std::string& name, int value) const
 	if (location >= 0)
 		glUniform1i(location, value);
 	else
-		WARN("Uniform {0} not found in shader!", name.c_str());
+		WARN("Uniform %s not found in shader!", name.c_str());
 }
 
 void Shader::SetUniform(const std::string& name, float value) const
@@ -132,7 +132,7 @@ void Shader::SetUniform(const std::string& name, float value) const
 	if (location >= 0)
 		glUniform1f(location, value);
 	else
-		WARN("Uniform {0} not found in shader!", name.c_str());
+		WARN("Uniform %s not found in shader!", name.c_str());
 }
 
 void Shader::SetUniform(const std::string& name, uint32_t value) const
@@ -141,7 +141,7 @@ void Shader::SetUniform(const std::string& name, uint32_t value) const
 	if (location >= 0)
 		glUniform1ui(location, value);
 	else
-		WARN("Uniform {0} not found in shader!", name.c_str());
+		WARN("Uniform %s not found in shader!", name.c_str());
 }
 
 void Shader::SetUniform(const std::string& name, const glm::vec2& value) const
@@ -150,7 +150,7 @@ void Shader::SetUniform(const std::string& name, const glm::vec2& value) const
 	if (location >= 0)
 		glUniform2f(location, value.x, value.y);
 	else
-		WARN("Uniform {0} not found in shader!", name.c_str());
+		WARN("Uniform %s not found in shader!", name.c_str());
 }
 
 void Shader::SetUniform(const std::string& name, const glm::vec3& value) const
@@ -159,7 +159,7 @@ void Shader::SetUniform(const std::string& name, const glm::vec3& value) const
 	if (location >= 0)
 		glUniform3f(location, value.x, value.y, value.z);
 	else
-		WARN("Uniform {0} not found in shader!", name.c_str());
+		WARN("Uniform %s not found in shader!", name.c_str());
 }
 
 void Shader::SetUniform(const std::string& name, const glm::vec4& value) const
@@ -168,7 +168,7 @@ void Shader::SetUniform(const std::string& name, const glm::vec4& value) const
 	if (location >= 0)
 		glUniform4f(location, value.x, value.y, value.z, value.w);
 	else
-		WARN("Uniform {0} not found in shader!", name.c_str());
+		WARN("Uniform %s not found in shader!", name.c_str());
 }
 
 void Shader::SetUniform(const std::string& name, const glm::mat4& value) const
@@ -177,7 +177,7 @@ void Shader::SetUniform(const std::string& name, const glm::mat4& value) const
 	if (location >= 0)
 		glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
 	else
-		WARN("Uniform {0} not found in shader!", name.c_str());
+		WARN("Uniform %s not found in shader!", name.c_str());
 }
 
 void Shader::CheckCompiled(const GLuint shader) const
@@ -206,7 +206,7 @@ void Shader::CheckLinked()
 		glGetProgramiv(m_ProgramId, GL_INFO_LOG_LENGTH, &maxLength);
 		std::vector<GLchar> errorLog(maxLength);
 		glGetProgramInfoLog(m_ProgramId, maxLength, &maxLength, &errorLog[0]);
-		ERROR("Failed to link program\n{0}", &errorLog[0]);
+		ERROR("Failed to link program\n%s", &errorLog[0]);
 
 		glDeleteProgram(m_ProgramId);
 		m_ProgramId = 0;

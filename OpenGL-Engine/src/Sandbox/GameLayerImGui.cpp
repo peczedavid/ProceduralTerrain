@@ -2,13 +2,22 @@
 
 #include "Sandbox/GameLayerImGui.h"
 #include <imgui.h>
+#include <ImGuizmo.h>
 #include <dxgi1_4.h>
 #include "Rendering/Renderer.h"
 #include "Core/Application.h"
+#include "Rendering/Material.h"
+#include <glm/gtc/type_ptr.inl>
+#include <glm/gtx/matrix_decompose.inl>
+
+#include "Core/Math/Math.h"
+
+Ref<Texture2D> GameLayerImGui::s_PlaceHolderTexture;
 
 GameLayerImGui::GameLayerImGui(GameLayer* gameLayer)
 	: m_GameLayer(gameLayer)
 {
+	s_PlaceHolderTexture = CreateRef<Texture2D>("assets/Textures/placeholder.png", GL_NEAREST, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 }
 
 void GameLayerImGui::ViewportPanel()
@@ -18,11 +27,10 @@ void GameLayerImGui::ViewportPanel()
 		const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		const float my_tex_w = viewportPanelSize.x;
 		const float my_tex_h = viewportPanelSize.y;
+		m_GameLayer->m_ActiveCamera->Resize(my_tex_w, my_tex_h);
 		if (m_GameLayer->m_ViewportSize.x != viewportPanelSize.x || m_GameLayer->m_ViewportSize.y != viewportPanelSize.y)
 		{
 			m_GameLayer->m_FrameBuffer->Resize(my_tex_w, my_tex_h);
-			m_GameLayer->m_Camera->Resize(my_tex_w, my_tex_h);
-			m_GameLayer->m_TrackballCamera->Resize(my_tex_w, my_tex_h);
 			m_GameLayer->m_ViewportSize.x = viewportPanelSize.x;
 			m_GameLayer->m_ViewportSize.y = viewportPanelSize.y;
 		}
@@ -31,6 +39,51 @@ void GameLayerImGui::ViewportPanel()
 			const ImVec2 uv_min(0.0f, 1.0f); // Top-left
 			const ImVec2 uv_max(1.0f, 0.0f); // Lower-right
 			ImGui::Image((ImTextureID)m_GameLayer->m_FrameBuffer->GetTextureId(), ImVec2(my_tex_w, my_tex_h), uv_min, uv_max);
+
+			if (m_SelectedObject)
+			{
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist();
+				float windowWidth = (float)ImGui::GetWindowWidth();
+				float windowHeight = (float)ImGui::GetWindowHeight();
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+				auto camera = m_GameLayer->m_ActiveCamera;
+				const glm::mat4 view = camera->GetView();
+				const glm::mat4 proj = camera->GetProj();
+				glm::mat4& transform = m_SelectedObject->GetTransform();
+
+				static ImGuizmo::OPERATION operation = ImGuizmo::OPERATION::TRANSLATE;
+				static ImGuizmo::MODE mode = ImGuizmo::MODE::LOCAL;
+
+				if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+				{
+					if (ImGui::IsKeyDown(ImGuiKey_W))
+					{
+						operation = ImGuizmo::OPERATION::TRANSLATE;
+						mode = ImGuizmo::MODE::WORLD;
+					}
+					else if (ImGui::IsKeyDown(ImGuiKey_E))
+					{
+						operation = ImGuizmo::OPERATION::ROTATE;
+						mode = ImGuizmo::MODE::LOCAL;
+					}
+					else if (ImGui::IsKeyDown(ImGuiKey_R))
+					{
+						operation = ImGuizmo::OPERATION::SCALE;
+						mode = ImGuizmo::MODE::LOCAL;
+					}
+				}
+
+				ImGuizmo::Manipulate(&view[0][0], &proj[0][0], operation, mode, &transform[0][0]);
+
+				if (ImGuizmo::IsUsing())
+				{
+					glm::vec3 translation, rotation, scale;
+					DecomposeTransform(transform, translation, rotation, scale);
+					m_SelectedObject->Set(translation, rotation, scale);
+				}
+			}
 		}
 	}
 	ImGui::End();
@@ -139,9 +192,9 @@ void GameLayerImGui::DebugOverlayPanel()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::Begin("Debug overaly", (bool*)1, window_flags);
 	ImGui::Text("Viewport size: %.0fx%.0f", m_GameLayer->m_ViewportSize.x, m_GameLayer->m_ViewportSize.y);
-	const glm::vec3 cameraPos = m_GameLayer->m_Camera->GetPosition();
+	const glm::vec3 cameraPos = m_GameLayer->m_ActiveCamera->GetPosition();
 	ImGui::Text("XYZ: %.2f / %.2f / %.2f", cameraPos.x, cameraPos.y, cameraPos.z);
-	const glm::vec3 cameraOri = m_GameLayer->m_Camera->GetOrientation();
+	const glm::vec3 cameraOri = m_GameLayer->m_ActiveCamera->GetOrientation();
 	ImGui::Text("Facing: %.2f / %.2f / %.2f", cameraOri.x, cameraOri.y, cameraOri.z);
 	ImGui::Text("%d FPS (max: %.0f)", m_GameLayer->m_FPS, Renderer::FPSPool.GetMax());
 	ImGui::Text("%.4f ms", 1.0f / m_GameLayer->m_FPS);
@@ -177,7 +230,7 @@ void GameLayerImGui::GraphicsSettingsPanel()
 		window->SetVSync(vSync);
 		if (ImGui::Button("Toggle camera"))
 		{
-			m_GameLayer->m_SelectedCamera = (m_GameLayer->m_SelectedCamera + 1) % 2;
+			m_GameLayer->ToggleCamera();
 		}
 	}
 	ImGui::End();
@@ -253,7 +306,7 @@ void GameLayerImGui::DrawImage(uint32_t textureId, float my_tex_w, float my_tex_
 }
 
 static int gameObjectPropsId = 0;
-static int selectionMask = 1;
+static int selectionMask = -1;
 
 int DrawVectorComponent(const char* name, float* num, const ImVec4& color, const float defaultValue = 0.0f)
 {
@@ -303,24 +356,53 @@ void GameLayerImGui::PropertiesPanel()
 	if (ImGui::Begin("Properties"))
 	{
 		gameObjectPropsId = 0;
-
-		auto& position = m_SelectedObject->GetPosition();
-		ImGui::Text("Position");
-		if (DrawVector(position))
-			m_SelectedObject->SetPosition(position);
-
-		auto rotation = glm::degrees(m_SelectedObject->GetRotation());
-		ImGui::Text("Rotation");
-		if (DrawVector(rotation))
+		if (!m_SelectedObject)
 		{
-			rotation = glm::radians(rotation);
-			m_SelectedObject->SetRotation(rotation);
+			ImGui::End();
+			return;
 		}
 
-		auto& scale = m_SelectedObject->GetScale();
-		ImGui::Text("Scale");
-		if (DrawVector(scale, 1.0f))
-			m_SelectedObject->SetScale(scale);
+		// Transform
+		{
+			ImGui::Spacing();
+			ImGui::Text("Transform");
+			ImGui::Spacing();
+			ImGui::Spacing();
+
+			auto& position = m_SelectedObject->GetPosition();
+			ImGui::Text("Position");
+			ImGui::SameLine();
+			if (DrawVector(position))
+				m_SelectedObject->SetPosition(position);
+
+			auto rotation = glm::degrees(m_SelectedObject->GetRotation());
+			ImGui::Text("Rotation");
+			ImGui::SameLine();
+			if (DrawVector(rotation))
+			{
+				rotation = glm::radians(rotation);
+				m_SelectedObject->SetRotation(rotation);
+			}
+
+			auto& scale = m_SelectedObject->GetScale();
+			ImGui::Text("Scale   ");
+			ImGui::SameLine();
+			if (DrawVector(scale, 1.0f))
+				m_SelectedObject->SetScale(scale);
+		
+			ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Separator();
+		}
+	
+		if(m_SelectedObject->GetMaterial())
+		{
+			ImGui::Spacing();
+			ImGui::Text("Material");
+			ImGui::Spacing();
+			ImGui::Spacing();
+			m_SelectedObject->GetMaterial()->DrawImGui();
+		}
 	}
 	ImGui::End();
 }
@@ -339,7 +421,7 @@ void GameLayerImGui::GameObjectsPanel()
 		for (auto& element : m_GameLayer->m_GameObjects)
 		{
 			ImGuiTreeNodeFlags nodeFlags = baseFlags;
-			const bool isSelected = (selectionMask & (1 << i)) != 0;
+			const bool isSelected = selectionMask == -1 ? false : (selectionMask & (1 << i)) != 0;
 			if (isSelected)
 			{
 				nodeFlags |= ImGuiTreeNodeFlags_Selected;
@@ -358,7 +440,17 @@ void GameLayerImGui::GameObjectsPanel()
 			i++;
 		}
 		if (nodeClicked != -1)
-			selectionMask = (1 << nodeClicked); // Click to single-select
+		{
+			if (selectionMask == (1 << nodeClicked)) // De-selected
+			{
+				selectionMask = -1;
+				m_SelectedObject = nullptr;
+			}
+			else
+			{
+				selectionMask = (1 << nodeClicked); // Selected
+			}
+		}
 	}
 	ImGui::End();
 }

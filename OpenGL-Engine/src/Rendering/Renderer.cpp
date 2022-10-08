@@ -11,15 +11,15 @@ static void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum s
 	switch (severity)
 	{
 		case GL_DEBUG_SEVERITY_HIGH:
-		ERROR("OpenGL HIGH severity message: {0}", message);
+		ERROR("OpenGL HIGH severity message: %s", message);
 		break;
 
 		case GL_DEBUG_SEVERITY_MEDIUM:
-		WARN("OpenGL MEDIUM severity message: {0}", message);
+		WARN("OpenGL MEDIUM severity message: %s", message);
 		break;
 
 		case GL_DEBUG_SEVERITY_LOW:
-		INFO("OpenGL LOW severity message: {0}", message);
+		INFO("OpenGL LOW severity message: %s", message);
 		break;
 	}
 }

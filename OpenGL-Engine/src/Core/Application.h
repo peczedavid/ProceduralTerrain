@@ -31,7 +31,7 @@ private:
 public:
 	inline bool IsCursor() { return m_Cursor; }
 	inline const bool IsCursor() const { return m_Cursor; }
-	inline void SetCursor(const bool cursor) { m_Cursor = cursor; }
+	inline void SetCursor(const bool cursor) { m_Window->SetCursor(cursor); m_Cursor = cursor; }
 };
 
 Application* CreateApplication();

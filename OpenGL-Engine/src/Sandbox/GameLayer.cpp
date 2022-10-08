@@ -1,6 +1,4 @@
-// TODO: - offset terrain height relative to amplitude so it starts at 0
-//		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
-// 
+// TODO:
 //		 - make renderer into static class			DONE
 //		 - make FPSPool into own class/struct		DONE
 //		 - put shaders into assets					DONE
@@ -19,20 +17,23 @@
 //		 - uniform buffer objects eg camera uniform DONE
 // 
 //       - object loading							DONE
-//		 - don't pass shared_ptr -> pass by
-//		   reference .get() return value
-//		 - logging to imgui window
+//		 - logging to imgui window					DONE
 //			
-//		 - nice gerstner waves
-//		 - scene system (switching between scenes)
-//		 - infinite grid CTRL+G toggle
-//		 - materials, pbr rendering?
-//		 - tree rendering
+//		 - nice gerstner waves						DONE
 // 
-//		 - screenshots in dist mode
-//		 - profiling (maybe benchmark scene)
-//		 - trackball camera controls
+//		 - guizmos									DONE
+//		 - trackball camera controls				DONE
 //		 https://computergraphics.stackexchange.com/questions/151/how-to-implement-a-trackball-in-opengl
+//		 https://physicscatalyst.com/graduation/wp-content/uploads/2016/09/rectangular-to-spherical-coordinates-300x256.png
+//		 - materials, pbr rendering?				WIP    - optional textures
+//		 - tree rendering							WIP    - submesh system
+// 
+//		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
+//		 - scene system (switching between scenes)
+//		 - profiling (maybe benchmark scene)
+//		 - infinite grid CTRL+G toggle
+//		http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+//		 - screenshots in dist mode
 
 #include "pch.h"
 
@@ -56,11 +57,6 @@ float Random(float max = 1.0f, float min = 0.0f)
 
 GameLayer::GameLayer()
 {
-	TRACE("Trace");
-	INFO("Info");
-	WARN("Warning");
-	ERROR("Error");
-
 	m_ShaderLibrary.Add("Terrain shader", CreateShaderRef(
 		"assets/GLSL/terrain/terrain.vert",
 		"assets/GLSL/terrain/terrain.tesc",
@@ -88,10 +84,12 @@ GameLayer::GameLayer()
 	m_GroundPlane = CreateRef<Plane>(planeSize, planeDivision);
 	m_WaterPlane = CreateRef<Plane>(waterPlaneSize, waterPlaneDivision);
 
-	m_Camera = CreateRef<Camera>(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
+	m_Camera = CreateRef<FPSCamera>(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
-	m_TrackballCamera = CreateRef<TrackballCamera>(128.0f, glm::vec3(0, 0, -75.0f));
+	m_TrackballCamera = CreateRef<TrackballCamera>(192.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	m_TrackballCamera->Resize(1, 1);
+	ToggleCamera();
+
 
 	auto skyboxShader = CreateShaderRef("assets/GLSL/skybox.vert", "assets/GLSL/skybox.frag");
 	m_ShaderLibrary.Add("Skybox shader", skyboxShader);
@@ -175,24 +173,36 @@ GameLayer::GameLayer()
 	m_ColossalModel = CreateRef<Model>("assets/Models/colossal.obj");
 	m_AmongUsModel = CreateRef<Model>("assets/Models/amogus.obj");
 
-	m_Sphere = CreateRef<GameObject>(m_SphereModel.get());
+	Ref<PBRMaterial> whitePBRmaterial = CreateRef<PBRMaterial>();
+	whitePBRmaterial->SetShader(m_ShaderLibrary.Get("PBR shader"));
+
+	Ref<PBRMaterial> redPBRMaterial = CreateRef<PBRMaterial>();
+	redPBRMaterial->SetShader(m_ShaderLibrary.Get("PBR shader"));
+	redPBRMaterial->Albedo = glm::vec3(1, 0, 0);
+
+	Ref<PBRMaterial> textuerPBRMaterial = CreateRef<PBRMaterial>();
+	textuerPBRMaterial->SetShader(m_ShaderLibrary.Get("PBR shader"));
+	textuerPBRMaterial->UseAlbedoMap = true;
+	textuerPBRMaterial->AlbedoMap = m_WaterTexture;
+
+	m_Sphere = CreateRef<GameObject>(m_SphereModel.get(), textuerPBRMaterial);
 	m_Sphere->SetPosition(glm::vec3(30.0f, 50.0f, -50.0f));
 	m_Sphere->SetScale(10.0f);
-	m_Teapot = CreateRef<GameObject>(m_TeapotModel.get());
+	m_Teapot = CreateRef<GameObject>(m_TeapotModel.get(), whitePBRmaterial);
 	m_Teapot->SetPosition(glm::vec3(-30.0f, 50.0f, -50.0f));
-	m_Monkey = CreateRef<GameObject>(m_MonkeyModel.get());
+	m_Monkey = CreateRef<GameObject>(m_MonkeyModel.get(), whitePBRmaterial);
 	m_Monkey->SetPosition(glm::vec3(0.0f, 50.0f, -50.0f));
 	m_Monkey->SetScale(10.0f);
-	m_Tree = CreateRef<GameObject>(m_TreeModel.get());
-	m_Tree->SetPosition(glm::vec3(0.0f, 50.0f, -75.0f));
+	m_Tree = CreateRef<GameObject>(m_TreeModel.get(), whitePBRmaterial);
+	m_Tree->SetPosition(glm::vec3(-50.0f, 50.0f, -50.0f));
 	m_Tree->SetScale(15.0f);
-	m_Eren = CreateRef<GameObject>(m_ErenModel.get());
+	m_Eren = CreateRef<GameObject>(m_ErenModel.get(), whitePBRmaterial);
 	m_Eren->SetPosition(glm::vec3(-50.0f, 50.0f, -125.0f));
 	m_Eren->SetScale(15.0f);
-	m_Colossal = CreateRef<GameObject>(m_ColossalModel.get());
+	m_Colossal = CreateRef<GameObject>(m_ColossalModel.get(), redPBRMaterial);
 	m_Colossal->SetPosition(glm::vec3(50.0f, 50.0f, -175.0f));
 	m_Colossal->SetScale(2.0f);
-	m_AmongUs = CreateRef<GameObject>(m_AmongUsModel.get());
+	m_AmongUs = CreateRef<GameObject>(m_AmongUsModel.get(), redPBRMaterial);
 	m_AmongUs->SetPosition(glm::vec3(0.0f, 50.0f, -100.0f));
 	m_AmongUs->SetScale(10.0f);
 
@@ -214,17 +224,12 @@ void GameLayer::OnUpdate(const float dt)
 	m_Time += dt;
 	const float fov = 45.0f, const nearPlane = 0.1f, const farPlane = 3000.0f;
 
-	m_Camera->UpdateMatrix(fov, nearPlane, farPlane);
-	m_TrackballCamera->UpdateMatrix(fov, nearPlane, farPlane);
-	if (!Application::Get().IsCursor())
-	{
-		m_Camera->Update(dt);
-	}
-	m_TrackballCamera->Update(dt);
+	m_ActiveCamera->CalculateMatrix(fov, nearPlane, farPlane);
+	m_ActiveCamera->Update(dt);
 
 	SetUniformBuffers();
 
-	m_Skybox->Render(m_Camera);
+	m_Skybox->Render();
 
 	glm::mat4 model;
 
@@ -253,9 +258,8 @@ void GameLayer::OnUpdate(const float dt)
 
 	auto shader = m_ShaderLibrary.Get("PBR shader");
 	shader->Use();
-	//shader->SetUniform("u_Albedo", glm::vec3(1.0f, 1.0f, 1.0f));
 	for (auto& gameObject : m_GameObjects)
-		gameObject.second->Draw(*shader.get());
+		gameObject.second->Draw();
 
 #if 1
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
@@ -263,7 +267,6 @@ void GameLayer::OnUpdate(const float dt)
 	m_WaterTexture->Bind(0);
 	waterShader->SetUniform("u_Shininess", m_WaterShininess);
 	waterShader->SetUniform("u_Reflectivity", m_WaterReflectivity);
-	waterShader->SetUniform("u_CameraPos", m_Camera->GetPosition());
 	waterShader->SetUniform("u_NormalView", m_WaterNormals ? 1 : 0);
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(-(float)waterPlaneSize / 2.f, m_WaterLevel, -(float)waterPlaneSize / 2.f));
 	waterShader->SetUniform("u_Model", model);
@@ -271,9 +274,7 @@ void GameLayer::OnUpdate(const float dt)
 #endif
 
 	if (Renderer::DebugView)
-		m_Axis->Render(m_Camera);
-
-	//FFTLoop();
+		m_Axis->Render(m_ActiveCamera);
 
 	RenderEnd();
 }
@@ -347,23 +348,24 @@ void GameLayer::RenderEnd()
 #endif
 }
 
+void GameLayer::ToggleCamera()
+{
+	m_SelectedCamera = (m_SelectedCamera + 1) % 2;
+	if (m_SelectedCamera == 0)
+		m_ActiveCamera = m_Camera.get();
+	else if (m_SelectedCamera == 1)
+		m_ActiveCamera = m_TrackballCamera.get();
+
+	Application::Get().SetCursor(m_SelectedCamera == 1);
+}
+
 void GameLayer::SetUniformBuffers()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, m_CameraUBO);
-	if (m_SelectedCamera == 0)
-	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetProj()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_Camera->GetMatrix()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), sizeof(glm::vec4), &m_Camera->GetPosition()[0]);
-	}
-	else if (m_SelectedCamera == 1)
-	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetView()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetProj()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_TrackballCamera->GetViewProj()[0][0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), sizeof(glm::vec4), &m_TrackballCamera->GetPosition()[0]);
-	}
+	glBufferSubData(GL_UNIFORM_BUFFER, 0 * sizeof(glm::mat4), sizeof(glm::mat4), &m_ActiveCamera->GetView()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 1 * sizeof(glm::mat4), sizeof(glm::mat4), &m_ActiveCamera->GetProj()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), &m_ActiveCamera->GetViewProj()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), sizeof(glm::vec4), &m_ActiveCamera->GetPosition()[0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, m_WavesUBO);

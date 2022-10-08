@@ -1,6 +1,14 @@
 #version 450 core
 precision highp float;
 
+layout (std140, binding = 0) uniform CameraBufferObject
+{
+	mat4 View;
+	mat4 Proj;
+	mat4 ViewProj;
+	vec4 Position;
+} u_Camera;
+
 layout (std140, binding = 2) uniform EnviromentBuffer
 {
 	vec4 SunDirection;
@@ -19,7 +27,6 @@ in vec2 v_TexCoords;
 
 uniform sampler2D u_WaterTexture;
 uniform int u_NormalView;
-uniform vec3 u_CameraPos;
 uniform float u_Shininess;
 uniform float u_Reflectivity;
 
@@ -27,7 +34,7 @@ vec4 shade() {
 	vec4 pixelColor;
 
 	const vec3 N = normalize(v_Normal);
-	const vec3 view = normalize(u_CameraPos - v_WorldPos.xyz);
+	const vec3 view = normalize(u_Camera.Position.xyz - v_WorldPos.xyz);
 	const vec3 lightDirection = normalize(u_Enviroment.SunDirection.xyz);
 	vec4 waterColor = texture(u_WaterTexture, v_TexCoords);
 
