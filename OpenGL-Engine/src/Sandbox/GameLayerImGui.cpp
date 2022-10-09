@@ -108,7 +108,7 @@ void GameLayerImGui::LandscapePanel()
 {
 	if (ImGui::Begin("Landscape"))
 	{
-		ImGui::SliderFloat("MaxHeight", &m_GameLayer->m_MaxHeight, 0.0f, 1000.f);
+		ImGui::SliderFloat("MaxHeight", &m_GameLayer->m_MaxHeight, 0.0f, 300.0f);
 		ImGui::Checkbox("Normals", &m_GameLayer->m_TerrainNormals);
 		ImGui::Checkbox("Shade", &m_GameLayer->m_ShadeTerrain);
 	}

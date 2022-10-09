@@ -61,8 +61,7 @@ void main()
 	worldPos.y = vertexInfo.w * u_MaxLevel;
 	
 	gl_Position = u_Camera.ViewProj * worldPos;
-	vec4 normal = vec4(vertexInfo.xyz, 0.0) * 2.0 - 1.0;
-	v_Normal = normalize(normal);
+	v_Normal = vec4(vertexInfo.xyz, 0.0) * 2.0 - 1.0;
 	v_TexCoords = worldPos.xz / 12.5;
 	
 	const float vertexDistance = length((u_Camera.View * worldPos).xyz);

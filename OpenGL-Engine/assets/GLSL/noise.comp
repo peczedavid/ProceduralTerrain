@@ -18,6 +18,7 @@ void main()
     vec2 fragCoord = gl_GlobalInvocationID.xy;
 
     vec3 noiseData = FractBrownNoiseDeriv((fragCoord + u_WorldOffset) * u_Scale / 10.0);
+    noiseData.x += 1.5 * u_Amplitude;
     float height = noiseData.x;
     float du = noiseData.y;
     float dv = noiseData.z;

@@ -23,18 +23,19 @@ uniform int u_Shade;
 
 void main()
 {
+	vec4 N = normalize(v_Normal);
 	if(u_NormalView == 0)
 	{
 		const vec4 groundColor = texture(u_GroundTexture, v_TexCoords);
 		const vec4 rockColor = texture(u_RockTexture, v_TexCoords);
 		// Rock texture based on steepness 
-		const float lambda = smoothstep(0.525, 0.725, v_Normal.y);
+		const float lambda = smoothstep(0.525, 0.725, N.y);
 		outColor = mix(rockColor, groundColor, lambda);
 
 		if(u_Shade == 1)
 		{
 			// Diffuse lighting
-			const float cost = dot(v_Normal, normalize(u_Enviroment.SunDirection));
+			const float cost = dot(N, normalize(u_Enviroment.SunDirection));
 			// Ambient lighting
 			outColor.xyz *= clamp(cost, 0.25, 1.0);
 		}
@@ -44,12 +45,12 @@ void main()
 	}
 	else
 	{
-		outColor.rgb = vec3(v_Normal + 0.7) / 1.7;
+		outColor.rgb = vec3(N + 0.7) / 1.7;
 		
 		if(u_Shade == 1)
 		{
 			// Diffuse lighting
-			const float cost = dot(v_Normal, normalize(u_Enviroment.SunDirection));
+			const float cost = dot(N, normalize(u_Enviroment.SunDirection));
 			// Ambient lighting
 			outColor.xyz *= clamp(cost, 0.25, 1.0);
 		}
