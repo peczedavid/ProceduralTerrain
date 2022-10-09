@@ -31,7 +31,6 @@
 //		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
 //		 - scene system (switching between scenes)
 //		 - profiling (maybe benchmark scene)
-//		 - clear console after a certain number of logs
 //		 - infinite grid CTRL+G toggle
 //		http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
 //		 - screenshots in dist mode
