@@ -10,3 +10,7 @@
 [submodule "OpenGL-Engine/vendor/ImGuizmo"]
 	path = OpenGL-Engine/vendor/ImGuizmo
 	url = https://github.com/peczedavid/ImGuizmo.git
+[submodule "OpenGL-Engine/vendor/imgui"]
+	path = OpenGL-Engine/vendor/imgui
+	url = http://github.com/peczedavid/imgui
+	branch = docking
