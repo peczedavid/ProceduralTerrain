@@ -39,7 +39,7 @@ private:
 	Ref<FPSCamera> m_Camera;
 	Ref<TrackballCamera> m_TrackballCamera;
 	Camera* m_ActiveCamera;
-	uint32_t m_SelectedCamera = 0;
+	uint32_t m_SelectedCamera = 1;
 	Ref<Skybox> m_Skybox;
 	Ref<Axis> m_Axis;
 
@@ -69,9 +69,9 @@ private:
 	
 	glm::vec2 m_NoiseOffset = glm::vec2(0.0f, 0.0f);
 
-	float m_WaterLevel = 25.0f;
+	float m_WaterLevel = -25.0f;
 	std::vector<glm::vec4> m_Waves;
-	std::vector<glm::vec4> m_WavesInitial	;
+	std::vector<glm::vec4> m_WavesInitial;
 	const size_t m_WavesCount = 16;
 	float m_WaterShininess = 140.0f, m_WaterReflectivity = 1.05f;
 	float m_SteepnessDropoff = 0.496f, m_WavelengthDropoff = 0.138f;

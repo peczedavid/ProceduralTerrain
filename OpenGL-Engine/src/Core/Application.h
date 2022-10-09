@@ -15,6 +15,8 @@ public:
 	void PushLayer(Layer* layer);
 	void PushOverlay(Layer* overlay);
 
+	void Close();
+
 	static inline Application& Get() { return *s_Instance; }
 	inline Window* GetWindow() { return m_Window; }
 	const inline Window* GetWindow() const { return m_Window; }
@@ -25,6 +27,7 @@ private:
 	LayerStack* m_LayerStack;
 	Window* m_Window;
 	bool m_Cursor;
+	bool m_ViewportHovered;
 	ImGuiLayer* m_ImGuiLayer;
 
 	static Application* s_Instance;
@@ -32,6 +35,8 @@ public:
 	inline bool IsCursor() { return m_Cursor; }
 	inline const bool IsCursor() const { return m_Cursor; }
 	inline void SetCursor(const bool cursor) { m_Window->SetCursor(cursor); m_Cursor = cursor; }
+	bool IsViewportHovered() { return m_ViewportHovered; }
+	void SetViewportHovered(bool hovered) { m_ViewportHovered = hovered; }
 };
 
 Application* CreateApplication();

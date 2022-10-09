@@ -4,6 +4,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <Core/Application.h>
+#include <backends/imgui_impl_glfw.h>
 
 FPSCamera::FPSCamera(const glm::vec3& position, const glm::vec3& orientation)
 	: m_Position(position), m_Orientation(glm::normalize(orientation)), m_Up({ 0.0f, 1.0f, 0.0f })
@@ -111,13 +112,12 @@ void FPSCamera::Resize(const uint32_t width, const uint32_t height)
 	m_Height = height;
 }
 
-
-
-// TODO: integrate event system
 static int scrollEvent = 0;
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	scrollEvent = yoffset;
+	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+	if(Application::Get().IsViewportHovered())
+		scrollEvent = yoffset;
 }
 
 TrackballCamera::TrackballCamera(const float radius, const glm::vec3& lookat)
