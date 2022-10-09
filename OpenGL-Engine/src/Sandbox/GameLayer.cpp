@@ -403,9 +403,11 @@ void GameLayer::GenerateTerrain()
 		for (int x = -1; x <= 1; x++)
 		{
 			const int index = (z + 1) * 3 + (x + 1);
-			terrainComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * (int)planeSize, z * (int)planeSize));
+			const uint32_t width = m_HeightMaps[index]->GetWidth();
+			const uint32_t height = m_HeightMaps[index]->GetHeight();
+			terrainComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * ((int)width - 1), z * ((int)height - 1)));
 			m_HeightMaps[index]->BindImage();
-			terrainComputeShader->Dispatch(glm::uvec3(ceil(planeSize / 16), ceil(planeSize / 16), 1));
+			terrainComputeShader->Dispatch(glm::uvec3(ceil(width / 16), ceil(height / 16), 1));
 		}
 	}
 }

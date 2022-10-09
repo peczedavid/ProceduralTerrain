@@ -108,7 +108,7 @@ void GameLayerImGui::LandscapePanel()
 {
 	if (ImGui::Begin("Landscape"))
 	{
-		ImGui::SliderFloat("MaxHeight", &m_GameLayer->m_MaxHeight, 0.0f, 1000.f);
+		ImGui::SliderFloat("MaxHeight", &m_GameLayer->m_MaxHeight, 0.0f, 300.0f);
 		ImGui::Checkbox("Normals", &m_GameLayer->m_TerrainNormals);
 		ImGui::Checkbox("Shade", &m_GameLayer->m_ShadeTerrain);
 	}
@@ -207,6 +207,7 @@ void GameLayerImGui::DebugOverlayPanel()
 
 void GameLayerImGui::TexturesPanel()
 {
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 	if (ImGui::Begin("Textures"))
 	{
 		for (int i = 2; i >= 0; i--)
@@ -219,6 +220,7 @@ void GameLayerImGui::TexturesPanel()
 		}
 	}
 	ImGui::End();
+	ImGui::PopStyleVar();
 }
 
 void GameLayerImGui::GraphicsSettingsPanel()
@@ -296,14 +298,14 @@ void GameLayerImGui::DrawImage(uint32_t textureId, float my_tex_w, float my_tex_
 			ImGui::BeginTooltip();
 			const float region_sz = 32.0f;
 			float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
-			float region_y = my_tex_h - (io.MousePos.y - pos.y);
+			float region_y = io.MousePos.y - pos.y;
 			region_y = my_tex_h - region_y;
 			region_y = region_y - region_sz * 0.5f;
 			const float zoom = 7.0f;
-			if (region_x < 0.0f) { region_x = 0.0f; }
-			else if (region_x > my_tex_w - region_sz) { region_x = my_tex_w - region_sz; }
-			if (region_y < 0.0f) { region_y = 0.0f; }
-			else if (region_y > my_tex_h - region_sz) { region_y = my_tex_h - region_sz; }
+			//if (region_x < 0.0f) { region_x = 0.0f; }
+			//else if (region_x > my_tex_w - region_sz) { region_x = my_tex_w - region_sz; }
+			//if (region_y < 0.0f) { region_y = 0.0f; }
+			//else if (region_y > my_tex_h - region_sz) { region_y = my_tex_h - region_sz; }
 			ImGui::Text("Min: (%.2f, %.2f)", region_x, region_y);
 			ImGui::Text("Max: (%.2f, %.2f)", region_x + region_sz, region_y + region_sz);
 			const ImVec2 uv0((region_x) / my_tex_w, (region_y + region_sz) / my_tex_h);
