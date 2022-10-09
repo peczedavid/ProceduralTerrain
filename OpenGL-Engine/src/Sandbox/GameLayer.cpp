@@ -81,6 +81,13 @@ GameLayer::GameLayer()
 		"assets/GLSL/pbr/pbr.frag"
 	));
 
+	// https://www.geeks3d.com/hacklab/20180514/demo-wireframe-shader-opengl-3-2-and-opengl-es-3-1/
+	m_ShaderLibrary.Add("PBR wireframe shader", CreateShaderRef(
+		"assets/GLSL/pbr/pbr-wireframe.vert",
+		"assets/GLSL/pbr/pbr-wireframe.geom",
+		"assets/GLSL/pbr/pbr-wireframe.frag"
+	));
+
 	m_GroundPlane = CreateRef<Plane>(planeSize, planeDivision);
 	m_WaterPlane = CreateRef<Plane>(waterPlaneSize, waterPlaneDivision);
 
@@ -256,8 +263,6 @@ void GameLayer::OnUpdate(const float dt)
 	}
 #endif
 
-	auto shader = m_ShaderLibrary.Get("PBR shader");
-	shader->Use();
 	for (auto& gameObject : m_GameObjects)
 		gameObject.second->Draw();
 
