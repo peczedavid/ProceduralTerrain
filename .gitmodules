@@ -4,10 +4,6 @@
 [submodule "OpenGL-Engine/vendor/glm"]
 	path = OpenGL-Engine/vendor/glm
 	url = https://github.com/peczedavid/glm.git
-[submodule "OpenGL-Engine/vendor/imgui"]
-	path = OpenGL-Engine/vendor/imgui
-	url = https://github.com/peczedavid/imgui.git
-	branch = docking
 [submodule "OpenGL-Engine/vendor/spdlog"]
 	path = OpenGL-Engine/vendor/spdlog
 	url = https://github.com/peczedavid/spdlog
