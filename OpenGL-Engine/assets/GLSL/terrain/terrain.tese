@@ -57,12 +57,11 @@ void main()
 	
 	if(texCoord.x < 0) texCoord.x = 1 - texCoord.x;
 	texCoord.y = 1 - texCoord.y;
-	const vec3 vertexInfo = texture(u_NoiseTexture, texCoord).xyz;
-	worldPos.y = vertexInfo.x * u_MaxLevel;
+	const vec4 vertexInfo = texture(u_NoiseTexture, texCoord);
+	worldPos.y = vertexInfo.w * u_MaxLevel;
 	
 	gl_Position = u_Camera.ViewProj * worldPos;
-	vec4 normal = vec4(-vertexInfo.y, 1.0, -vertexInfo.z, 0.0);
-	//normal.y /= worldPos.y;
+	vec4 normal = vec4(vertexInfo.xyz, 0.0) * 2.0 - 1.0;
 	v_Normal = normalize(normal);
 	v_TexCoords = worldPos.xz / 12.5;
 	

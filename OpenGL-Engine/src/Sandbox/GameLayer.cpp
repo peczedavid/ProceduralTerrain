@@ -169,8 +169,8 @@ GameLayer::GameLayer()
 	m_TeapotModel = CreateRef<Model>("assets/Models/teapot.obj");
 	m_MonkeyModel = CreateRef<Model>("assets/Models/monkey.obj");
 	m_TreeModel = CreateRef<Model>("assets/Models/birch_tree.obj");
-	m_ErenModel = CreateRef<Model>("assets/Models/eren.obj");
-	m_ColossalModel = CreateRef<Model>("assets/Models/colossal.obj");
+	//m_ErenModel = CreateRef<Model>("assets/Models/eren.obj");
+	//m_ColossalModel = CreateRef<Model>("assets/Models/colossal.obj");
 	m_AmongUsModel = CreateRef<Model>("assets/Models/amogus.obj");
 
 	Ref<PBRMaterial> whitePBRmaterial = CreateRef<PBRMaterial>();
@@ -196,12 +196,12 @@ GameLayer::GameLayer()
 	m_Tree = CreateRef<GameObject>(m_TreeModel.get(), whitePBRmaterial);
 	m_Tree->SetPosition(glm::vec3(-50.0f, 50.0f, -50.0f));
 	m_Tree->SetScale(15.0f);
-	m_Eren = CreateRef<GameObject>(m_ErenModel.get(), whitePBRmaterial);
-	m_Eren->SetPosition(glm::vec3(-50.0f, 50.0f, -125.0f));
-	m_Eren->SetScale(15.0f);
-	m_Colossal = CreateRef<GameObject>(m_ColossalModel.get(), redPBRMaterial);
-	m_Colossal->SetPosition(glm::vec3(50.0f, 50.0f, -175.0f));
-	m_Colossal->SetScale(2.0f);
+	//m_Eren = CreateRef<GameObject>(m_ErenModel.get(), whitePBRmaterial);
+	//m_Eren->SetPosition(glm::vec3(-50.0f, 50.0f, -125.0f));
+	//m_Eren->SetScale(15.0f);
+	//m_Colossal = CreateRef<GameObject>(m_ColossalModel.get(), redPBRMaterial);
+	//m_Colossal->SetPosition(glm::vec3(50.0f, 50.0f, -175.0f));
+	//m_Colossal->SetScale(2.0f);
 	m_AmongUs = CreateRef<GameObject>(m_AmongUsModel.get(), redPBRMaterial);
 	m_AmongUs->SetPosition(glm::vec3(0.0f, 50.0f, -100.0f));
 	m_AmongUs->SetScale(10.0f);
@@ -210,8 +210,8 @@ GameLayer::GameLayer()
 	m_GameObjects["Tree"] = m_Tree;
 	m_GameObjects["Monkey"] = m_Monkey;
 	m_GameObjects["Teapot"] = m_Teapot;
-	m_GameObjects["Eren"] = m_Eren;
-	m_GameObjects["Colossal"] = m_Colossal;
+	//m_GameObjects["Eren"] = m_Eren;
+	//m_GameObjects["Colossal"] = m_Colossal;
 	m_GameObjects["Among us"] = m_AmongUs;
 }
 
@@ -261,7 +261,7 @@ void GameLayer::OnUpdate(const float dt)
 	for (auto& gameObject : m_GameObjects)
 		gameObject.second->Draw();
 
-#if 1
+#if 0
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
 	waterShader->Use();
 	m_WaterTexture->Bind(0);

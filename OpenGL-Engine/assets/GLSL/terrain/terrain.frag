@@ -28,7 +28,7 @@ void main()
 		const vec4 groundColor = texture(u_GroundTexture, v_TexCoords);
 		const vec4 rockColor = texture(u_RockTexture, v_TexCoords);
 		// Rock texture based on steepness 
-		const float lambda = smoothstep(0.825, 0.925, v_Normal.y);
+		const float lambda = smoothstep(0.525, 0.725, v_Normal.y);
 		outColor = mix(rockColor, groundColor, lambda);
 
 		if(u_Shade == 1)
