@@ -56,7 +56,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 Window::Window(const WindowProps& props)
 	: m_Width(props.Width), m_Height(props.Height), m_Maximized(props.Maximized)
 {
-	ASSERT(glfwInit(), "GLFW Initialization failed!");
+	int result = glfwInit();
+	ASSERT(result, "GLFW Initialization failed!");
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -82,7 +83,8 @@ Window::Window(const WindowProps& props)
 	}
 
 	glfwMakeContextCurrent(m_Window);
-	ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "OpenGL context creation failed!");
+	result = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	ASSERT(result, "OpenGL context creation failed!");
 
 	m_VSync = true;
 	glfwSwapInterval(m_VSync ? 1 : 0);
