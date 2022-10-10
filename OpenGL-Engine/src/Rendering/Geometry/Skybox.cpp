@@ -21,23 +21,23 @@ Skybox::Skybox(Ref<Shader> shader)
 	constexpr uint32_t indices[36] =
 	{
 		// Right
-		1, 2, 6,
-		6, 5, 1,
+		6, 2, 1,
+		1, 5, 6,
 		// Left
-		0, 4, 7,
-		7, 3, 0,
+		7, 4, 0,
+		0, 3, 7,
 		// Top
-		4, 5, 6,
-		6, 7, 4,
+		6, 5, 4,
+		4, 7, 6,
 		// Bottom
-		0, 3, 2,
-		2, 1, 0,
+		2, 3, 0,
+		0, 1, 2,
 		// Back
-		0, 1, 5,
-		5, 4, 0,
+		5, 1, 0,
+		0, 4, 5,
 		// Front
-		3, 7, 6,
-		6, 2, 3
+		6, 7, 3,
+		3, 2, 6
 	};
 
 	glGenVertexArrays(1, &m_Vao);

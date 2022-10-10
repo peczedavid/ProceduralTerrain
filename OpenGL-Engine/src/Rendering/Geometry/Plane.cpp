@@ -9,7 +9,7 @@ Plane::Plane(uint32_t width, uint32_t div)
 	glGenBuffers(1, &m_Ebo);
 
 	glBindVertexArray(m_Vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+	
 
 	this->GenerateMesh(width, div);
 
@@ -48,22 +48,27 @@ void Plane::GenerateMesh(uint32_t width, uint32_t div)
 		}
 	}
 
+	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 	glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), &m_Vertices[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
 	m_Indices.clear();
 	for (uint32_t y = 0; y < div; y++)
 	{
 		for (uint32_t x = 0; x < div; x++)
 		{
 			uint32_t i = y * (div + 1) + x;
+			m_Indices.push_back(i + div + 1);
+			m_Indices.push_back(i + div + 1 + 1);
+			m_Indices.push_back(i + 1);
 			m_Indices.push_back(i);
+			/*m_Indices.push_back(i);
 			m_Indices.push_back(i + 1);
 			m_Indices.push_back(i + div + 1 + 1);
-			m_Indices.push_back(i + div + 1);
+			m_Indices.push_back(i + div + 1);*/
 		}
 	}
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(uint16_t), &m_Indices[0], GL_STATIC_DRAW);
 }
 

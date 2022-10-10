@@ -144,6 +144,7 @@ void GameLayerImGui::ContolsPanel()
 		ImGui::Text("F - Wireframe");
 		ImGui::Text("Tab - Cursor");
 		ImGui::Text("Esc - Close");
+		ImGui::Text("Ctrl+G - Grid");
 	}
 	ImGui::End();
 }
@@ -234,14 +235,6 @@ void GameLayerImGui::GraphicsSettingsPanel()
 		if (ImGui::Button("Toggle camera"))
 		{
 			m_GameLayer->ToggleCamera();
-		}
-		if (ImGui::Button("Maximize"))
-		{
-			window->Maximize();
-		}
-		if (ImGui::Button("Restore"))
-		{
-			window->Restore();
 		}
 	}
 	ImGui::End();

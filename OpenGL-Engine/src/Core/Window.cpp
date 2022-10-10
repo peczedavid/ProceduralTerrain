@@ -44,6 +44,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		Renderer::DebugView = !Renderer::DebugView;
 	}
+	if (key == GLFW_KEY_G && action == GLFW_PRESS)
+	{
+		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		{
+			Renderer::Grid = !Renderer::Grid;
+		}
+	}
 }
 
 Window::Window(const WindowProps& props)

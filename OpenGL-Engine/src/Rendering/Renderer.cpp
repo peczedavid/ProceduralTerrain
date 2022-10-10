@@ -4,6 +4,7 @@
 
 bool Renderer::DebugView = false;
 bool Renderer::WireFrame = false;
+bool Renderer::Grid = false;
 FPSPool Renderer::FPSPool;
 
 static void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
@@ -43,7 +44,7 @@ void Renderer::SetOpenGLConfig()
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
-	//glFrontFace(GL_CW);
+	//glFrontFace(GL_CCW);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glPolygonMode(GL_FRONT_AND_BACK, WireFrame ? GL_LINE : GL_FILL);

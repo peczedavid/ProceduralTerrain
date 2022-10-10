@@ -7,6 +7,7 @@
 #include "Rendering/Geometry/Skybox.h"
 #include "Rendering/Geometry/Plane.h"
 #include "Rendering/Geometry/Axis.h"
+#include "Rendering/Geometry/Grid.h"
 #include "Rendering/FrameBuffer.h"
 #include "Rendering/Geometry/FullscreenQuad.h"
 #include "Rendering/GameObject.h"
@@ -42,6 +43,7 @@ private:
 	uint32_t m_SelectedCamera = 1;
 	Ref<Skybox> m_Skybox;
 	Ref<Axis> m_Axis;
+	Ref<Grid> m_Grid;
 
 	Ref<Texture2D> m_UVTexture;
 	Ref<Texture2D> m_GroundTexture, m_RockTexture, m_WaterTexture;

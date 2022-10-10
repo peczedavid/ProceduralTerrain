@@ -15,6 +15,7 @@ public:
 public:
 	static FPSPool FPSPool;
 	static bool DebugView;
+	static bool Grid;
 private:
 	static bool WireFrame;
 };

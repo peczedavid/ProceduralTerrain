@@ -25,14 +25,17 @@
 //		 - trackball camera controls				DONE
 //		 https://computergraphics.stackexchange.com/questions/151/how-to-implement-a-trackball-in-opengl
 //		 https://physicscatalyst.com/graduation/wp-content/uploads/2016/09/rectangular-to-spherical-coordinates-300x256.png
+//		 - fix seames between chunks				DONE
+//		 - infinite grid, CTRL+G toggle				DONE
+//		 http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+//		
+//		 - rewrite controls panel
 //		 - materials, pbr rendering?				WIP    - optional textures
 //		 - tree rendering							WIP    - submesh system
+//		
 // 
-//		 - fix seames between chunks (maybe (planeSize+1)*(planeSize+1) heightmaps)
 //		 - scene system (switching between scenes)
 //		 - profiling (maybe benchmark scene)
-//		 - infinite grid CTRL+G toggle
-//		http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
 //		 - screenshots in dist mode
 
 #include "pch.h"
@@ -105,6 +108,10 @@ GameLayer::GameLayer()
 	auto axisShader = CreateShaderRef("assets/GLSL/axis/axis.vert", "assets/GLSL/axis/axis.frag");
 	m_ShaderLibrary.Add("Axis shader", axisShader);
 	m_Axis = CreateRef<Axis>(axisShader);
+
+	auto gridShader = CreateShaderRef("assets/GLSL/grid/grid.vert", "assets/GLSL/grid/grid.frag");
+	m_ShaderLibrary.Add("Grid shader", gridShader);
+	m_Grid = CreateRef<Grid>(gridShader);
 
 	m_FullscreenQuad = CreateRef<FullscreenQuad>();
 
@@ -280,6 +287,9 @@ void GameLayer::OnUpdate(const float dt)
 
 	if (Renderer::DebugView)
 		m_Axis->Render(m_ActiveCamera);
+
+	if (Renderer::Grid)
+		m_Grid->Draw();
 
 	RenderEnd();
 }
