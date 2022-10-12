@@ -38,6 +38,8 @@
 //		 - profiling (maybe benchmark scene)
 //		 - screenshots in dist mode
 
+//		 - ett, camera system
+//		 https://www.3dgep.com/understanding-the-view-matrix/
 #include "pch.h"
 
 #include "Sandbox/GameLayer.h"
