@@ -34,11 +34,12 @@ vec4 Grid(vec3 fragPos, float scale, bool drawAxis) {
     float minimumz = min(derivative.y, 1);
     float minimumx = min(derivative.x, 1);
     vec4 color = vec4(0.2, 0.2, 0.2, 1.0 - min(line, 1.0));
+    const float size = 5.0;
     // z axis
-    if(fragPos.x > -10 * minimumx && fragPos.x < 10 * minimumx)
+    if(fragPos.x > -size * minimumx && fragPos.x < size * minimumx)
         color.z = 1.0;
     // x axis
-    if(fragPos.z > -10 * minimumz && fragPos.z < 10 * minimumz)
+    if(fragPos.z > -size * minimumz && fragPos.z < size * minimumz)
         color.x = 1.0;
     return color;
 }
