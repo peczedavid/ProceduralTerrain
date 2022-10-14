@@ -38,16 +38,14 @@
 //		 - profiling (maybe benchmark scene)
 //		 - screenshots in dist mode
 
-<<<<<<< Updated upstream
 //		 - ett, camera system
 //		 https://www.3dgep.com/understanding-the-view-matrix/
-=======
+// 
 //		 - custom title bar
 //		 https://kubyshkin.name/posts/win32-window-custom-title-bar-caption/
 //		 https://www.youtube.com/watch?v=qZZePCNLBuQ
 //		 https://github.com/grassator/win32-window-custom-titlebar
 
->>>>>>> Stashed changes
 #include "pch.h"
 
 #include "Sandbox/GameLayer.h"
