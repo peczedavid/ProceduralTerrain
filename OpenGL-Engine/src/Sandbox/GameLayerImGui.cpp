@@ -182,6 +182,12 @@ void GameLayerImGui::VendorInfoPanel()
 		ImGui::Text("Version: %s", version);
 		ImGui::Text("OpenGL %d.%d", majorVersion, minorVersion);
 		ImGui::Text("VRAM: %d/%d MB", usedVRAM, maxVRAM);
+		MEMORYSTATUSEX memInfo{};
+		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+		GlobalMemoryStatusEx(&memInfo);
+		DWORDLONG totalPhysMem = memInfo.ullTotalPhys / 1024 / 1024;
+		DWORDLONG physMemUsed = (memInfo.ullTotalPhys - memInfo.ullAvailPhys) / 1024 / 1024;
+		ImGui::Text("RAM: %llu/%llu MB", physMemUsed, totalPhysMem);
 	}
 	ImGui::End();
 }
