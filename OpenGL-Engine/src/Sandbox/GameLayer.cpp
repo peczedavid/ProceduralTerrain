@@ -33,13 +33,13 @@
 //		 - materials, pbr rendering?				WIP    - optional textures
 //		 - tree rendering							WIP    - submesh system
 // 
-//		 - procedural sky with sun
 //		 - scene system (switching between scenes)
 //		 - profiling (maybe benchmark scene)
 //		 - screenshots in dist mode
 
 //		 - ett, camera system
 //		 https://www.3dgep.com/understanding-the-view-matrix/
+//		 - procedural sky with sun
 // 
 //		 - custom title bar
 //		 https://kubyshkin.name/posts/win32-window-custom-title-bar-caption/
@@ -195,6 +195,9 @@ GameLayer::GameLayer()
 	m_ColossalModel = CreateRef<Model>("assets/Models/colossal.obj");
 	m_AmongUsModel = CreateRef<Model>("assets/Models/amogus.obj");
 
+	m_GumsModel = CreateRef<Model>("assets/Models/gums.obj");
+	m_TeethModel = CreateRef<Model>("assets/Models/teeth.obj");
+
 	Ref<PBRMaterial> whitePBRmaterial = CreateRef<PBRMaterial>();
 	whitePBRmaterial->SetShader(m_ShaderLibrary.Get("PBR shader"));
 
@@ -228,6 +231,23 @@ GameLayer::GameLayer()
 	m_AmongUs->SetPosition(glm::vec3(0.0f, 50.0f, -100.0f));
 	m_AmongUs->SetScale(10.0f);
 
+	m_GumsBottom = CreateRef<GameObject>(m_GumsModel.get(), redPBRMaterial);
+	m_GumsBottom->SetScale(15.0f);
+	m_GumsBottom->SetPosition(glm::vec3(0.0f, 50.0f, 0.0f));
+	m_GumsBottom->SetRotation(glm::vec3(0.0f, 3.14f, 0.0f));
+	m_GumsTop = CreateRef<GameObject>(m_GumsModel.get(), redPBRMaterial);
+	m_GumsTop->SetScale(15.0f);
+	m_GumsTop->SetPosition(glm::vec3(0.0f, 65.0f, 0.0f));
+	m_GumsTop->SetRotation(glm::vec3(0.0f, 3.14f, 3.14f));
+	m_TeethBottom = CreateRef<GameObject>(m_TeethModel.get(), whitePBRmaterial);
+	m_TeethBottom->SetScale(15.0f);
+	m_TeethBottom->SetPosition(glm::vec3(0.0f, 50.0f, 0.0f));
+	m_TeethBottom->SetRotation(glm::vec3(0.0f, 3.14f, 0.0f));
+	m_TeethTop = CreateRef<GameObject>(m_TeethModel.get(), whitePBRmaterial);
+	m_TeethTop->SetScale(15.0f);
+	m_TeethTop->SetPosition(glm::vec3(0.0f, 65.0, 0.0f));
+	m_TeethTop->SetRotation(glm::vec3(0.0f, 3.14f, 3.14f));
+
 	m_GameObjects["Sphere"] = m_Sphere;
 	m_GameObjects["Tree"] = m_Tree;
 	m_GameObjects["Monkey"] = m_Monkey;
@@ -235,6 +255,10 @@ GameLayer::GameLayer()
 	m_GameObjects["Eren"] = m_Eren;
 	m_GameObjects["Colossal"] = m_Colossal;
 	m_GameObjects["Among us"] = m_AmongUs;
+	m_GameObjects["Gums bottom"] = m_GumsBottom;
+	m_GameObjects["Gums top"] = m_GumsTop;
+	m_GameObjects["Teeth bottom"] = m_TeethBottom;
+	m_GameObjects["Teeth top"] = m_TeethTop;
 }
 
 void GameLayer::OnUpdate(const float dt)
