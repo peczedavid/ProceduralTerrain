@@ -54,7 +54,7 @@ private:
 	Ref<Model> m_ErenModel, m_ColossalModel, m_AmongUsModel;
 	Ref<Model> m_GumsModel, m_TeethModel, m_BracesModel;
 	Ref<GameObject> m_Monkey, m_Teapot, m_Sphere, m_Tree, m_Eren, m_Colossal, m_AmongUs;
-	Ref<GameObject> m_GumsBottom, m_GumsTop, m_TeethBottom, m_TeethTop, m_BracesBottom, m_BracesTop;
+	Ref<GameObject> m_MouthBase, m_GumsBottom, m_GumsTop, m_TeethBottom, m_TeethTop, m_BracesBottom, m_BracesTop;
 	std::unordered_map<std::string, Ref<GameObject>> m_GameObjects;
 
 	glm::vec4 m_SunDirection = glm::vec4(0.254f, 0.341f, 0.905f, 0.0f);

@@ -255,30 +255,22 @@ GameLayer::GameLayer()
 	m_AmongUs->SetScale(10.0f);
 
 	m_GumsBottom = CreateRef<GameObject>(m_GumsModel.get(), gumsMaterial);
-	m_GumsBottom->SetScale(15.0f);
-	m_GumsBottom->SetPosition(glm::vec3(0.0f, 50.0f, 0.0f));
 	m_GumsBottom->SetRotation(glm::vec3(0.0f, 3.14f, 0.0f));
 	m_GumsTop = CreateRef<GameObject>(m_GumsModel.get(), gumsMaterial);
-	m_GumsTop->SetScale(15.0f);
-	m_GumsTop->SetPosition(glm::vec3(0.0f, 65.0f, 0.0f));
 	m_GumsTop->SetRotation(glm::vec3(0.0f, 3.14f, 3.14f));
 	m_TeethBottom = CreateRef<GameObject>(m_TeethModel.get(), teethMaterial);
-	m_TeethBottom->SetScale(15.0f);
-	m_TeethBottom->SetPosition(glm::vec3(0.0f, 50.0f, 0.0f));
 	m_TeethBottom->SetRotation(glm::vec3(0.0f, 3.14f, 0.0f));
 	m_TeethTop = CreateRef<GameObject>(m_TeethModel.get(), teethMaterial);
-	m_TeethTop->SetScale(15.0f);
-	m_TeethTop->SetPosition(glm::vec3(0.0f, 65.0, 0.0f));
 	m_TeethTop->SetRotation(glm::vec3(0.0f, 3.14f, 3.14f));
 	m_BracesBottom = CreateRef<GameObject>(m_BracesModel.get(), bracesMaterial);
-	m_BracesBottom->SetScale(15.0f);
-	m_BracesBottom->SetPosition(glm::vec3(0.0f, 50.0f, 0.0f));
 	m_BracesBottom->SetRotation(glm::vec3(0.0f, 3.14f, 0.0f));
 	m_BracesTop = CreateRef<GameObject>(m_BracesModel.get(), bracesMaterial);
-	m_BracesTop->SetScale(15.0f);
-	m_BracesTop->SetPosition(glm::vec3(0.0f, 65.0f, 0.0f));
 	m_BracesTop->SetRotation(glm::vec3(0.0f, 3.14f, 3.14f));
 	
+	m_MouthBase = CreateRef<GameObject>(nullptr, nullptr);
+	m_MouthBase->SetScale(15.0f);
+	m_MouthBase->SetPosition(glm::vec3(0.0f, 50.0f, 0.0f));
+	m_MouthBase->SetRotation(glm::vec3(0.0f, 3.14f, 0.0f));
 
 	m_GameObjects["Sphere"] = m_Sphere;
 	m_GameObjects["Tree"] = m_Tree;
@@ -293,6 +285,7 @@ GameLayer::GameLayer()
 	m_GameObjects["Teeth top"] = m_TeethTop;
 	m_GameObjects["Braces bottom"] = m_BracesBottom;
 	m_GameObjects["Braces top"] = m_BracesTop;
+	m_GameObjects["Mouth base"] = m_MouthBase;
 }
 
 void GameLayer::OnUpdate(const float dt)
@@ -335,6 +328,20 @@ void GameLayer::OnUpdate(const float dt)
 		}
 	}
 #endif
+
+	m_BracesBottom->SetScale(m_MouthBase->GetScale());
+	m_BracesTop->SetScale(m_MouthBase->GetScale());
+	m_TeethBottom->SetScale(m_MouthBase->GetScale());
+	m_TeethTop->SetScale(m_MouthBase->GetScale());
+	m_GumsBottom->SetScale(m_MouthBase->GetScale());
+	m_GumsTop->SetScale(m_MouthBase->GetScale());
+	const glm::vec3 offset(0.0f, m_MouthBase->GetScale().y, 0.0f);
+	m_BracesBottom->SetPosition(m_MouthBase->GetPosition());
+	m_BracesTop->SetPosition(m_MouthBase->GetPosition() + offset);
+	m_TeethBottom->SetPosition(m_MouthBase->GetPosition());
+	m_TeethTop->SetPosition(m_MouthBase->GetPosition() + offset);
+	m_GumsBottom->SetPosition(m_MouthBase->GetPosition());
+	m_GumsTop->SetPosition(m_MouthBase->GetPosition() + offset);
 
 	for (auto& gameObject : m_GameObjects)
 		gameObject.second->Draw();

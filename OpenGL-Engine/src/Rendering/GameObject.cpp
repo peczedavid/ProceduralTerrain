@@ -19,6 +19,7 @@ GameObject::~GameObject()
 
 void GameObject::Draw()
 {
+	if (m_Model == nullptr) return;
 	m_Material->SetUniforms();
 	m_Material->GetShader()->SetUniform("u_Model", m_Transform);
 	m_Model->Draw();
