@@ -57,6 +57,8 @@ private:
 	Ref<GameObject> m_MouthBase, m_GumsBottom, m_GumsTop, m_TeethBottom, m_TeethTop, m_BracesBottom, m_BracesTop;
 	std::unordered_map<std::string, Ref<GameObject>> m_GameObjects;
 
+	float m_MouthRotation = 0.0f;
+
 	glm::vec4 m_SunDirection = glm::vec4(0.254f, 0.341f, 0.905f, 0.0f);
 	float m_Time = 0.0f;
 	glm::vec2 m_FogData = glm::vec2(0.002f, 2.5f);

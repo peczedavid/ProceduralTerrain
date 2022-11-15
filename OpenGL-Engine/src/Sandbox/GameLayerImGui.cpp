@@ -242,6 +242,8 @@ void GameLayerImGui::GraphicsSettingsPanel()
 		{
 			m_GameLayer->ToggleCamera();
 		}
+		// TODO: remove
+		ImGui::SliderFloat("Mouth", &m_GameLayer->m_MouthRotation, 0.0f, glm::pi<float>() / 6.0f);
 	}
 	ImGui::End();
 }

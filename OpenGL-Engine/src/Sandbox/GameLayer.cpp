@@ -343,6 +343,13 @@ void GameLayer::OnUpdate(const float dt)
 	m_GumsBottom->SetPosition(m_MouthBase->GetPosition());
 	m_GumsTop->SetPosition(m_MouthBase->GetPosition() + offset);
 
+	m_GumsBottom->SetRotation(glm::vec3(-m_MouthRotation, 3.14f, 0.0f));
+	m_GumsTop->SetRotation(glm::vec3(m_MouthRotation, 3.14f, 3.14f));
+	m_TeethBottom->SetRotation(glm::vec3(-m_MouthRotation, 3.14f, 0.0f));
+	m_TeethTop->SetRotation(glm::vec3(m_MouthRotation, 3.14f, 3.14f));
+	m_BracesBottom->SetRotation(glm::vec3(-m_MouthRotation, 3.14f, 0.0f));
+	m_BracesTop->SetRotation(glm::vec3(m_MouthRotation, 3.14f, 3.14f));
+
 	for (auto& gameObject : m_GameObjects)
 		gameObject.second->Draw();
 
