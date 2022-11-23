@@ -1,6 +1,8 @@
 #version 450 core
 precision highp float;
 
+#define M_PI 3.1415926535897932384626433832795
+
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 layout(rgba32f, binding = 0) uniform image2D u_Texture;
 
@@ -28,14 +30,17 @@ void main()
     imageStore(u_Texture, ivec2(fragCoord), fragColor);
 }
 
-float hash1(vec2 v) {
-  v = 50.0 * fract(v * 0.3183099);
-  return fract(v.x * v.y * (v.x + v.y));
+float hash(vec2 v) {
+  v = 100.0 * fract(v * M_PI);
+  return fract(dot(v, v) * v.x);
+  //return fract(v.x * v.y * (v.x + v.y));
 }
 
+// Pythagorean triples
 // 4/5=0.8, 3/5=0.6
+//
 // Rotation matrices so the layered noises have a slight rotational offset
-// Better seams between chunks
+// Better seam at 0
 const mat2 m2 = mat2(0.80, 0.60, -0.60, 0.80);
 const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
 
@@ -46,14 +51,14 @@ const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
 vec3 NoiseDeriv(in vec2 v) {
   vec2 p = floor(v);
   vec2 w = fract(v);
-  vec2 u = w * w * (3.0 - 2.0 * w);
+  vec2 u = w * w * (3.0 - 2.0 * w);   // 3*w^2 - 2*w^3
   vec2 du = 6.0 * w * (1.0 - w);
 
   // Corners
-  float a = hash1(p + vec2(0, 0));
-  float b = hash1(p + vec2(1, 0));
-  float c = hash1(p + vec2(0, 1));
-  float d = hash1(p + vec2(1, 1));
+  float a = hash(p + vec2(0, 0));
+  float b = hash(p + vec2(1, 0));
+  float c = hash(p + vec2(0, 1));
+  float d = hash(p + vec2(1, 1));
 
   float k0 = a;
   float k1 = b - a;
