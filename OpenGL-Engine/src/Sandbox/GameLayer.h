@@ -46,7 +46,7 @@ private:
 	Ref<Grid> m_Grid;
 
 	Ref<Texture2D> m_UVTexture;
-	Ref<Texture2D> m_GroundTexture, m_RockTexture, m_WaterTexture;
+	Ref<Texture2D> m_GroundTexture, m_RockTexture, m_SnowTexture, m_WaterTexture;
 	std::vector<Ref<Texture2D>> m_HeightMaps;
 
 	Ref<Plane> m_GroundPlane, m_WaterPlane;
