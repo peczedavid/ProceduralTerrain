@@ -12,12 +12,14 @@ layout (std140, binding = 2) uniform EnviromentBuffer
 
 out vec4 outColor;
 
+in vec4 v_WorldPos;
 in vec4 v_Normal;
 in vec2 v_TexCoords;
 in float v_Visibility;
 
 uniform sampler2D u_GroundTexture;
 uniform sampler2D u_RockTexture;
+uniform float u_MaxLevel;
 uniform int u_NormalView;
 uniform int u_Shade;
 
@@ -28,9 +30,13 @@ void main()
 	{
 		const vec4 groundColor = texture(u_GroundTexture, v_TexCoords);
 		const vec4 rockColor = texture(u_RockTexture, v_TexCoords);
+		const vec4 snowColor = vec4(1.0, 1.0, 1.0, 1.0);
 		// Rock texture based on steepness 
-		const float lambda = smoothstep(0.525, 0.725, N.y);
-		outColor = mix(rockColor, groundColor, lambda);
+		const float rockLambda = smoothstep(0.525, 0.725, N.y);
+		outColor = mix(rockColor, groundColor, rockLambda);
+		// Snow texture based on height
+		const float snowLambda = smoothstep(0.5, 1.0, v_WorldPos.y / u_MaxLevel);
+		outColor = mix(outColor, snowColor, snowLambda);
 
 		if(u_Shade == 1)
 		{
