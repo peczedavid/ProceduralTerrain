@@ -66,6 +66,7 @@ private:
 
 	int m_TessLevel = 1;
 	float m_MaxHeight = 87.0f;
+	glm::vec2 m_GlobalOffset = glm::vec2(0.0f, 0.0f);
 	bool m_TerrainNormals = false;
 	bool m_ShadeTerrain = true;
 	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;

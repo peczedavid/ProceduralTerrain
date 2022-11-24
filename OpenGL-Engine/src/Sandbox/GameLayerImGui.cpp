@@ -109,6 +109,13 @@ void GameLayerImGui::LandscapePanel()
 	if (ImGui::Begin("Landscape"))
 	{
 		ImGui::SliderFloat("MaxHeight", &m_GameLayer->m_MaxHeight, 0.0f, 300.0f);
+		if(ImGui::DragFloat2("Global offset", &m_GameLayer->m_GlobalOffset[0], 10.0f))
+		{
+			auto& terrainComputeShader = m_GameLayer->m_ShaderLibrary.Get("Terrain compute shader");
+			terrainComputeShader->Use();
+			terrainComputeShader->SetUniform("u_GlobalOffset", m_GameLayer->m_GlobalOffset);
+			m_GameLayer->GenerateTerrain();
+		}
 		ImGui::Checkbox("Normals", &m_GameLayer->m_TerrainNormals);
 		ImGui::Checkbox("Shade", &m_GameLayer->m_ShadeTerrain);
 	}
