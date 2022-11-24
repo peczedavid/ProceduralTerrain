@@ -30,10 +30,8 @@ void main()
     imageStore(u_Texture, ivec2(fragCoord), fragColor);
 }
 
-float hash(vec2 v) {
-  v = 100.0 * fract(v * M_PI);
-  return fract(dot(v, v) * v.x);
-  //return fract(v.x * v.y * (v.x + v.y));
+float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233)))*43758.5453123);
 }
 
 // Pythagorean triples
@@ -55,10 +53,10 @@ vec3 NoiseDeriv(in vec2 v) {
   vec2 du = 6.0 * w * (1.0 - w);
 
   // Corners
-  float a = hash(p + vec2(0, 0));
-  float b = hash(p + vec2(1, 0));
-  float c = hash(p + vec2(0, 1));
-  float d = hash(p + vec2(1, 1));
+  float a = random(p + vec2(0, 0));
+  float b = random(p + vec2(1, 0));
+  float c = random(p + vec2(0, 1));
+  float d = random(p + vec2(1, 1));
 
   float k0 = a;
   float k1 = b - a;
