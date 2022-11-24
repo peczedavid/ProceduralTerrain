@@ -127,6 +127,7 @@ GameLayer::GameLayer()
 	m_RockTexture = CreateRef<Texture2D>("assets/Textures/rock-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_SnowTexture = CreateRef<Texture2D>("assets/Textures/snow-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_WaterTexture = CreateRef<Texture2D>("assets/Textures/water-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_SandTexture = CreateRef<Texture2D>("assets/Textures/sand-texture-2.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_UVTexture = CreateRef<Texture2D>("assets/Textures/uv-texture.png", GL_LINEAR, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 
 	m_FrameBuffer = CreateRef<FrameBuffer>(1, 1);
@@ -310,9 +311,9 @@ void GameLayer::OnUpdate(const float dt)
 #if 1
 	auto terrainShader = m_ShaderLibrary.Get("Terrain shader");
 	terrainShader->Use();
-	m_GroundTexture->Bind(1);
-	m_RockTexture->Bind(2);
-	m_SnowTexture->Bind(3);
+	m_SandTexture->Bind(1);
+	m_SandTexture->Bind(2);
+	m_SandTexture->Bind(3);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);

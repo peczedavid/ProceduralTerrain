@@ -94,11 +94,11 @@ void GameLayerImGui::NoisePanel()
 {
 	if (ImGui::Begin("Noise props"))
 	{
-		ImGui::SliderFloat("Amlitude", &m_GameLayer->m_Amplitude, 0.01f, 1.0f);
-		ImGui::SliderFloat("Frequency", &m_GameLayer->m_Frequency, 0.01f, 5.0f);
-		ImGui::SliderFloat("Gain", &m_GameLayer->m_Gain, 0.01f, 0.5f);
-		ImGui::SliderFloat("Scale", &m_GameLayer->m_Scale, 0.001f, 0.3f);
-		ImGui::SliderFloat2("NoiseOffset", &m_GameLayer->m_NoiseOffset[0], 0.0f, 10.0f);
+		if(ImGui::SliderFloat("Amlitude", &m_GameLayer->m_Amplitude, 0.01f, 1.0f)) m_GameLayer->GenerateTerrain();
+		if(ImGui::SliderFloat("Frequency", &m_GameLayer->m_Frequency, 0.01f, 5.0f)) m_GameLayer->GenerateTerrain();
+		if(ImGui::SliderFloat("Gain", &m_GameLayer->m_Gain, 0.01f, 0.5f)) m_GameLayer->GenerateTerrain();
+		if(ImGui::SliderFloat("Scale", &m_GameLayer->m_Scale, 0.001f, 0.3f)) m_GameLayer->GenerateTerrain();
+		if(ImGui::SliderFloat2("NoiseOffset", &m_GameLayer->m_NoiseOffset[0], 0.0f, 10.0f)) m_GameLayer->GenerateTerrain();
 		if (ImGui::Button("Generate")) m_GameLayer->GenerateTerrain();
 	}
 	ImGui::End();
@@ -255,7 +255,7 @@ void GameLayerImGui::EnviromentPanel()
 		ImGui::SliderFloat3("Sun direction", &m_GameLayer->m_SunDirection[0], -10.0f, 10.f);
 		ImGui::SliderFloat("Fog density", &m_GameLayer->m_FogData[0], 0.0f, 0.01f);
 		ImGui::SliderFloat("Fog gradient", &m_GameLayer->m_FogData[1], 0.0f, 5.f);
-		ImGui::SliderFloat3("Fog color", &m_GameLayer->m_FogColor[0], 0.0f, 1.f);
+		ImGui::ColorEdit3("Fog color", &m_GameLayer->m_FogColor[0], ImGuiColorEditFlags_NoInputs);
 	}
 	ImGui::End();
 }
