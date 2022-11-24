@@ -39,6 +39,7 @@ out float v_Visibility;
 
 uniform vec3 u_CameraPos;
 
+// TODO: LINK THE WEBSITE TO WORD
 vec3 GerstnerWave(vec4 wave, vec3 pos, inout vec3 tangent, inout vec3 binormal)
 {
     const float steepness = wave.z;
