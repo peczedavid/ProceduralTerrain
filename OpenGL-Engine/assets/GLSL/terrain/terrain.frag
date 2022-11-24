@@ -31,12 +31,12 @@ void main()
 	{
 		const vec4 groundColor = texture(u_GroundTexture, v_TexCoords);
 		const vec4 rockColor = texture(u_RockTexture, v_TexCoords);
-		const vec4 snowColor = texture(u_SnowTexture, v_TexCoords);//vec4(1.0, 1.0, 1.0, 1.0);
+		const vec4 snowColor = texture(u_SnowTexture, v_TexCoords);
 		// Rock texture based on steepness 
 		const float rockLambda = smoothstep(0.525, 0.725, N.y);
 		outColor = mix(rockColor, groundColor, rockLambda);
 		// Snow texture based on height
-		const float snowLambda = smoothstep(0.5, 1.0, v_WorldPos.y / u_MaxLevel);
+		const float snowLambda = smoothstep(0.65, 0.85, v_WorldPos.y / u_MaxLevel);
 		outColor = mix(outColor, snowColor, snowLambda);
 
 		if(u_Shade == 1)

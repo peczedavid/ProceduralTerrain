@@ -311,9 +311,9 @@ void GameLayer::OnUpdate(const float dt)
 #if 1
 	auto terrainShader = m_ShaderLibrary.Get("Terrain shader");
 	terrainShader->Use();
-	m_SandTexture->Bind(1);
-	m_SandTexture->Bind(2);
-	m_SandTexture->Bind(3);
+	m_GroundTexture->Bind(1);//m_SandTexture->Bind(1);
+	m_RockTexture->Bind(2);//m_SandTexture->Bind(2);
+	m_SnowTexture->Bind(3);//m_SandTexture->Bind(3);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
@@ -353,8 +353,8 @@ void GameLayer::OnUpdate(const float dt)
 	m_BracesBottom->SetRotation(glm::vec3(-m_MouthRotation, 3.14f, 0.0f));
 	m_BracesTop->SetRotation(glm::vec3(m_MouthRotation, 3.14f, 3.14f));
 
-	for (auto& gameObject : m_GameObjects)
-		gameObject.second->Draw();
+	//for (auto& gameObject : m_GameObjects)
+	//	gameObject.second->Draw();
 
 #if 1
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
