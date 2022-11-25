@@ -50,9 +50,7 @@ const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
 vec3 NoiseDeriv(in vec2 v) {
   vec2 p = floor(v);
   vec2 w = fract(v);
-  //vec2 u = w * w * (3.0 - 2.0 * w);
   vec2 u = w*w*w*(w*(w*6.-15.)+10.); // Quintic interpolation curve
-  //vec2 du = 6.0 * w * (1.0 - w);
   vec2 du = 30.0*(w-1)*(w-1)*w*w;
 
   // Corners
@@ -66,9 +64,10 @@ vec3 NoiseDeriv(in vec2 v) {
   float k2 = c - a;
   float k4 = a - b - c + d;
 
-  return vec3(
-    -1.0 + 2.0 * (k0 + k1 * u.x + k2 * u.y + k4 * u.x * u.y),
-     2.0 * du * vec2(k1 + k4 * u.y, k2 + k4 * u.x));
+  float noiseValue = k0 + k1 * u.x + k2 * u.y + k4 * u.x * u.y;
+  vec2 noiseDeriv = du * vec2(k1 + k4 * u.y, k2 + k4 * u.x);
+
+  return vec3(2.0 * noiseValue - 1.0,  2.0 * noiseDeriv);
 }
 
 #define OCTAVES 8
@@ -77,6 +76,7 @@ vec3 FractBrownNoiseDeriv(in vec2 x) {
   float b = u_Amplitude;
   vec2 d = vec2(0.0);
   mat2 m = mat2(1.0, 0.0, 0.0, 1.0);
+
   for (int i = 0; i < OCTAVES; i++)
   {
     vec3 n = NoiseDeriv(x + u_NoiseOffset);
