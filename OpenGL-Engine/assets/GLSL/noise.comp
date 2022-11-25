@@ -50,8 +50,10 @@ const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
 vec3 NoiseDeriv(in vec2 v) {
   vec2 p = floor(v);
   vec2 w = fract(v);
-  vec2 u = w * w * (3.0 - 2.0 * w);   // 3*w^2 - 2*w^3
-  vec2 du = 6.0 * w * (1.0 - w);
+  //vec2 u = w * w * (3.0 - 2.0 * w);
+  vec2 u = w*w*w*(w*(w*6.-15.)+10.); // Quintic interpolation curve
+  //vec2 du = 6.0 * w * (1.0 - w);
+  vec2 du = 30.0*(w-1)*(w-1)*w*w;
 
   // Corners
   float a = random(p + vec2(0, 0));
