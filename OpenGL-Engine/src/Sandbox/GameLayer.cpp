@@ -311,9 +311,12 @@ void GameLayer::OnUpdate(const float dt)
 #if 1
 	auto terrainShader = m_ShaderLibrary.Get("Terrain shader");
 	terrainShader->Use();
-	m_GroundTexture->Bind(1);//m_SandTexture->Bind(1);
-	m_RockTexture->Bind(2);//m_SandTexture->Bind(2);
-	m_SnowTexture->Bind(3);//m_SandTexture->Bind(3);
+	m_GroundTexture->Bind(1);
+	m_RockTexture->Bind(2);
+	m_SnowTexture->Bind(3);
+	//m_SandTexture->Bind(1);
+	//m_SandTexture->Bind(2);
+	//m_SandTexture->Bind(3);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
@@ -512,6 +515,20 @@ void GameLayer::GenerateTerrain()
 
 void GameLayer::UpdateFPS(const float dt)
 {
+	{
+		static float t = 0.0f;
+		t += dt;
+		if (t > 5.0f)
+		{
+			static float sumFPS = 0.0f;
+			static uint32_t countFPS = 0u;
+			sumFPS += m_FPS;
+			countFPS++;
+			if (countFPS % 10000)
+				TRACE("Average FPS = %d", int(sumFPS / countFPS));
+		}
+	}
+
 	static float lastFPSUpdate = 0.0f;
 	static float sumDt = 0.0f;
 	static uint32_t numFrames = 0u;

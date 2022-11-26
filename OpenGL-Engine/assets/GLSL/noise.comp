@@ -35,14 +35,6 @@ float random(vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233)))*43758.5453123);
 }
 
-// Pythagorean triples
-// 4/5=0.8, 3/5=0.6
-//
-// Rotation matrices so the layered noises have a slight rotational offset
-// Better seam at 0
-const mat2 m2 = mat2(0.80, 0.60, -0.60, 0.80);
-const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
-
 // return:
 // x: noise value
 // y: v.x partial derivative
@@ -51,7 +43,7 @@ vec3 NoiseDeriv(in vec2 v) {
   vec2 p = floor(v);
   vec2 w = fract(v);
   vec2 u = w*w*w*(w*(w*6.-15.)+10.); // Quintic interpolation curve
-  vec2 du = 30.0*(w-1)*(w-1)*w*w;
+  vec2 du = 30.0*(w-1)*(w-1)*w*w; // Derivative of u
 
   // Corners
   float a = random(p + vec2(0, 0));
@@ -80,11 +72,11 @@ vec3 FractBrownNoiseDeriv(in vec2 x) {
   for (int i = 0; i < OCTAVES; i++)
   {
     vec3 n = NoiseDeriv(x + u_NoiseOffset);
-    a += b * n.x;              // accumulate values
-    d += b * m * n.yz;         // accumulate derivatives
-    b *= u_Gain;               // decrease amplitude every octave
-    x = u_Frequency * m2 * x;
-    m = u_Frequency * m2i * m;
+    a += b * n.x;       // accumulate values
+    d += b * m * n.yz;  // accumulate derivatives
+    b *= u_Gain;        // decrease amplitude every octave
+    x *= u_Frequency;   // increase frequency 
+    m *= u_Frequency;   // rotate m so the layers don't stack up
   }
 
   return vec3(a, d);
