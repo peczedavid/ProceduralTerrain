@@ -499,6 +499,7 @@ void GameLayer::GenerateTerrain()
 	terrainComputeShader->SetUniform("u_Scale", m_Scale);
 	terrainComputeShader->SetUniform("u_NoiseOffset", m_NoiseOffset);
 
+	auto start = std::chrono::high_resolution_clock::now();
 	for (int z = -1; z <= 1; z++)
 	{
 		for (int x = -1; x <= 1; x++)
@@ -508,9 +509,12 @@ void GameLayer::GenerateTerrain()
 			const uint32_t height = m_HeightMaps[index]->GetHeight();
 			terrainComputeShader->SetUniform("u_WorldOffset", glm::vec2(x * ((int)width - 1), z * ((int)height - 1)));
 			m_HeightMaps[index]->BindImage();
-			terrainComputeShader->Dispatch(glm::uvec3(ceil(width / 16), ceil(height / 16), 1));
+			terrainComputeShader->Dispatch(glm::uvec3(ceil(width / 32), ceil(height / 32), 1));
 		}
 	}
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+	TRACE("Generation: %llu us", duration.count());
 }
 
 void GameLayer::UpdateFPS(const float dt)
