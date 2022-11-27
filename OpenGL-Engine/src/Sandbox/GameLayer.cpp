@@ -189,6 +189,7 @@ GameLayer::GameLayer()
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, 2, m_EnviromentUBO, 0, enviromentUBOSize);
 
+#if 0
 	m_SphereModel = CreateRef<Model>("assets/Models/sphere.obj");
 	m_TeapotModel = CreateRef<Model>("assets/Models/teapot.obj");
 	m_MonkeyModel = CreateRef<Model>("assets/Models/monkey.obj");
@@ -288,6 +289,7 @@ GameLayer::GameLayer()
 	m_GameObjects["Braces bottom"] = m_BracesBottom;
 	m_GameObjects["Braces top"] = m_BracesTop;
 	m_GameObjects["Mouth base"] = m_MouthBase;
+#endif
 }
 
 void GameLayer::OnUpdate(const float dt)
@@ -311,12 +313,12 @@ void GameLayer::OnUpdate(const float dt)
 #if 1
 	auto terrainShader = m_ShaderLibrary.Get("Terrain shader");
 	terrainShader->Use();
-	m_GroundTexture->Bind(1);
-	m_RockTexture->Bind(2);
-	m_SnowTexture->Bind(3);
-	//m_SandTexture->Bind(1);
-	//m_SandTexture->Bind(2);
-	//m_SandTexture->Bind(3);
+	//m_GroundTexture->Bind(1);
+	//m_RockTexture->Bind(2);
+	//m_SnowTexture->Bind(3);
+	m_SandTexture->Bind(1);
+	m_SandTexture->Bind(2);
+	m_SandTexture->Bind(3);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
@@ -335,6 +337,7 @@ void GameLayer::OnUpdate(const float dt)
 	}
 #endif
 
+#if 0
 	m_BracesBottom->SetScale(m_MouthBase->GetScale());
 	m_BracesTop->SetScale(m_MouthBase->GetScale());
 	m_TeethBottom->SetScale(m_MouthBase->GetScale());
@@ -356,8 +359,9 @@ void GameLayer::OnUpdate(const float dt)
 	m_BracesBottom->SetRotation(glm::vec3(-m_MouthRotation, 3.14f, 0.0f));
 	m_BracesTop->SetRotation(glm::vec3(m_MouthRotation, 3.14f, 3.14f));
 
-	//for (auto& gameObject : m_GameObjects)
-	//	gameObject.second->Draw();
+	for (auto& gameObject : m_GameObjects)
+		gameObject.second->Draw();
+#endif
 
 #if 1
 	auto waterShader = m_ShaderLibrary.Get("Water shader");
@@ -528,8 +532,8 @@ void GameLayer::UpdateFPS(const float dt)
 			static uint32_t countFPS = 0u;
 			sumFPS += m_FPS;
 			countFPS++;
-			if (countFPS % 10000)
-				TRACE("Average FPS = %d", int(sumFPS / countFPS));
+			//if (countFPS % 10000)
+			//	TRACE("Average FPS = %d", int(sumFPS / countFPS));
 		}
 	}
 
