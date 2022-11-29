@@ -24,6 +24,11 @@ uniform float u_MaxLevel;
 uniform int u_NormalView;
 uniform int u_Shade;
 
+uniform float u_RockScale;
+uniform float u_RockLevel;
+uniform float u_SnowScale;
+uniform float u_SnowLevel;
+
 float QuinticSmoothStep(float edge0, float edge1, float x)
 {
 	float t = clamp((x - edge0) / (edge1 - edge0),0.0, 1.0);
@@ -39,10 +44,10 @@ void main()
 		const vec4 rockColor = texture(u_RockTexture, v_TexCoords);
 		const vec4 snowColor = texture(u_SnowTexture, v_TexCoords);
 		// Rock texture based on steepness 
-		const float rockLambda = QuinticSmoothStep(0.525, 0.725, N.y);
+		const float rockLambda = QuinticSmoothStep(u_RockLevel, u_RockLevel + u_RockScale, N.y);
 		outColor = mix(rockColor, groundColor, rockLambda);
 		// Snow texture based on height
-		const float snowLambda = QuinticSmoothStep(0.65, 0.85, v_WorldPos.y / u_MaxLevel);
+		const float snowLambda = QuinticSmoothStep(u_SnowLevel, u_SnowLevel + u_SnowScale, v_WorldPos.y / u_MaxLevel);
 		outColor = mix(outColor, snowColor, snowLambda);
 
 		if(u_Shade == 1)

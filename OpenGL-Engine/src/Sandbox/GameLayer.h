@@ -65,12 +65,12 @@ private:
 	glm::vec2 m_FogData = glm::vec2(0.001f, 2.5f);
 	glm::vec4 m_FogColor = glm::vec4(0.4f, 0.5f, 0.6f, 1.0f);
 
-	int m_TessLevel = 1;
+	float m_RockScale = 0.15f, m_RockLevel = 0.486f;
+	float m_SnowScale = 0.2f, m_SnowLevel = 0.65f;
 	float m_MaxHeight = 87.0f;
 	glm::vec2 m_GlobalOffset = glm::vec2(0.0f, 0.0f);
 	bool m_TerrainNormals = false;
 	bool m_ShadeTerrain = true;
-	float m_GrassLevel = 0.0f, m_RockLevel = 0.094f, m_SnowLevel = 0.661f;
 
 	float m_Gain = 0.245f, m_Lacunarity = 1.184f, m_Amplitude = 0.385f, m_Frequency = 2.776f;
 	float m_Scale = 0.100f;

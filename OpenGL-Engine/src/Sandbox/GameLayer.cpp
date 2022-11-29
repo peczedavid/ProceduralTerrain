@@ -327,7 +327,10 @@ void GameLayer::OnUpdate(const float dt)
 		m_SnowTexture->Bind(3);
 	}
 	
-	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
+	terrainShader->SetUniform("u_RockScale", m_RockScale);
+	terrainShader->SetUniform("u_RockLevel", m_RockLevel);
+	terrainShader->SetUniform("u_SnowScale", m_SnowScale);
+	terrainShader->SetUniform("u_SnowLevel", m_SnowLevel);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);
 	terrainShader->SetUniform("u_Shade", m_ShadeTerrain ? 1 : 0);

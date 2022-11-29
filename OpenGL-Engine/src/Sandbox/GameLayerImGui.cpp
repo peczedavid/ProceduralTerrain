@@ -116,6 +116,12 @@ void GameLayerImGui::LandscapePanel()
 			terrainComputeShader->SetUniform("u_GlobalOffset", m_GameLayer->m_GlobalOffset);
 			m_GameLayer->GenerateTerrain();
 		}
+
+		ImGui::SliderFloat("Rock level", &m_GameLayer->m_RockLevel, 0.0f, 1.0f);
+		ImGui::SliderFloat("Rock scale", &m_GameLayer->m_RockScale, 0.0f, 1.0f);
+		ImGui::SliderFloat("Snow level", &m_GameLayer->m_SnowLevel, 0.0f, 1.0f);
+		ImGui::SliderFloat("Snow scale", &m_GameLayer->m_SnowScale, 0.0f, 1.0f);
+
 		ImGui::Checkbox("Normals", &m_GameLayer->m_TerrainNormals);
 		ImGui::Checkbox("Shade", &m_GameLayer->m_ShadeTerrain);
 		if (ImGui::Checkbox("Desert", &m_GameLayer->m_UseSandTextures))

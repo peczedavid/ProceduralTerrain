@@ -52,6 +52,7 @@ vec3 NoiseDeriv(in vec2 v) {
   float d = random(p + vec2(1, 1));
 
   // Helper variables
+  // Assure connectivity along edges
   float k0 = a;
   float k1 = b - a;
   float k2 = c - a;
@@ -64,6 +65,12 @@ vec3 NoiseDeriv(in vec2 v) {
   return vec3(2.0 * noiseValue - 1.0,  2.0 * noiseDeriv);
 }
 
+// 4/5=0.8, 3/5=0.6
+// Rotation matrices so the layered noises have a slight rotational offset
+// Better seams between chunks
+const mat2 m2 = mat2(0.80, 0.60, -0.60, 0.80);
+const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
+
 #define OCTAVES 8
 vec3 FractBrownNoiseDeriv(in vec2 x) {
   float a = 0.0;
@@ -74,11 +81,11 @@ vec3 FractBrownNoiseDeriv(in vec2 x) {
   for (int i = 0; i < OCTAVES; i++)
   {
     vec3 n = NoiseDeriv(x + u_NoiseOffset);
-    a += b * n.x;       // accumulate values
-    d += b * m * n.yz;  // accumulate derivatives
-    b *= u_Gain;        // decrease amplitude every octave
-    x *= u_Frequency;   // increase frequency 
-    m *= u_Frequency;   // rotate m so the layers don't stack up
+    a += b * n.x;               // accumulate values
+    d += b * m * n.yz;          // accumulate derivatives
+    b *= u_Gain;                // decrease amplitude every octave
+    x = u_Frequency * m2 * x;   // increase frequency 
+    m = u_Frequency * m2i * m;  // rotate m so the layers don't stack up
   }
 
   return vec3(a, d);
