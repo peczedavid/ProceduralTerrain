@@ -51,11 +51,13 @@ vec3 NoiseDeriv(in vec2 v) {
   float c = random(p + vec2(0, 1));
   float d = random(p + vec2(1, 1));
 
+  // Helper variables
   float k0 = a;
   float k1 = b - a;
   float k2 = c - a;
   float k4 = a - b - c + d;
 
+  // Interpolation
   float noiseValue = k0 + k1 * u.x + k2 * u.y + k4 * u.x * u.y;
   vec2 noiseDeriv = du * vec2(k1 + k4 * u.y, k2 + k4 * u.x);
 
