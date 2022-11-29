@@ -313,12 +313,20 @@ void GameLayer::OnUpdate(const float dt)
 #if 1
 	auto terrainShader = m_ShaderLibrary.Get("Terrain shader");
 	terrainShader->Use();
-	//m_GroundTexture->Bind(1);
-	//m_RockTexture->Bind(2);
-	//m_SnowTexture->Bind(3);
-	m_SandTexture->Bind(1);
-	m_SandTexture->Bind(2);
-	m_SandTexture->Bind(3);
+
+	if (m_UseSandTextures)
+	{
+		m_SandTexture->Bind(1);
+		m_SandTexture->Bind(2);
+		m_SandTexture->Bind(3);
+	}
+	else
+	{
+		m_GroundTexture->Bind(1);
+		m_RockTexture->Bind(2);
+		m_SnowTexture->Bind(3);
+	}
+	
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_MaxLevel", m_MaxHeight);
 	terrainShader->SetUniform("u_NormalView", m_TerrainNormals ? 1 : 0);

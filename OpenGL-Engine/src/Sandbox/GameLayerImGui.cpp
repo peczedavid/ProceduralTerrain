@@ -118,6 +118,17 @@ void GameLayerImGui::LandscapePanel()
 		}
 		ImGui::Checkbox("Normals", &m_GameLayer->m_TerrainNormals);
 		ImGui::Checkbox("Shade", &m_GameLayer->m_ShadeTerrain);
+		if (ImGui::Checkbox("Desert", &m_GameLayer->m_UseSandTextures))
+		{
+			if (m_GameLayer->m_UseSandTextures)
+			{
+				m_GameLayer->m_FogColor = glm::vec4(0.6f, 0.5f, 0.4f, 1.0f);
+			}
+			else
+			{
+				m_GameLayer->m_FogColor = glm::vec4(0.4f, 0.5f, 0.6f, 1.0f);
+			}
+		}
 	}
 	ImGui::End();
 }

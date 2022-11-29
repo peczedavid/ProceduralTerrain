@@ -45,6 +45,7 @@ private:
 	Ref<Axis> m_Axis;
 	Ref<Grid> m_Grid;
 
+	bool m_UseSandTextures = false;
 	Ref<Texture2D> m_UVTexture;
 	Ref<Texture2D> m_GroundTexture, m_RockTexture, m_SnowTexture, m_SandTexture, m_WaterTexture;
 	std::vector<Ref<Texture2D>> m_HeightMaps;
@@ -61,7 +62,7 @@ private:
 
 	glm::vec4 m_SunDirection = glm::vec4(0.254f, 0.341f, 0.905f, 0.0f);
 	float m_Time = 0.0f;
-	glm::vec2 m_FogData = glm::vec2(0.002f, 2.5f);
+	glm::vec2 m_FogData = glm::vec2(0.001f, 2.5f);
 	glm::vec4 m_FogColor = glm::vec4(0.4f, 0.5f, 0.6f, 1.0f);
 
 	int m_TessLevel = 1;
