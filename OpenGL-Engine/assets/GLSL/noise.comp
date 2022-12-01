@@ -39,11 +39,12 @@ float random(vec2 st) {
 // x: noise value
 // y: v.x partial derivative
 // z: v.y partial derivative
+// 2D version of: vec4 noised( in vec3 x ), from https://iquilezles.org/articles/morenoise/
 vec3 NoiseDeriv(in vec2 v) {
   vec2 p = floor(v);
   vec2 w = fract(v);
   vec2 u = w*w*w*(w*(w*6.-15.)+10.); // Quintic interpolation curve
-  vec2 du = 30.0*(w-1)*(w-1)*w*w; // Derivative of u
+  vec2 du = 30.0*w*w*(w*(w-2.0)+1.0); // Derivative of quintic interpolation curve 
 
   // Corners
   float a = random(p + vec2(0, 0));
@@ -58,7 +59,7 @@ vec3 NoiseDeriv(in vec2 v) {
   float k2 = c - a;
   float k4 = a - b - c + d;
 
-  // Interpolation
+  // Bilinear interpolation
   float noiseValue = k0 + k1 * u.x + k2 * u.y + k4 * u.x * u.y;
   vec2 noiseDeriv = du * vec2(k1 + k4 * u.y, k2 + k4 * u.x);
 
@@ -73,20 +74,27 @@ const mat2 m2i = mat2(0.80, -0.60, 0.60, 0.80);
 
 #define OCTAVES 8
 vec3 FractBrownNoiseDeriv(in vec2 x) {
-  float a = 0.0;
-  float b = u_Amplitude;
-  vec2 d = vec2(0.0);
-  mat2 m = mat2(1.0, 0.0, 0.0, 1.0);
+  float value = 0.0;
+  float amplitude = u_Amplitude;
+  vec2 derivatives = vec2(0.0);
+  mat2 rotOffset = mat2(1.0, 0.0, 0.0, 1.0);
 
   for (int i = 0; i < OCTAVES; i++)
   {
-    vec3 n = NoiseDeriv(x + u_NoiseOffset);
-    a += b * n.x;               // accumulate values
-    d += b * m * n.yz;          // accumulate derivatives
-    b *= u_Gain;                // decrease amplitude every octave
-    x = u_Frequency * m2 * x;   // increase frequency 
-    m = u_Frequency * m2i * m;  // rotate m so the layers don't stack up
+    // Get the noise data
+    vec3 noiseData = NoiseDeriv(x + u_NoiseOffset);
+    // Accumulate values
+    value += amplitude * noiseData.x;
+    // Accumulate derivatives
+    derivatives += amplitude * rotOffset * noiseData.yz;
+    // Decrease amplitude every octave
+    amplitude *= u_Gain;
+    // Increase frequency every octave with a small rotational offset
+    // so the domains don't align
+    x = u_Frequency * m2 * x;
+    // Change the rotation every octave for more variety
+    rotOffset = u_Frequency * m2i * rotOffset;
   }
 
-  return vec3(a, d);
+  return vec3(value, derivatives);
 }
