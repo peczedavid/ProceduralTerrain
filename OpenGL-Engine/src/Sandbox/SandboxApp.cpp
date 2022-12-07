@@ -2,6 +2,7 @@
 
 #include "Core/Application.h"
 #include "Sandbox/GameLayer.h"
+#include "Sandbox/ClothSimulation/ClothSimulationLayer.h"
 
 class Sandbox : public Application
 {
@@ -9,8 +10,10 @@ public:
 	Sandbox(const WindowProps& props)
 		: Application(props)
 	{
-		TRACE("Pushing GameLayer");
-		this->PushLayer(new GameLayer());
+		/*TRACE("Pushing GameLayer");
+		this->PushLayer(new GameLayer());*/
+		TRACE("Pushing ClothSimulationLayer");
+		this->PushLayer(new ClothSimulationLayer());
 	}
 
 	~Sandbox()
