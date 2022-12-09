@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "Rendering/Renderer.h"
+#include <Rendering/Texture2D.h>
 
 bool Renderer::DebugView = false;
 bool Renderer::WireFrame = false;
@@ -25,12 +26,15 @@ static void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum s
 	}
 }
 
+Ref<Texture2D> Renderer::s_PlaceHolderTexture;
+
 void Renderer::Initialize()
 {
 	SetOpenGLConfig();
 	glDebugMessageCallback(DebugMessageCallback, nullptr);
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	s_PlaceHolderTexture = CreateRef<Texture2D>("assets/Textures/placeholder.png", GL_NEAREST, GL_REPEAT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 }
 
 void Renderer::TogglePolygonMode()

@@ -12,6 +12,7 @@
 #include "Rendering/Geometry/FullscreenQuad.h"
 #include "Rendering/GameObject.h"
 #include "Rendering/Material.h"
+#include <Sandbox/ClothSimulation/Planet.h>
 
 class ClothSimulationLayer : public Layer
 {
@@ -45,7 +46,9 @@ private:
 	Ref<Texture2D> m_UVTexture;
 
 	Ref<Model> m_MonkeyModel, m_TeapotModel;
+	Ref<Model> m_SphereModel;
 	std::unordered_map<std::string, Ref<GameObject>> m_GameObjects;
+	std::vector<Ref<Planet>> m_Planets;
 
 	glm::vec4 m_SunDirection = glm::vec4(0.254f, 0.341f, 0.905f, 0.0f);
 	float m_Time = 0.0f;

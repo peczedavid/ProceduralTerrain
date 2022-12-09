@@ -17,6 +17,10 @@ GameObject::~GameObject()
 {
 }
 
+void GameObject::Update(float dt)
+{
+}
+
 void GameObject::Draw()
 {
 	if (m_Model == nullptr) return;

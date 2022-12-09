@@ -12,6 +12,8 @@ public:
 	GameObject operator=(const GameObject&) = delete;
 	~GameObject();
 
+	virtual void Update(float dt);
+
 	void Draw();
 	
 	void Set(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale);

@@ -15,8 +15,6 @@ public:
 	void ShadersPanel();
 	void GraphicsSettingsPanel();
 	void DebugOverlayPanel();
-public:
-	static Ref<Texture2D> s_PlaceHolderTexture;
 private:
 	ClothSimulationLayer* m_Layer;
 	GameObject* m_SelectedObject = nullptr;

@@ -17,7 +17,7 @@ ClothSimulationLayer::ClothSimulationLayer()
 		"assets/GLSL/pbr/pbr.frag"
 	));
 
-	m_Camera = CreateRef<FPSCamera>(glm::vec3(0, 64, 0), glm::vec3(0, -0.45f, -1.0f));
+	m_Camera = CreateRef<FPSCamera>(glm::vec3(0, 10, 30), glm::vec3(0, -0.45f, -1.0f));
 	m_Camera->Resize(1, 1);
 	m_TrackballCamera = CreateRef<TrackballCamera>(192.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	m_TrackballCamera->Resize(1, 1);
@@ -61,6 +61,35 @@ ClothSimulationLayer::ClothSimulationLayer()
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, 2, m_EnviromentUBO, 0, enviromentUBOSize);
 
+	const auto& pbrShader = m_ShaderLibrary.Get("PBR shader");
+
+	m_SphereModel = CreateRef<Model>("assets/Models/sphere.obj");
+
+	Ref<PBRMaterial> whitePBRmaterial = CreateRef<PBRMaterial>();
+	whitePBRmaterial->SetShader(pbrShader);
+	Ref<PBRMaterial> greenPBRMaterial = CreateRef<PBRMaterial>();
+	greenPBRMaterial->SetShader(pbrShader);
+	greenPBRMaterial->Albedo = glm::vec3(0.35f, 0.6f, 0.15f);
+
+	PlanetData planetData1;
+	planetData1.Radius = 10.0f;
+	planetData1.Mass = 300.0f;
+	Ref<Planet> planet1 = CreateRef<Planet>(m_SphereModel.get(), whitePBRmaterial, planetData1);
+	planet1->SetScale(10.0f);
+	planet1->SetPosition(glm::vec3(-20.0f, 5.0f, 0.0f));
+
+	PlanetData planetData2;
+	planetData2.Radius = 10.0f;
+	planetData2.Velocity = glm::vec3(0.0f, 0.0f, -1.0f);
+	Ref<Planet> planet2 = CreateRef<Planet>(m_SphereModel.get(), greenPBRMaterial, planetData2);
+	planet2->SetScale(10.0f);
+	planet2->SetPosition(glm::vec3(20.0f, 5.0f, 0.0f));
+
+
+	m_GameObjects["Planet 1"] = planet1;
+	m_GameObjects["Planet 2"] = planet2;
+	m_Planets.push_back(planet1);
+	m_Planets.push_back(planet2);
 }
 
 void ClothSimulationLayer::OnUpdate(const float dt)
@@ -76,6 +105,15 @@ void ClothSimulationLayer::OnUpdate(const float dt)
 	m_ActiveCamera->Update(dt);
 
 	SetUniformBuffers();
+
+	for (auto& planet : m_Planets)
+		planet->UpdateVelocity(m_Planets, dt);
+
+	for (auto& planet : m_Planets)
+		planet->UpdatePosition(dt);
+
+	for (auto& gameObject : m_GameObjects)
+		gameObject.second->Draw();
 
 	m_Skybox->Render();
 
